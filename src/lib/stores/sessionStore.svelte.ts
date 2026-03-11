@@ -21,6 +21,7 @@ class SessionStoreState {
 	isLoadingSessions = $state(false);
 	isLoadingDetail = $state(false);
 	isRefreshingProjects = $state(false);
+	isRefreshingSessions = $state(false);
 	projectsError = $state<string | null>(null);
 	sessionsError = $state<string | null>(null);
 	detailError = $state<string | null>(null);
@@ -103,7 +104,11 @@ class SessionStoreState {
 
 	async loadSessions(folder: string) {
 		console.log('[sessionStore] Loading sessions for:', folder);
-		this.isLoadingSessions = true;
+		if (this.sessionList && this.selectedProject === folder) {
+			this.isRefreshingSessions = true;
+		} else {
+			this.isLoadingSessions = true;
+		}
 		this.sessionsError = null;
 		this.selectedProject = folder;
 		this.selectedSessionId = null;
@@ -118,6 +123,7 @@ class SessionStoreState {
 			console.error('[sessionStore] Failed to load sessions:', e);
 		} finally {
 			this.isLoadingSessions = false;
+			this.isRefreshingSessions = false;
 		}
 	}
 
