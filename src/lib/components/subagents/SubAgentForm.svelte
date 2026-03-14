@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { CreateSubAgentRequest, SubAgent } from '$lib/types';
 	import { parseSubAgentMarkdown, type ParsedSubAgent } from '$lib/utils/markdownParser';
+	import * as m from '$lib/paraglide/messages.js';
 	import { Clipboard, Check, AlertCircle, FileUp } from 'lucide-svelte';
 
 	type Props = {
@@ -39,7 +40,7 @@
 		if (subagent.tags) tagsInput = subagent.tags.join(', ');
 
 		importStatus = 'success';
-		importMessage = subagent.name ? `Imported "${subagent.name}"` : 'Content imported';
+		importMessage = subagent.name ? m.subagent_imported_name({ name: subagent.name }) : m.subagent_content_imported();
 
 		setTimeout(() => {
 			importStatus = 'idle';
@@ -71,7 +72,7 @@
 				applyParsedSubAgent(result.data);
 			} else {
 				importStatus = 'error';
-				importMessage = result.error ?? 'Could not parse clipboard content';
+				importMessage = result.error ?? m.subagent_parse_clipboard_error();
 				setTimeout(() => {
 					importStatus = 'idle';
 					importMessage = '';
@@ -79,7 +80,7 @@
 			}
 		} catch {
 			importStatus = 'error';
-			importMessage = 'Could not access clipboard';
+			importMessage = m.subagent_clipboard_access_error();
 			setTimeout(() => {
 				importStatus = 'idle';
 				importMessage = '';
@@ -103,7 +104,7 @@
 					applyParsedSubAgent(result.data);
 				} else {
 					importStatus = 'error';
-					importMessage = result.error ?? 'Could not parse file';
+					importMessage = result.error ?? m.subagent_parse_file_error();
 					setTimeout(() => {
 						importStatus = 'idle';
 						importMessage = '';
@@ -111,7 +112,7 @@
 				}
 			} catch {
 				importStatus = 'error';
-				importMessage = 'Could not read file';
+				importMessage = m.subagent_file_read_error();
 				setTimeout(() => {
 					importStatus = 'idle';
 					importMessage = '';
@@ -121,39 +122,39 @@
 		input.click();
 	}
 
-	const modelOptions = [
-		{ value: '', label: 'Default (inherit from parent)' },
-		{ value: 'sonnet', label: 'Sonnet' },
-		{ value: 'opus', label: 'Opus' },
-		{ value: 'haiku', label: 'Haiku' },
-		{ value: 'inherit', label: 'Inherit (use main conversation model)' }
-	];
+	const modelOptions = $derived([
+		{ value: '', label: m.subagent_model_default() },
+		{ value: 'sonnet', label: m.subagent_model_sonnet() },
+		{ value: 'opus', label: m.subagent_model_opus() },
+		{ value: 'haiku', label: m.subagent_model_haiku() },
+		{ value: 'inherit', label: m.subagent_model_inherit() }
+	]);
 
-	const permissionModeOptions = [
-		{ value: '', label: 'Default (standard permission prompting)' },
-		{ value: 'default', label: 'Default' },
-		{ value: 'acceptEdits', label: 'Accept Edits (auto-accepts file edits)' },
-		{ value: 'dontAsk', label: "Don't Ask (skip permission prompts)" },
-		{ value: 'bypassPermissions', label: 'Bypass Permissions (use with caution)' },
-		{ value: 'plan', label: 'Plan (read-only exploration)' },
-		{ value: 'ignore', label: 'Ignore (skip this permission mode)' }
-	];
+	const permissionModeOptions = $derived([
+		{ value: '', label: m.subagent_permission_default() },
+		{ value: 'default', label: m.subagent_permission_default_label() },
+		{ value: 'acceptEdits', label: m.subagent_permission_accept_edits() },
+		{ value: 'dontAsk', label: m.subagent_permission_dont_ask() },
+		{ value: 'bypassPermissions', label: m.subagent_permission_bypass() },
+		{ value: 'plan', label: m.subagent_permission_plan() },
+		{ value: 'ignore', label: m.subagent_permission_ignore() }
+	]);
 
 	function validate(): boolean {
 		errors = {};
 
 		if (!name.trim()) {
-			errors.name = 'Name is required';
+			errors.name = m.validation_name_required();
 		} else if (!/^[a-z][a-z0-9-]*$/.test(name.trim())) {
-			errors.name = 'Name must start with a lowercase letter and contain only lowercase letters, numbers, and hyphens';
+			errors.name = m.validation_name_format();
 		}
 
 		if (!description.trim()) {
-			errors.description = 'Description is required';
+			errors.description = m.validation_description_required();
 		}
 
 		if (!content.trim()) {
-			errors.content = 'Content is required';
+			errors.content = m.validation_content_required();
 		}
 
 		return Object.keys(errors).length === 0;
@@ -221,10 +222,10 @@
 						</p>
 					{:else}
 						<p class="text-sm font-medium text-gray-700 dark:text-gray-300">
-							Import from Markdown
+							{m.subagent_import_markdown()}
 						</p>
 						<p class="text-xs text-gray-500 dark:text-gray-400">
-							Paste or import a <code class="px-1 bg-gray-200 dark:bg-gray-700 rounded">.md</code> file with YAML frontmatter
+							{m.subagent_import_markdown_hint()}
 						</p>
 					{/if}
 				</div>
@@ -236,7 +237,7 @@
 					class="btn btn-secondary text-sm"
 				>
 					<FileUp class="w-4 h-4 mr-1.5" />
-					File
+					{m.hook_import_file()}
 				</button>
 				<button
 					type="button"
@@ -244,7 +245,7 @@
 					class="btn btn-secondary text-sm"
 				>
 					<Clipboard class="w-4 h-4 mr-1.5" />
-					Paste
+					{m.hook_import_paste()}
 				</button>
 			</div>
 		</div>
@@ -253,7 +254,7 @@
 	<!-- Name -->
 	<div>
 		<label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-			Name <span class="text-red-500">*</span>
+			{m.label_name()} <span class="text-red-500">*</span>
 		</label>
 		<input
 			type="text"
@@ -261,13 +262,13 @@
 			bind:value={name}
 			class="input mt-1"
 			class:border-red-500={errors.name}
-			placeholder="my-sub-agent"
+			placeholder={m.placeholder_subagent_name()}
 		/>
 		{#if errors.name}
 			<p class="mt-1 text-sm text-red-500">{errors.name}</p>
 		{:else}
 			<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-				This will be the sub-agent's identifier
+				{m.subagent_name_hint()}
 			</p>
 		{/if}
 	</div>
@@ -275,7 +276,7 @@
 	<!-- Description -->
 	<div>
 		<label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-			Description <span class="text-red-500">*</span>
+			{m.label_description()} <span class="text-red-500">*</span>
 		</label>
 		<textarea
 			id="description"
@@ -283,13 +284,13 @@
 			rows={2}
 			class="input mt-1 resize-none"
 			class:border-red-500={errors.description}
-			placeholder="What this sub-agent does and when to use it"
+			placeholder={m.placeholder_subagent_description()}
 		></textarea>
 		{#if errors.description}
 			<p class="mt-1 text-sm text-red-500">{errors.description}</p>
 		{:else}
 			<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-				Claude uses this to decide when to delegate to this sub-agent
+				{m.subagent_description_hint()}
 			</p>
 		{/if}
 	</div>
@@ -297,7 +298,7 @@
 	<!-- Model -->
 	<div>
 		<label for="model" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-			Model
+			{m.label_model()}
 		</label>
 		<select
 			id="model"
@@ -309,14 +310,14 @@
 			{/each}
 		</select>
 		<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-			Optional model override for this sub-agent
+			{m.subagent_model_hint()}
 		</p>
 	</div>
 
 	<!-- Permission Mode -->
 	<div>
 		<label for="permissionMode" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-			Permission Mode
+			{m.label_permission_mode()}
 		</label>
 		<select
 			id="permissionMode"
@@ -328,48 +329,48 @@
 			{/each}
 		</select>
 		<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-			Controls how the sub-agent handles permission requests
+			{m.subagent_permission_hint()}
 		</p>
 	</div>
 
 	<!-- Tools -->
 	<div>
 		<label for="tools" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-			Allowed Tools
+			{m.label_allowed_tools()}
 		</label>
 		<input
 			type="text"
 			id="tools"
 			bind:value={toolsInput}
 			class="input mt-1"
-			placeholder="Read, Edit, Bash, Glob, Grep"
+			placeholder={m.placeholder_allowed_tools_subagent()}
 		/>
 		<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-			Comma-separated list of tools. Leave empty to inherit all tools from parent.
+			{m.subagent_tools_hint()}
 		</p>
 	</div>
 
 	<!-- Skills -->
 	<div>
 		<label for="skills" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-			Auto-load Skills
+			{m.label_autoload_skills()}
 		</label>
 		<input
 			type="text"
 			id="skills"
 			bind:value={skillsInput}
 			class="input mt-1"
-			placeholder="commit, review-pr, deploy"
+			placeholder={m.placeholder_subagent_skills_list()}
 		/>
 		<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-			Comma-separated list of skills to automatically load when sub-agent starts
+			{m.subagent_skills_hint()}
 		</p>
 	</div>
 
 	<!-- Content -->
 	<div>
 		<label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-			Sub-Agent Prompt <span class="text-red-500">*</span>
+			{m.label_subagent_prompt()} <span class="text-red-500">*</span>
 		</label>
 		<textarea
 			id="content"
@@ -377,23 +378,13 @@
 			rows={12}
 			class="input mt-1 font-mono text-sm resize-y"
 			class:border-red-500={errors.content}
-			placeholder="You are a specialized sub-agent for...
-
-## Your Responsibilities
-
-1. ...
-2. ...
-
-## Guidelines
-
-- ...
-- ..."
+			placeholder={m.placeholder_subagent_prompt_template()}
 		></textarea>
 		{#if errors.content}
 			<p class="mt-1 text-sm text-red-500">{errors.content}</p>
 		{:else}
 			<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-				The system prompt that defines this sub-agent's behavior
+				{m.subagent_prompt_hint()}
 			</p>
 		{/if}
 	</div>
@@ -401,27 +392,27 @@
 	<!-- Tags -->
 	<div>
 		<label for="tags" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-			Tags
+			{m.label_tags()}
 		</label>
 		<input
 			type="text"
 			id="tags"
 			bind:value={tagsInput}
 			class="input mt-1"
-			placeholder="code-review, testing, documentation"
+			placeholder={m.placeholder_subagent_tags()}
 		/>
 		<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-			Comma-separated tags for organization
+			{m.subagent_tags_hint()}
 		</p>
 	</div>
 
 	<!-- Actions -->
 	<div class="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
 		<button type="button" onclick={onCancel} class="btn btn-secondary">
-			Cancel
+			{m.action_cancel()}
 		</button>
 		<button type="submit" class="btn btn-primary" disabled={isSubmitting}>
-			{initialValues.name ? 'Update Sub-Agent' : 'Create Sub-Agent'}
+			{initialValues.name ? m.subagent_update() : m.subagent_create()}
 		</button>
 	</div>
 </form>

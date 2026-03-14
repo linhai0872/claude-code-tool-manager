@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { AlertTriangle } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		open: boolean;
@@ -16,8 +17,8 @@
 		open,
 		title,
 		message,
-		confirmText = 'Confirm',
-		cancelText = 'Cancel',
+		confirmText = m.action_confirm(),
+		cancelText = m.action_cancel(),
 		variant = 'danger',
 		onConfirm,
 		onCancel

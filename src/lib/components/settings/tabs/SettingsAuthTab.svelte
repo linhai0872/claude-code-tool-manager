@@ -3,6 +3,7 @@
 	import { AuthHelpersEditor } from '$lib/components/auth-helpers';
 	import { claudeSettingsLibrary } from '$lib/stores';
 	import type { ClaudeSettingsScope } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 
 	function getSettingCount(scope: ClaudeSettingsScope): number {
 		if (!claudeSettingsLibrary.settings) return 0;
@@ -26,7 +27,7 @@
 	{#snippet children({ settings, save })}
 		<AuthHelpersEditor
 			{settings}
-			onsave={(s) => save(s, 'Auth helper settings saved', 'Failed to save auth helper settings')}
+			onsave={(s) => save(s, m.settings_auth_saved(), m.settings_auth_save_failed())}
 		/>
 	{/snippet}
 </ScopedSettingsWrapper>

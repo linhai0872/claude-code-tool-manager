@@ -2,6 +2,8 @@
 	import type { ClaudeSettings } from '$lib/types';
 	import { UI_TOGGLE_FIELDS } from '$lib/types';
 	import { Save } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
+	import { getUiToggleDescription, getUiToggleLabel } from '$lib/utils/claudeSettingsOptionsI18n';
 
 	type Props = {
 		settings: ClaudeSettings;
@@ -36,8 +38,8 @@
 	}
 
 	function getTriStateLabel(value: boolean | undefined): string {
-		if (value === undefined) return 'Not set';
-		return value ? 'Enabled' : 'Disabled';
+		if (value === undefined) return m.label_not_set();
+		return value ? m.label_enabled() : m.label_disabled();
 	}
 
 	function getTriStateColor(value: boolean | undefined): string {
@@ -64,9 +66,9 @@
 
 <div class="space-y-6">
 	<div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
-		<h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">UI Toggles</h3>
+		<h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">{m.ui_toggles_title()}</h3>
 		<p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-			Control visual and interaction preferences for Claude Code
+			{m.ui_toggles_desc()}
 		</p>
 
 		<div class="space-y-4">
@@ -74,12 +76,12 @@
 				{@const value = values[field.key]}
 				<div class="flex items-center justify-between">
 					<div>
-						<label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-							{field.label}
-						</label>
+						<p class="text-sm font-medium text-gray-700 dark:text-gray-300">
+							{getUiToggleLabel(field.key)}
+						</p>
 						<p class="text-xs text-gray-500 dark:text-gray-400">
-							{field.description}
-							<span class="text-gray-400 dark:text-gray-500">(default: {field.defaultValue ? 'enabled' : 'disabled'})</span>
+							{getUiToggleDescription(field.key)}
+							<span class="text-gray-400 dark:text-gray-500">({m.ui_toggles_default_state({ state: field.defaultValue ? m.label_enabled() : m.label_disabled() })})</span>
 						</p>
 					</div>
 					<div class="flex items-center gap-2">
@@ -89,7 +91,7 @@
 						<button
 							onclick={() => handleToggle(field.key)}
 							class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors {getTriStateColor(value)}"
-							title="Click to cycle: Not set → Enabled → Disabled → Not set"
+							title={m.label_tristate_cycle_hint()}
 						>
 							<span
 								class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {getTriStatePosition(value)}"
@@ -104,7 +106,7 @@
 	<div class="flex justify-end">
 		<button onclick={handleSave} class="btn btn-primary">
 			<Save class="w-4 h-4 mr-2" />
-			Save UI Toggle Settings
+			{m.ui_toggles_save()}
 		</button>
 	</div>
 </div>

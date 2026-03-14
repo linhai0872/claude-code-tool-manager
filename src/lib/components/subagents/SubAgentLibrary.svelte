@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { SubAgent } from '$lib/types';
 	import { subagentLibrary } from '$lib/stores';
+	import * as m from '$lib/paraglide/messages.js';
 	import SubAgentCard from './SubAgentCard.svelte';
 	import { SearchBar } from '$lib/components/shared';
 	import { Bot } from 'lucide-svelte';
@@ -29,12 +30,12 @@
 		<div class="flex-1 max-w-sm">
 			<SearchBar
 				bind:value={subagentLibrary.searchQuery}
-				placeholder="Search sub-agents..."
+				placeholder={m.placeholder_search_subagents()}
 			/>
 		</div>
 
 		<div class="text-sm text-gray-500 dark:text-gray-400">
-			{subagentLibrary.subagents.length} sub-agent{subagentLibrary.subagents.length !== 1 ? 's' : ''}
+			{m.subagent_count({ count: subagentLibrary.subagents.length })}
 		</div>
 	</div>
 
@@ -47,14 +48,14 @@
 		<div class="text-center py-12">
 			<Bot class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
 			{#if subagentLibrary.searchQuery}
-				<h3 class="text-lg font-medium text-gray-900 dark:text-white">No matching sub-agents</h3>
+				<h3 class="text-lg font-medium text-gray-900 dark:text-white">{m.empty_no_matching_subagents()}</h3>
 				<p class="text-gray-500 dark:text-gray-400 mt-1">
-					Try adjusting your search
+					{m.empty_try_adjusting_search()}
 				</p>
 			{:else}
-				<h3 class="text-lg font-medium text-gray-900 dark:text-white">No sub-agents in library</h3>
+				<h3 class="text-lg font-medium text-gray-900 dark:text-white">{m.empty_no_subagents_in_library()}</h3>
 				<p class="text-gray-500 dark:text-gray-400 mt-1">
-					Add your first custom sub-agent to get started
+					{m.empty_add_first_subagent()}
 				</p>
 			{/if}
 		</div>

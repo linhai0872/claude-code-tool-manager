@@ -3,6 +3,7 @@
 	import { projectTotalTokens } from '$lib/types/session';
 	import { formatCompactNumber, estimateSessionCost, formatCost } from '$lib/types/usage';
 	import { FolderOpen, Hash, MessageSquare, Cpu, DollarSign } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		projects: ProjectSummary[];
@@ -32,33 +33,33 @@
 
 	const cards = $derived([
 		{
-			label: 'Projects',
+			label: m.session_projects(),
 			value: projects.length.toString(),
 			icon: FolderOpen,
 			color: 'bg-blue-500'
 		},
 		{
-			label: 'Total Sessions',
+			label: m.analytics_total_sessions(),
 			value: formatCompactNumber(totalSessions),
 			icon: Hash,
 			color: 'bg-purple-500'
 		},
 		{
-			label: 'Total Tokens',
+			label: m.analytics_total_tokens(),
 			value: formatCompactNumber(totalTokensAll),
 			icon: MessageSquare,
 			color: 'bg-amber-500'
 		},
 		{
-			label: 'Models Used',
+			label: m.session_models_used(),
 			value: totalModels.toString(),
 			icon: Cpu,
 			color: 'bg-green-500'
 		},
 		{
-			label: 'Est. API Cost',
+			label: m.label_est_cost(),
 			value: formatCost(totalEstCost),
-			subtitle: 'if billed at API rates',
+			subtitle: m.analytics_if_billed_api_rates(),
 			icon: DollarSign,
 			color: 'bg-emerald-500'
 		}

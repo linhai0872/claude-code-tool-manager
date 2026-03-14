@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Mcp } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 	import { mcpLibrary } from '$lib/stores';
 	import McpCard from './McpCard.svelte';
 	import { SearchBar } from '$lib/components/shared';
@@ -28,10 +29,10 @@
 	}
 
 	const typeFilters: { value: 'all' | 'stdio' | 'sse' | 'http'; label: string; icon: typeof Package }[] = [
-		{ value: 'all', label: 'All', icon: Package },
-		{ value: 'stdio', label: 'stdio', icon: Plug },
-		{ value: 'sse', label: 'SSE', icon: Globe },
-		{ value: 'http', label: 'HTTP', icon: Server }
+		{ value: 'all', label: m.mcp_filter_all(), icon: Package },
+		{ value: 'stdio', label: m.mcp_type_stdio(), icon: Plug },
+		{ value: 'sse', label: m.mcp_type_sse(), icon: Globe },
+		{ value: 'http', label: m.mcp_type_http(), icon: Server }
 	];
 </script>
 
@@ -41,7 +42,7 @@
 		<div class="flex-1 max-w-sm">
 			<SearchBar
 				bind:value={mcpLibrary.searchQuery}
-				placeholder="Search MCPs..."
+				placeholder={m.placeholder_search_mcps()}
 			/>
 		</div>
 
@@ -73,14 +74,14 @@
 		<div class="text-center py-12">
 			<Package class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
 			{#if mcpLibrary.searchQuery || mcpLibrary.selectedType !== 'all'}
-				<h3 class="text-lg font-medium text-gray-900 dark:text-white">No matching MCPs</h3>
+				<h3 class="text-lg font-medium text-gray-900 dark:text-white">{m.mcp_no_matching()}</h3>
 				<p class="text-gray-500 dark:text-gray-400 mt-1">
-					Try adjusting your search or filters
+					{m.mcp_adjust_filters()}
 				</p>
 			{:else}
-				<h3 class="text-lg font-medium text-gray-900 dark:text-white">No MCPs in library</h3>
+				<h3 class="text-lg font-medium text-gray-900 dark:text-white">{m.mcp_empty_library()}</h3>
 				<p class="text-gray-500 dark:text-gray-400 mt-1">
-					Add your first MCP to get started
+					{m.mcp_empty_library_hint()}
 				</p>
 			{/if}
 		</div>

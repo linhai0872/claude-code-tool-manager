@@ -1,4 +1,6 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
+
 	type Props = {
 		html: string;
 	};
@@ -15,7 +17,7 @@
 	{#if html}
 		{@html html}
 	{:else}
-		<p class="text-gray-400 dark:text-gray-500 italic">Nothing to preview</p>
+		<p class="text-gray-400 dark:text-gray-500 italic">{m.memory_nothing_to_preview()}</p>
 	{/if}
 </div>
 

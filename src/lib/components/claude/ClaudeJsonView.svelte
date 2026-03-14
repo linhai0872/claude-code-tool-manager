@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { claudeJson, notifications, type ClaudeJsonMcp } from '$lib/stores';
+	import * as m from '$lib/paraglide/messages.js';
 	import { FileJson, FolderOpen, Plug, Globe, Server, X, RefreshCw, ChevronDown, ChevronRight } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 
@@ -35,9 +36,9 @@
 		if (!mcp.projectPath) return;
 		try {
 			await claudeJson.toggleMcp(mcp.projectPath, mcp.name, !mcp.isEnabled);
-			notifications.success(`${mcp.name} ${mcp.isEnabled ? 'disabled' : 'enabled'}`);
+			notifications.success(mcp.isEnabled ? m.notify_disabled_name({ name: mcp.name }) : m.notify_enabled_name({ name: mcp.name }));
 		} catch {
-			notifications.error('Failed to toggle MCP');
+			notifications.error(m.notify_toggle_failed({ entity: m.entity_mcp() }));
 		}
 	}
 
@@ -48,9 +49,9 @@
 			} else {
 				await claudeJson.removeGlobalMcp(mcp.name);
 			}
-			notifications.success(`Removed ${mcp.name}`);
+			notifications.success(m.notify_removed({ entity: m.entity_mcp() }));
 		} catch {
-			notifications.error('Failed to remove MCP');
+			notifications.error(m.notify_remove_failed({ entity: m.entity_mcp() }));
 		}
 	}
 
@@ -66,15 +67,15 @@
 				<FileJson class="w-5 h-5 text-orange-600 dark:text-orange-400" />
 			</div>
 			<div>
-				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">Claude.json Config</h2>
+				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">{m.claude_json_title()}</h2>
 				<p class="text-sm text-gray-500 dark:text-gray-400">
-					MCPs configured directly in ~/.claude.json
+					{m.claude_json_subtitle()}
 				</p>
 			</div>
 		</div>
 		<button onclick={() => claudeJson.loadAll()} class="btn btn-secondary">
 			<RefreshCw class="w-4 h-4 mr-2" />
-			Refresh
+			{m.action_refresh()}
 		</button>
 	</div>
 
@@ -90,7 +91,7 @@
 		<!-- Global MCPs -->
 		{#if claudeJson.globalMcps.length > 0}
 			<div class="card">
-				<h3 class="text-md font-medium text-gray-900 dark:text-white mb-4">Global MCPs</h3>
+				<h3 class="text-md font-medium text-gray-900 dark:text-white mb-4">{m.dashboard_global_mcps()}</h3>
 				<div class="space-y-2">
 					{#each claudeJson.globalMcps as mcp (mcp.name)}
 						<div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -106,7 +107,7 @@
 							<button
 								onclick={() => handleRemove(mcp)}
 								class="p-1.5 text-gray-400 hover:text-red-500 rounded"
-								title="Remove"
+								title={m.action_remove()}
 							>
 								<X class="w-4 h-4" />
 							</button>
@@ -119,7 +120,7 @@
 		<!-- Project MCPs -->
 		{#if claudeJson.projects.length > 0}
 			<div class="space-y-3">
-				<h3 class="text-md font-medium text-gray-900 dark:text-white">Project MCPs</h3>
+				<h3 class="text-md font-medium text-gray-900 dark:text-white">{m.claude_json_project_mcps()}</h3>
 				{#each claudeJson.projects as project (project.path)}
 					<div class="card">
 						<button
@@ -137,7 +138,7 @@
 							</div>
 							<div class="flex items-center gap-2">
 								<span class="text-sm text-gray-500 dark:text-gray-400">
-									{project.mcps.length} MCP{project.mcps.length !== 1 ? 's' : ''}
+									{m.claude_json_project_mcp_count({ count: String(project.mcps.length) })}
 								</span>
 								{#if expandedProjects.has(project.path)}
 									<ChevronDown class="w-5 h-5 text-gray-400" />
@@ -161,7 +162,7 @@
 												</span>
 												<span class="text-xs text-gray-500 dark:text-gray-400 ml-2">({mcp.type})</span>
 												{#if !mcp.isEnabled}
-													<span class="ml-2 text-xs text-yellow-600 dark:text-yellow-400">disabled</span>
+													<span class="ml-2 text-xs text-yellow-600 dark:text-yellow-400">{m.label_disabled()}</span>
 												{/if}
 											</div>
 										</div>
@@ -171,6 +172,7 @@
 												class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {mcp.isEnabled ? 'bg-primary-600' : 'bg-gray-200 dark:bg-gray-600'}"
 												role="switch"
 												aria-checked={mcp.isEnabled}
+												aria-label={mcp.isEnabled ? m.action_disable() : m.action_enable()}
 											>
 												<span
 													class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {mcp.isEnabled ? 'translate-x-4' : 'translate-x-0'}"
@@ -179,7 +181,7 @@
 											<button
 												onclick={() => handleRemove(mcp)}
 												class="p-1.5 text-gray-400 hover:text-red-500 rounded"
-												title="Remove"
+												title={m.action_remove()}
 											>
 												<X class="w-4 h-4" />
 											</button>
@@ -194,9 +196,9 @@
 		{:else if claudeJson.globalMcps.length === 0}
 			<div class="card text-center py-8">
 				<FileJson class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-				<h3 class="text-lg font-medium text-gray-900 dark:text-white">No MCPs in claude.json</h3>
+				<h3 class="text-lg font-medium text-gray-900 dark:text-white">{m.claude_json_empty_title()}</h3>
 				<p class="text-gray-500 dark:text-gray-400 mt-1">
-					MCPs configured through Claude Code will appear here
+					{m.claude_json_empty_desc()}
 				</p>
 			</div>
 		{/if}

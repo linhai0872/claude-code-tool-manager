@@ -2,6 +2,8 @@
 	import type { ClaudeSettings } from '$lib/types';
 	import { AUTO_UPDATES_CHANNELS, TEAMMATE_MODES } from '$lib/types';
 	import { Save } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
+	import { getAutoUpdatesChannelLabel, getTeammateModeLabel } from '$lib/utils/claudeSettingsOptionsI18n';
 
 	type Props = {
 		settings: ClaudeSettings;
@@ -41,24 +43,24 @@
 
 <div class="space-y-6">
 	<div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
-		<h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">Session & Cleanup</h3>
+		<h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">{m.settings_session_title()}</h3>
 		<p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-			Configure session cleanup, update channels, teammate mode, and plans directory
+			{m.settings_session_desc()}
 		</p>
 
 		<div class="space-y-4">
 			<div>
 				<label for="cleanup-days" class="text-sm font-medium text-gray-700 dark:text-gray-300">
-					Cleanup Period (days)
+					{m.settings_session_cleanup_label()}
 				</label>
 				<p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
-					Number of days before old sessions are cleaned up
+					{m.settings_session_cleanup_desc()}
 				</p>
 				<input
 					id="cleanup-days"
 					type="number"
 					bind:value={cleanupPeriodDays}
-					placeholder="30"
+					placeholder={m.placeholder_cleanup_days()}
 					min="1"
 					class="input w-full"
 				/>
@@ -66,44 +68,44 @@
 
 			<div>
 				<label for="updates-channel" class="text-sm font-medium text-gray-700 dark:text-gray-300">
-					Auto Updates Channel
+					{m.settings_session_updates_label()}
 				</label>
 				<p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
-					Which release channel to use for automatic updates
+					{m.settings_session_updates_desc()}
 				</p>
 				<select id="updates-channel" bind:value={autoUpdatesChannel} class="input w-full">
 					{#each AUTO_UPDATES_CHANNELS as channel}
-						<option value={channel.value}>{channel.label}</option>
+						<option value={channel.value}>{getAutoUpdatesChannelLabel(channel.value)}</option>
 					{/each}
 				</select>
 			</div>
 
 			<div>
 				<label for="teammate-mode" class="text-sm font-medium text-gray-700 dark:text-gray-300">
-					Teammate Mode
+					{m.settings_session_teammate_label()}
 				</label>
 				<p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
-					How Claude Code runs as a background teammate
+					{m.settings_session_teammate_desc()}
 				</p>
 				<select id="teammate-mode" bind:value={teammateMode} class="input w-full">
 					{#each TEAMMATE_MODES as mode}
-						<option value={mode.value}>{mode.label}</option>
+						<option value={mode.value}>{getTeammateModeLabel(mode.value)}</option>
 					{/each}
 				</select>
 			</div>
 
 			<div>
 				<label for="plans-dir" class="text-sm font-medium text-gray-700 dark:text-gray-300">
-					Plans Directory
+					{m.settings_session_plans_label()}
 				</label>
 				<p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
-					Directory where Claude Code stores plan files
+					{m.settings_session_plans_desc()}
 				</p>
 				<input
 					id="plans-dir"
 					type="text"
 					bind:value={plansDirectory}
-					placeholder="./plans"
+					placeholder={m.placeholder_plans_directory()}
 					class="input w-full"
 				/>
 			</div>
@@ -113,7 +115,7 @@
 	<div class="flex justify-end">
 		<button onclick={handleSave} class="btn btn-primary">
 			<Save class="w-4 h-4 mr-2" />
-			Save Session & Cleanup Settings
+			{m.settings_session_save_btn()}
 		</button>
 	</div>
 </div>

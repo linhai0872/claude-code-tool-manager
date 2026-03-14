@@ -3,6 +3,7 @@
 	import { FileSuggestionEditor } from '$lib/components/file-suggestion';
 	import { claudeSettingsLibrary } from '$lib/stores';
 	import type { ClaudeSettingsScope } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 
 	function getSettingCount(scope: ClaudeSettingsScope): number {
 		if (!claudeSettingsLibrary.settings) return 0;
@@ -23,7 +24,7 @@
 	{#snippet children({ settings, save })}
 		<FileSuggestionEditor
 			{settings}
-			onsave={(s) => save(s, 'File suggestion settings saved', 'Failed to save file suggestion settings')}
+			onsave={(s) => save(s, m.settings_file_suggestion_saved(), m.settings_file_suggestion_save_failed())}
 		/>
 	{/snippet}
 </ScopedSettingsWrapper>

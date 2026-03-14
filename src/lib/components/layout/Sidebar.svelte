@@ -5,6 +5,7 @@
 	import { getVersion } from '@tauri-apps/api/app';
 	import TodayUsageWidget from './TodayUsageWidget.svelte';
 	import { sessionStore } from '$lib/stores';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let appVersion = $state('');
 
@@ -33,44 +34,44 @@
 
 	const isSettingsActive = $derived($page.url.pathname === '/settings' || $page.url.pathname.startsWith('/settings'));
 
-	const navGroups: NavGroup[] = [
+	const navGroups: NavGroup[] = $derived([
 		{
-			label: 'Core',
+			label: m.nav_core(),
 			items: [
-				{ href: '/', label: 'Dashboard', icon: Plug },
-				{ href: '/projects', label: 'Projects', icon: FolderOpen }
+				{ href: '/', label: m.nav_dashboard(), icon: Plug },
+				{ href: '/projects', label: m.nav_projects(), icon: FolderOpen }
 			]
 		},
 		{
-			label: 'Tools',
+			label: m.nav_tools(),
 			items: [
-				{ href: '/library', label: 'MCPs', icon: Library },
-				{ href: '/subagents', label: 'Agents', icon: Bot },
-				{ href: '/skills', label: 'Skills', icon: Sparkles },
-				{ href: '/commands', label: 'Commands', icon: Terminal },
-				{ href: '/hooks', label: 'Hooks', icon: Zap }
+				{ href: '/library', label: m.nav_mcps(), icon: Library },
+				{ href: '/subagents', label: m.nav_agents(), icon: Bot },
+				{ href: '/skills', label: m.nav_skills(), icon: Sparkles },
+				{ href: '/commands', label: m.nav_commands(), icon: Terminal },
+				{ href: '/hooks', label: m.nav_hooks(), icon: Zap }
 			]
 		},
 		{
-			label: 'Configure',
+			label: m.nav_configure(),
 			items: [
-				{ href: '/profiles', label: 'Profiles', icon: Layers },
-				{ href: '/statusline', label: 'Status Line', icon: PanelBottom },
-				{ href: '/permissions', label: 'Permissions', icon: Shield },
-				{ href: '/memory', label: 'Memory', icon: FileText },
-				{ href: '/marketplace', label: 'Marketplace', icon: Store }
+				{ href: '/profiles', label: m.nav_profiles(), icon: Layers },
+				{ href: '/statusline', label: m.nav_statusline(), icon: PanelBottom },
+				{ href: '/permissions', label: m.nav_permissions(), icon: Shield },
+				{ href: '/memory', label: m.nav_memory(), icon: FileText },
+				{ href: '/marketplace', label: m.nav_marketplace(), icon: Store }
 			]
 		},
 		{
-			label: 'Insights',
+			label: m.nav_insights(),
 			items: [
-				{ href: '/analytics', label: 'Analytics', icon: BarChart3 },
-				{ href: '/insights', label: 'Insights', icon: TrendingUp },
-				{ href: '/sessions', label: 'Sessions', icon: FolderSearch },
-				{ href: '/comparison', label: 'Comparison', icon: GitCompareArrows }
+				{ href: '/analytics', label: m.nav_analytics(), icon: BarChart3 },
+				{ href: '/insights', label: m.nav_insights_page(), icon: TrendingUp },
+				{ href: '/sessions', label: m.nav_sessions(), icon: FolderSearch },
+				{ href: '/comparison', label: m.nav_comparison(), icon: GitCompareArrows }
 			]
 		}
-	];
+	]);
 </script>
 
 <aside class="w-56 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex flex-col">
@@ -80,8 +81,8 @@
 				<Plug class="w-5 h-5 text-white" />
 			</div>
 			<div>
-				<h1 class="font-semibold text-gray-900 dark:text-white">Claude Code</h1>
-				<p class="text-xs text-gray-500 dark:text-gray-400">Tool Manager</p>
+				<h1 class="font-semibold text-gray-900 dark:text-white">{m.app_title()}</h1>
+				<p class="text-xs text-gray-500 dark:text-gray-400">{m.app_subtitle()}</p>
 			</div>
 		</div>
 	</div>
@@ -123,7 +124,7 @@
 					: 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/50'}"
 		>
 			<Settings class="w-5 h-5" />
-			Settings
+			{m.nav_settings()}
 		</a>
 		<p class="text-xs text-gray-400 dark:text-gray-500 px-3 mt-2">
 			{appVersion ? `v${appVersion}` : ''}

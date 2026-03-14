@@ -7,6 +7,14 @@
 	} from '$lib/types';
 	import type { ClaudeSettings } from '$lib/types';
 	import { Save } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
+	import {
+		getClaudeModelDescription,
+		getClaudeModelLabel,
+		getCommonLanguageLabel,
+		getModelShortcutLabel,
+		getOutputStyleLabel
+	} from '$lib/utils/modelConfigI18n';
 
 	type Props = {
 		settings: ClaudeSettings;
@@ -61,7 +69,7 @@
 </script>
 
 <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
-	<h3 class="text-base font-semibold text-gray-900 dark:text-white mb-4">Model & Output</h3>
+	<h3 class="text-base font-semibold text-gray-900 dark:text-white mb-4">{m.settings_model_title()}</h3>
 
 	<div class="space-y-4">
 		<!-- Model -->
@@ -70,27 +78,29 @@
 				for="model-select"
 				class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
 			>
-				Default Model
+				{m.settings_model_default_label()}
 			</label>
 			<select
 				id="model-select"
 				bind:value={model}
 				class="input text-sm w-full"
 			>
-				<option value="">Not set (use default)</option>
-				{#each CLAUDE_MODELS as m}
-					<option value={m.value}>{m.label} — {m.description}</option>
+				<option value="">{m.label_not_set_default()}</option>
+				{#each CLAUDE_MODELS as model_opt}
+					<option value={model_opt.value}>
+						{getClaudeModelLabel(model_opt.value, model_opt.label)} — {getClaudeModelDescription(model_opt.value, model_opt.description)}
+					</option>
 				{/each}
 			</select>
 		</div>
 
 		<!-- Available Models -->
 		<div>
-			<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-				Available Models
-			</label>
+			<p class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+				{m.settings_model_available_label()}
+			</p>
 			<p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
-				Restrict which models can be selected. Leave empty for no restriction.
+				{m.settings_model_available_desc()}
 			</p>
 			<div class="flex flex-wrap gap-2">
 				{#each AVAILABLE_MODEL_SHORTCUTS as shortcut}
@@ -102,7 +112,7 @@
 							? 'bg-primary-50 dark:bg-primary-900/30 border-primary-300 dark:border-primary-700 text-primary-700 dark:text-primary-300'
 							: 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500'}"
 					>
-						{shortcut.label}
+						{getModelShortcutLabel(shortcut.value)}
 					</button>
 				{/each}
 			</div>
@@ -114,7 +124,7 @@
 				for="output-style-select"
 				class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
 			>
-				Output Style
+				{m.settings_model_output_style_label()}
 			</label>
 			<select
 				id="output-style-select"
@@ -122,7 +132,7 @@
 				class="input text-sm w-full"
 			>
 				{#each OUTPUT_STYLES as style}
-					<option value={style.value}>{style.label}</option>
+					<option value={style.value}>{getOutputStyleLabel(style.value)}</option>
 				{/each}
 			</select>
 		</div>
@@ -133,7 +143,7 @@
 				for="language-select"
 				class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
 			>
-				Response Language
+				{m.settings_model_language_label()}
 			</label>
 			<select
 				id="language-select"
@@ -141,7 +151,7 @@
 				class="input text-sm w-full"
 			>
 				{#each COMMON_LANGUAGES as lang}
-					<option value={lang.value}>{lang.label}</option>
+					<option value={lang.value}>{getCommonLanguageLabel(lang.value)}</option>
 				{/each}
 			</select>
 		</div>
@@ -152,7 +162,7 @@
 				for="thinking-select"
 				class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
 			>
-				Extended Thinking
+				{m.settings_model_thinking_label()}
 			</label>
 			<select
 				id="thinking-select"
@@ -160,9 +170,9 @@
 				onchange={handleThinkingChange}
 				class="input text-sm w-full"
 			>
-				<option value="">Not set (use default)</option>
-				<option value="true">Always enabled</option>
-				<option value="false">Disabled</option>
+				<option value="">{m.label_not_set_default()}</option>
+				<option value="true">{m.settings_model_thinking_always()}</option>
+				<option value="false">{m.label_disabled()}</option>
 			</select>
 		</div>
 	</div>
@@ -170,7 +180,7 @@
 	<div class="mt-5 flex justify-end">
 		<button onclick={handleSave} class="btn btn-primary">
 			<Save class="w-4 h-4 mr-2" />
-			Save Model Settings
+			{m.settings_model_save_btn()}
 		</button>
 	</div>
 </div>

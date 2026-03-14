@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { ChevronDown, ChevronRight } from 'lucide-svelte';
 	import type { SessionFacet } from '$lib/types';
+	import { OUTCOME_COLORS } from '$lib/types/insights';
 	import {
-		OUTCOME_LABELS,
-		OUTCOME_COLORS,
-		HELPFULNESS_LABELS,
-		SESSION_TYPE_LABELS
-	} from '$lib/types/insights';
+		getOutcomeLabel,
+		getHelpfulnessLabel,
+		getSessionTypeLabel
+	} from '$lib/utils/insightsI18n';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		facets: SessionFacet[];
@@ -40,15 +41,15 @@
 	class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4"
 >
 	<h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-		Session Summaries
+		{m.analytics_session_summaries()}
 		<span class="text-xs font-normal text-gray-400 dark:text-gray-500 ml-2">
-			{facets.length} sessions
+			{m.analytics_sessions_count({ count: facets.length })}
 		</span>
 	</h3>
 
 	{#if facets.length === 0}
 		<div class="flex items-center justify-center py-12 text-gray-400 dark:text-gray-500">
-			No session data available
+			{m.empty_no_session_data()}
 		</div>
 	{:else}
 		<div class="space-y-1.5 max-h-[500px] overflow-y-auto">
@@ -73,7 +74,7 @@
 						></div>
 
 						<span class="text-sm text-gray-700 dark:text-gray-300 truncate flex-1">
-							{facet.briefSummary || facet.underlyingGoal || 'Untitled session'}
+							{facet.briefSummary || facet.underlyingGoal || m.analytics_untitled_session()}
 						</span>
 
 						<span
@@ -90,7 +91,7 @@
 							{#if facet.underlyingGoal}
 								<div>
 									<span class="text-[10px] uppercase tracking-wider font-semibold text-gray-400 dark:text-gray-500">
-										Goal
+										{m.label_goal()}
 									</span>
 									<p class="text-sm text-gray-700 dark:text-gray-300 mt-0.5">
 										{facet.underlyingGoal}
@@ -101,7 +102,7 @@
 							{#if facet.briefSummary}
 								<div>
 									<span class="text-[10px] uppercase tracking-wider font-semibold text-gray-400 dark:text-gray-500">
-										Summary
+										{m.label_summary()}
 									</span>
 									<p class="text-sm text-gray-700 dark:text-gray-300 mt-0.5">
 										{facet.briefSummary}
@@ -114,14 +115,14 @@
 									class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium"
 									style="background: {outcomeColor(facet.outcome)}20; color: {outcomeColor(facet.outcome)}"
 								>
-									{OUTCOME_LABELS[facet.outcome] || facet.outcome}
+									{getOutcomeLabel(facet.outcome)}
 								</span>
 
 								{#if facet.claudeHelpfulness}
 									<span
 										class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400"
 									>
-										{HELPFULNESS_LABELS[facet.claudeHelpfulness] || facet.claudeHelpfulness}
+										{getHelpfulnessLabel(facet.claudeHelpfulness)}
 									</span>
 								{/if}
 
@@ -129,7 +130,7 @@
 									<span
 										class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
 									>
-										{SESSION_TYPE_LABELS[facet.sessionType] || facet.sessionType}
+										{getSessionTypeLabel(facet.sessionType)}
 									</span>
 								{/if}
 
@@ -137,7 +138,7 @@
 									<span
 										class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium {facet.primarySuccess === 'true' ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400' : 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400'}"
 									>
-										{facet.primarySuccess === 'true' ? 'Success' : 'Not Successful'}
+										{facet.primarySuccess === 'true' ? m.label_success() : m.label_not_successful()}
 									</span>
 								{/if}
 							</div>
@@ -145,7 +146,7 @@
 							{#if facet.frictionDetail}
 								<div>
 									<span class="text-[10px] uppercase tracking-wider font-semibold text-gray-400 dark:text-gray-500">
-										Friction
+										{m.label_friction()}
 									</span>
 									<p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
 										{facet.frictionDetail}
@@ -156,7 +157,7 @@
 							{#if Object.keys(facet.goalCategories).length > 0}
 								<div>
 									<span class="text-[10px] uppercase tracking-wider font-semibold text-gray-400 dark:text-gray-500">
-										Categories
+										{m.label_categories()}
 									</span>
 									<div class="flex flex-wrap gap-1 mt-0.5">
 										{#each Object.entries(facet.goalCategories) as [cat, count]}

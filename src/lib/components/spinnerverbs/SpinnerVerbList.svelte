@@ -2,6 +2,7 @@
 	import { GripVertical, Pencil, Trash2 } from 'lucide-svelte';
 	import { spinnerVerbLibrary } from '$lib/stores';
 	import type { SpinnerVerb } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		onEdit: (verb: SpinnerVerb) => void;
@@ -41,7 +42,7 @@
 
 {#if spinnerVerbLibrary.verbs.length === 0}
 	<div class="text-center py-12">
-		<p class="text-gray-500 dark:text-gray-400">No spinner verbs yet. Add one to get started.</p>
+		<p class="text-gray-500 dark:text-gray-400">{m.spinner_no_verbs()}</p>
 	</div>
 {:else}
 	<div class="space-y-2">
@@ -58,7 +59,7 @@
 			>
 				<button
 					class="cursor-grab text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-					aria-label="Drag to reorder"
+					aria-label={m.permission_drag_to_reorder()}
 				>
 					<GripVertical class="w-4 h-4" />
 				</button>
@@ -79,14 +80,14 @@
 					<button
 						onclick={() => onEdit(verb)}
 						class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-						aria-label="Edit verb"
+						aria-label={m.action_edit()}
 					>
 						<Pencil class="w-4 h-4" />
 					</button>
 					<button
 						onclick={() => onDelete(verb)}
 						class="p-1.5 rounded-lg text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-						aria-label="Delete verb"
+						aria-label={m.action_delete()}
 					>
 						<Trash2 class="w-4 h-4" />
 					</button>

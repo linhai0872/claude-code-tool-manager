@@ -2,6 +2,7 @@
 	import type { ClaudeSettings, SandboxSettings, SandboxNetworkSettings } from '$lib/types';
 	import { Save, Plus, X } from 'lucide-svelte';
 	import SandboxNetworkEditor from './SandboxNetworkEditor.svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		settings: ClaudeSettings;
@@ -92,8 +93,8 @@
 	}
 
 	function getTriStateLabel(value: boolean | undefined): string {
-		if (value === undefined) return 'Not set';
-		return value ? 'Enabled' : 'Disabled';
+		if (value === undefined) return m.label_not_set();
+		return value ? m.label_enabled() : m.label_disabled();
 	}
 
 	function getTriStateColor(value: boolean | undefined): string {
@@ -123,32 +124,28 @@
 		network = updated;
 	}
 
-	const toggleFields: {
-		key: 'enabled' | 'autoAllowBashIfSandboxed' | 'allowUnsandboxedCommands' | 'enableWeakerNestedSandbox';
-		label: string;
-		description: string;
-	}[] = [
+	const toggleFields = $derived([
 		{
-			key: 'enabled',
-			label: 'Sandbox Enabled',
-			description: 'Enable bash command sandboxing for isolation'
+			key: 'enabled' as const,
+			label: m.settings_sandbox_enabled_label(),
+			description: m.settings_sandbox_enabled_desc()
 		},
 		{
-			key: 'autoAllowBashIfSandboxed',
-			label: 'Auto-Allow Bash if Sandboxed',
-			description: 'Automatically allow bash commands when sandbox is active'
+			key: 'autoAllowBashIfSandboxed' as const,
+			label: m.settings_sandbox_auto_allow_label(),
+			description: m.settings_sandbox_auto_allow_desc()
 		},
 		{
-			key: 'allowUnsandboxedCommands',
-			label: 'Allow Unsandboxed Commands',
-			description: 'Allow certain commands to run outside the sandbox'
+			key: 'allowUnsandboxedCommands' as const,
+			label: m.settings_sandbox_allow_unsandboxed_label(),
+			description: m.settings_sandbox_allow_unsandboxed_desc()
 		},
 		{
-			key: 'enableWeakerNestedSandbox',
-			label: 'Enable Weaker Nested Sandbox',
-			description: 'Use a less restrictive sandbox for nested operations'
+			key: 'enableWeakerNestedSandbox' as const,
+			label: m.settings_sandbox_weaker_nested_label(),
+			description: m.settings_sandbox_weaker_nested_desc()
 		}
-	];
+	]);
 
 	function getFieldValue(key: typeof toggleFields[number]['key']): boolean | undefined {
 		if (key === 'enabled') return enabled;
@@ -162,9 +159,9 @@
 <div class="space-y-6">
 	<!-- General Settings -->
 	<div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
-		<h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">General</h3>
+		<h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">{m.settings_sandbox_general_title()}</h3>
 		<p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-			Control sandbox isolation for bash command execution
+			{m.settings_sandbox_general_desc()}
 		</p>
 
 		<div class="space-y-4">
@@ -186,7 +183,7 @@
 						<button
 							onclick={() => handleToggle(field.key)}
 							class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors {getTriStateColor(value)}"
-							title="Click to cycle: Not set → Enabled → Disabled → Not set"
+							title={m.label_tristate_cycle_hint()}
 						>
 							<span
 								class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {getTriStatePosition(value)}"
@@ -200,16 +197,16 @@
 
 	<!-- Excluded Commands -->
 	<div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
-		<h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">Excluded Commands</h3>
+		<h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">{m.settings_sandbox_excluded_title()}</h3>
 		<p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-			Commands excluded from sandbox restrictions (e.g. <code>git</code>, <code>docker</code>)
+			{m.settings_sandbox_excluded_desc()}
 		</p>
 
 		<div class="flex gap-2 mb-3">
 			<input
 				type="text"
 				bind:value={newCommand}
-				placeholder="e.g. git"
+				placeholder={m.placeholder_excluded_command()}
 				class="input text-sm flex-1"
 				onkeydown={(e) => e.key === 'Enter' && addCommand()}
 			/>
@@ -240,16 +237,16 @@
 			</div>
 		{:else}
 			<p class="text-xs text-gray-500 dark:text-gray-400 italic">
-				No excluded commands configured
+				{m.settings_sandbox_excluded_empty()}
 			</p>
 		{/if}
 	</div>
 
 	<!-- Network Configuration -->
 	<div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
-		<h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">Network</h3>
+		<h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">{m.settings_sandbox_network_title()}</h3>
 		<p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-			Configure network access rules for the sandbox
+			{m.settings_sandbox_network_desc()}
 		</p>
 
 		<SandboxNetworkEditor {network} onchange={handleNetworkChange} />
@@ -259,7 +256,7 @@
 	<div class="flex justify-end">
 		<button onclick={handleSave} class="btn btn-primary">
 			<Save class="w-4 h-4 mr-2" />
-			Save Sandbox Settings
+			{m.settings_sandbox_save_btn()}
 		</button>
 	</div>
 </div>

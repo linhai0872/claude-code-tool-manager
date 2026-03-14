@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { CreateSkillRequest, Skill } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 	import { parseSkillMarkdown } from '$lib/utils/markdownParser';
 	import { Clipboard, Check, AlertCircle, FileUp, TriangleAlert } from 'lucide-svelte';
 
@@ -45,7 +46,7 @@
 		if (parsed.tags) tagsInput = parsed.tags.join(', ');
 
 		importStatus = 'success';
-		importMessage = parsed.name ? `Imported "${parsed.name}"` : 'Content imported';
+		importMessage = parsed.name ? m.skill_import_success_name({ name: parsed.name }) : m.skill_import_success();
 
 		setTimeout(() => {
 			importStatus = 'idle';
@@ -60,7 +61,6 @@
 		const result = parseSkillMarkdown(text);
 
 		if (result.success && result.data) {
-			// Only prevent default if we successfully parsed frontmatter (has name)
 			if (result.data.name) {
 				e.preventDefault();
 				applyParsedSkill(result.data);
@@ -77,7 +77,7 @@
 				applyParsedSkill(result.data);
 			} else {
 				importStatus = 'error';
-				importMessage = result.error ?? 'Could not parse clipboard content';
+				importMessage = result.error ?? m.skill_import_parse_failed();
 				setTimeout(() => {
 					importStatus = 'idle';
 					importMessage = '';
@@ -85,7 +85,7 @@
 			}
 		} catch {
 			importStatus = 'error';
-			importMessage = 'Could not access clipboard';
+			importMessage = m.skill_import_clipboard_failed();
 			setTimeout(() => {
 				importStatus = 'idle';
 				importMessage = '';
@@ -109,7 +109,7 @@
 					applyParsedSkill(result.data);
 				} else {
 					importStatus = 'error';
-					importMessage = result.error ?? 'Could not parse file';
+					importMessage = result.error ?? m.skill_import_file_parse_failed();
 					setTimeout(() => {
 						importStatus = 'idle';
 						importMessage = '';
@@ -117,7 +117,7 @@
 				}
 			} catch {
 				importStatus = 'error';
-				importMessage = 'Could not read file';
+				importMessage = m.skill_import_file_read_failed();
 				setTimeout(() => {
 					importStatus = 'idle';
 					importMessage = '';
@@ -134,43 +134,38 @@
 		const trimmedDescription = description.trim();
 		const trimmedContent = content.trim();
 
-		// Validate name
 		if (!trimmedName) {
-			errors.name = 'Name is required';
+			errors.name = m.validation_name_required();
 		} else if (trimmedName.length > MAX_NAME_LENGTH) {
-			errors.name = `Name must be ${MAX_NAME_LENGTH} characters or less (currently ${trimmedName.length})`;
+			errors.name = m.validation_name_max_length({ max: MAX_NAME_LENGTH, current: trimmedName.length });
 		} else if (!NAME_PATTERN.test(trimmedName)) {
-			errors.name = 'Name must contain only lowercase letters, numbers, and hyphens';
+			errors.name = m.validation_name_pattern();
 		} else if (trimmedName.includes('<') || trimmedName.includes('>')) {
-			errors.name = 'Name cannot contain XML tags (< or >)';
+			errors.name = m.validation_name_no_xml();
 		} else {
-			// Check for reserved words
 			const nameLower = trimmedName.toLowerCase();
 			for (const reserved of RESERVED_WORDS) {
 				if (nameLower.includes(reserved)) {
-					errors.name = `Name cannot contain reserved word "${reserved}"`;
+					errors.name = m.validation_name_reserved({ word: reserved });
 					break;
 				}
 			}
 		}
 
-		// Validate description
 		if (trimmedDescription) {
 			if (trimmedDescription.length > MAX_DESCRIPTION_LENGTH) {
-				errors.description = `Description must be ${MAX_DESCRIPTION_LENGTH} characters or less (currently ${trimmedDescription.length})`;
+				errors.description = m.validation_description_max_length({ max: MAX_DESCRIPTION_LENGTH, current: trimmedDescription.length });
 			} else if (trimmedDescription.includes('<') || trimmedDescription.includes('>')) {
-				errors.description = 'Description cannot contain XML tags (< or >)';
+				errors.description = m.validation_description_no_xml();
 			}
 		}
 
-		// Validate content
 		if (!trimmedContent) {
-			errors.content = 'Content is required';
+			errors.content = m.validation_content_required();
 		} else {
-			// Check line count and warn if exceeding recommendation
 			const lineCount = trimmedContent.split('\n').length;
 			if (lineCount > RECOMMENDED_MAX_CONTENT_LINES) {
-				warnings.content = `Content has ${lineCount} lines, exceeding the recommended ${RECOMMENDED_MAX_CONTENT_LINES} lines. Consider splitting into separate reference files.`;
+				warnings.content = m.validation_content_lines_warning_split({ count: lineCount, max: RECOMMENDED_MAX_CONTENT_LINES });
 			}
 		}
 
@@ -233,10 +228,10 @@
 						</p>
 					{:else}
 						<p class="text-sm font-medium text-gray-700 dark:text-gray-300">
-							Import from Markdown
+							{m.skill_import_markdown()}
 						</p>
 						<p class="text-xs text-gray-500 dark:text-gray-400">
-							Paste or import a <code class="px-1 bg-gray-200 dark:bg-gray-700 rounded">.md</code> file with YAML frontmatter
+							{m.skill_import_markdown_hint()}
 						</p>
 					{/if}
 				</div>
@@ -248,7 +243,7 @@
 					class="btn btn-secondary text-sm"
 				>
 					<FileUp class="w-4 h-4 mr-1.5" />
-					File
+					{m.label_file()}
 				</button>
 				<button
 					type="button"
@@ -256,7 +251,7 @@
 					class="btn btn-secondary text-sm"
 				>
 					<Clipboard class="w-4 h-4 mr-1.5" />
-					Paste
+					{m.label_paste()}
 				</button>
 			</div>
 		</div>
@@ -265,7 +260,7 @@
 	<!-- Name -->
 	<div>
 		<label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-			Name <span class="text-red-500">*</span>
+			{m.label_name()} <span class="text-red-500">*</span>
 		</label>
 		<input
 			type="text"
@@ -273,14 +268,14 @@
 			bind:value={name}
 			class="input mt-1"
 			class:border-red-500={errors.name}
-			placeholder="my-skill"
+			placeholder={m.placeholder_skill_name()}
 		/>
 		{#if errors.name}
 			<p class="mt-1 text-sm text-red-500">{errors.name}</p>
 		{:else}
 			<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-				Will be saved to <code class="px-1 bg-gray-100 dark:bg-gray-700 rounded">.claude/skills/{name || 'name'}/SKILL.md</code>
-				<span class="text-gray-400 dark:text-gray-500">&nbsp;·&nbsp;Lowercase letters, numbers, and hyphens only</span>
+				{m.skill_name_hint({ name: name || 'name' })}
+				<span class="text-gray-400 dark:text-gray-500">&nbsp;·&nbsp;{m.skill_name_rules()}</span>
 			</p>
 		{/if}
 	</div>
@@ -288,7 +283,7 @@
 	<!-- Description -->
 	<div>
 		<label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-			Description
+			{m.label_description()}
 		</label>
 		<input
 			type="text"
@@ -296,13 +291,13 @@
 			bind:value={description}
 			class="input mt-1"
 			class:border-red-500={errors.description}
-			placeholder="When Claude should invoke this skill"
+			placeholder={m.placeholder_skill_description()}
 		/>
 		{#if errors.description}
 			<p class="mt-1 text-sm text-red-500">{errors.description}</p>
 		{:else}
 			<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-				Claude uses this to decide when to invoke the skill (max {MAX_DESCRIPTION_LENGTH} chars)
+				{m.skill_description_hint({ max: MAX_DESCRIPTION_LENGTH })}
 			</p>
 		{/if}
 	</div>
@@ -310,38 +305,37 @@
 	<!-- Allowed Tools -->
 	<div>
 		<label for="allowedTools" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-			Allowed Tools
+			{m.label_allowed_tools()}
 		</label>
 		<input
 			type="text"
 			id="allowedTools"
 			bind:value={allowedToolsInput}
 			class="input mt-1"
-			placeholder="Read, Edit, Bash(git:*), Glob, Grep"
+			placeholder={m.placeholder_allowed_tools_command()}
 		/>
 		<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-			Comma-separated list of tools. Use <code class="px-1 bg-gray-100 dark:bg-gray-700 rounded">*</code> for all tools.
-			Supports patterns like <code class="px-1 bg-gray-100 dark:bg-gray-700 rounded">Bash(git:*)</code>
+			{m.skill_allowed_tools_hint()}
 		</p>
 	</div>
 
 	<!-- Model Selection -->
 	<div>
 		<label for="model" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-			Model Override
+			{m.label_model_override()}
 		</label>
 		<select
 			id="model"
 			bind:value={model}
 			class="input mt-1"
 		>
-			<option value="">Default (inherit from session)</option>
-			<option value="opus">Opus (Most capable)</option>
-			<option value="sonnet">Sonnet (Balanced)</option>
-			<option value="haiku">Haiku (Fast & efficient)</option>
+			<option value="">{m.command_model_default()}</option>
+			<option value="opus">{m.command_model_opus()}</option>
+			<option value="sonnet">{m.command_model_sonnet()}</option>
+			<option value="haiku">{m.command_model_haiku()}</option>
 		</select>
 		<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-			Optionally force a specific model when executing this skill
+			{m.skill_model_hint()}
 		</p>
 	</div>
 
@@ -355,10 +349,10 @@
 		/>
 		<div>
 			<label for="disableModelInvocation" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-				Disable Model Invocation
+				{m.skill_disable_model_invocation()}
 			</label>
 			<p class="text-xs text-gray-500 dark:text-gray-400">
-				Prevent Claude from automatically invoking this skill. Useful for skills that should only be called by other skills.
+				{m.skill_disable_model_invocation_hint()}
 			</p>
 		</div>
 	</div>
@@ -366,7 +360,7 @@
 	<!-- Content -->
 	<div>
 		<label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-			Skill Instructions <span class="text-red-500">*</span>
+			{m.label_skill_instructions()} <span class="text-red-500">*</span>
 		</label>
 		<textarea
 			id="content"
@@ -374,19 +368,7 @@
 			rows={12}
 			class="input mt-1 font-mono text-sm resize-y"
 			class:border-red-500={errors.content}
-			placeholder={`# My Skill
-
-Instructions for Claude when this skill is invoked.
-
-## When to Use
-
-- When the user asks about...
-- When working with...
-
-## How to Execute
-
-1. First...
-2. Then...`}
+			placeholder={m.placeholder_skill_content_template()}
 		></textarea>
 		{#if errors.content}
 			<p class="mt-1 text-sm text-red-500">{errors.content}</p>
@@ -400,7 +382,7 @@ Instructions for Claude when this skill is invoked.
 				</div>
 			{/if}
 			<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-				Instructions that tell Claude how to execute this skill (recommended: under {RECOMMENDED_MAX_CONTENT_LINES} lines)
+				{m.skill_content_hint({ max: RECOMMENDED_MAX_CONTENT_LINES })}
 			</p>
 		{/if}
 	</div>
@@ -408,27 +390,27 @@ Instructions for Claude when this skill is invoked.
 	<!-- Tags -->
 	<div>
 		<label for="tags" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-			Tags
+			{m.label_tags()}
 		</label>
 		<input
 			type="text"
 			id="tags"
 			bind:value={tagsInput}
 			class="input mt-1"
-			placeholder="code-review, testing, documentation"
+			placeholder={m.placeholder_skill_tags()}
 		/>
 		<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-			Comma-separated tags for organization
+			{m.skill_tags_hint()}
 		</p>
 	</div>
 
 	<!-- Actions -->
 	<div class="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
 		<button type="button" onclick={onCancel} class="btn btn-secondary">
-			Cancel
+			{m.action_cancel()}
 		</button>
 		<button type="submit" class="btn btn-primary" disabled={isSubmitting}>
-			{initialValues.name ? 'Update Skill' : 'Create Skill'}
+			{initialValues.name ? m.skill_action_update() : m.skill_action_create()}
 		</button>
 	</div>
 </form>

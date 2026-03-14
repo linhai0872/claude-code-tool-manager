@@ -3,6 +3,7 @@
 	import { PluginListEditor, MarketplaceEditor } from '$lib/components/plugins';
 	import { claudeSettingsLibrary } from '$lib/stores';
 	import type { ClaudeSettingsScope } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 
 	function getSettingCount(scope: ClaudeSettingsScope): number {
 		if (!claudeSettingsLibrary.settings) return 0;
@@ -25,11 +26,11 @@
 		<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 			<PluginListEditor
 				{settings}
-				onsave={(s) => save(s, 'Plugin settings saved', 'Failed to save plugin settings')}
+				onsave={(s) => save(s, m.settings_plugin_saved(), m.settings_plugin_save_failed())}
 			/>
 			<MarketplaceEditor
 				{settings}
-				onsave={(s) => save(s, 'Marketplace settings saved', 'Failed to save marketplace settings')}
+				onsave={(s) => save(s, m.settings_marketplace_saved(), m.settings_marketplace_save_failed())}
 			/>
 		</div>
 	{/snippet}

@@ -2,6 +2,7 @@
 	import { whatsNew } from '$lib/stores/whatsNew.svelte';
 	import { X, ExternalLink, Sparkles, Loader2 } from 'lucide-svelte';
 	import { open } from '@tauri-apps/plugin-shell';
+	import * as m from '$lib/paraglide/messages.js';
 
 	function handleDismiss() {
 		whatsNew.dismiss();
@@ -80,7 +81,7 @@
 					</div>
 					<div>
 						<h2 id="whats-new-title" class="text-lg font-semibold text-gray-900 dark:text-white">
-							What's New
+							{m.modal_whats_new_title()}
 						</h2>
 						{#if whatsNew.release}
 							<p class="text-sm text-gray-500 dark:text-gray-400">
@@ -92,7 +93,7 @@
 				<button
 					onclick={handleDismiss}
 					class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-					aria-label="Close"
+					aria-label={m.action_close()}
 				>
 					<X class="w-5 h-5" />
 				</button>
@@ -107,7 +108,7 @@
 				{:else if whatsNew.release}
 					{#if whatsNew.release.publishedAt}
 						<p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-							Released {formatDate(whatsNew.release.publishedAt)}
+							{m.update_released({ date: formatDate(whatsNew.release.publishedAt) })}
 						</p>
 					{/if}
 
@@ -116,7 +117,7 @@
 					</div>
 				{:else}
 					<p class="text-gray-500 dark:text-gray-400">
-						No release notes available.
+						{m.modal_no_release_notes()}
 					</p>
 				{/if}
 			</div>
@@ -128,13 +129,13 @@
 					class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
 				>
 					<ExternalLink class="w-4 h-4" />
-					View on GitHub
+					{m.action_view_github()}
 				</button>
 				<button
 					onclick={handleDismiss}
 					class="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
 				>
-					Got it
+					{m.action_got_it()}
 				</button>
 			</div>
 		</div>

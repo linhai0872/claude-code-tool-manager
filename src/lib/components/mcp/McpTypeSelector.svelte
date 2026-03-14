@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { McpType } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 	import { Plug, Globe, Server } from 'lucide-svelte';
 
 	type Props = {
@@ -11,28 +12,28 @@
 	const types: { value: McpType; label: string; icon: typeof Plug; description: string }[] = [
 		{
 			value: 'stdio',
-			label: 'Standard I/O',
+			label: m.mcp_type_stdio(),
 			icon: Plug,
-			description: 'Local command-line tool (npx, python, etc.)'
+			description: m.mcp_type_stdio_desc()
 		},
 		{
 			value: 'sse',
-			label: 'Server-Sent Events',
+			label: m.mcp_type_sse(),
 			icon: Globe,
-			description: 'Cloud service with SSE endpoint'
+			description: m.mcp_type_sse_desc()
 		},
 		{
 			value: 'http',
-			label: 'HTTP/REST',
+			label: m.mcp_type_http(),
 			icon: Server,
-			description: 'REST API with token authentication'
+			description: m.mcp_type_http_desc()
 		}
 	];
 </script>
 
 <div class="space-y-2">
 	<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-		Connection Type <span class="text-red-500">*</span>
+		{m.label_connection_type()} <span class="text-red-500">*</span>
 	</label>
 
 	<div class="grid grid-cols-3 gap-3">

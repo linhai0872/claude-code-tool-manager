@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Command } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 	import { commandLibrary } from '$lib/stores';
 	import CommandCard from './CommandCard.svelte';
 	import { SearchBar } from '$lib/components/shared';
@@ -29,12 +30,12 @@
 		<div class="flex-1 max-w-sm">
 			<SearchBar
 				bind:value={commandLibrary.searchQuery}
-				placeholder="Search commands..."
+				placeholder={m.placeholder_search_commands()}
 			/>
 		</div>
 
 		<div class="text-sm text-gray-500 dark:text-gray-400">
-			{commandLibrary.commands.length} command{commandLibrary.commands.length !== 1 ? 's' : ''}
+			{m.command_count({ count: commandLibrary.commands.length })}
 		</div>
 	</div>
 
@@ -47,14 +48,14 @@
 		<div class="text-center py-12">
 			<Terminal class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
 			{#if commandLibrary.searchQuery}
-				<h3 class="text-lg font-medium text-gray-900 dark:text-white">No matching commands</h3>
+				<h3 class="text-lg font-medium text-gray-900 dark:text-white">{m.empty_no_matching_commands()}</h3>
 				<p class="text-gray-500 dark:text-gray-400 mt-1">
-					Try adjusting your search
+					{m.empty_adjust_search()}
 				</p>
 			{:else}
-				<h3 class="text-lg font-medium text-gray-900 dark:text-white">No commands in library</h3>
+				<h3 class="text-lg font-medium text-gray-900 dark:text-white">{m.empty_no_commands()}</h3>
 				<p class="text-gray-500 dark:text-gray-400 mt-1">
-					Add your first slash command to get started
+					{m.empty_add_first_command()}
 				</p>
 			{/if}
 		</div>

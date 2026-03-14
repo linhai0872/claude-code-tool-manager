@@ -2,6 +2,8 @@
 	import type { StatusLineSegment } from '$lib/types';
 	import { SEGMENT_TYPES, SEGMENT_COLORS } from '$lib/types';
 	import { GripVertical, X, Eye, EyeOff, CornerDownLeft } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
+	import { getStatuslineSegmentLabel } from '$lib/utils/statuslineI18n';
 
 	type Props = {
 		segment: StatusLineSegment;
@@ -31,12 +33,12 @@
 	>
 		<GripVertical class="w-3 h-3 text-gray-400 shrink-0 cursor-grab" />
 		<CornerDownLeft class="w-3 h-3 text-gray-400 shrink-0" />
-		<span class="text-gray-400 dark:text-gray-500 font-medium">New Line</span>
+		<span class="text-gray-400 dark:text-gray-500 font-medium">{m.segment_new_line()}</span>
 		<div class="flex-1 border-t border-dashed border-gray-300 dark:border-gray-600 mx-2"></div>
 		<button
 			onclick={(e) => { e.stopPropagation(); onRemove?.(segment); }}
 			class="p-0.5 rounded text-gray-400 hover:text-red-500 shrink-0"
-			title="Remove"
+			title={m.action_remove()}
 		>
 			<X class="w-3 h-3" />
 		</button>
@@ -58,13 +60,13 @@
 			<span class="w-1.5 h-1.5 rounded-full" style="background-color: {colorHex}"></span>
 		</span>
 		<span class="truncate font-medium text-gray-700 dark:text-gray-300">
-			{meta?.label || segment.type}
+			{meta ? getStatuslineSegmentLabel(meta.type) : segment.type}
 		</span>
 		<div class="ml-auto flex items-center gap-1 shrink-0">
 			<button
 				onclick={(e) => { e.stopPropagation(); onToggle?.(segment); }}
 				class="p-1 rounded text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-				title={segment.enabled ? 'Disable' : 'Enable'}
+				title={segment.enabled ? m.action_disable() : m.action_enable()}
 			>
 				{#if segment.enabled}
 					<Eye class="w-3.5 h-3.5" />
@@ -75,7 +77,7 @@
 			<button
 				onclick={(e) => { e.stopPropagation(); onRemove?.(segment); }}
 				class="p-1 rounded text-gray-400 hover:text-red-500"
-				title="Remove"
+				title={m.action_remove()}
 			>
 				<X class="w-3.5 h-3.5" />
 			</button>

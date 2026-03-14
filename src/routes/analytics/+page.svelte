@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { Header } from '$lib/components/layout';
-	import { onDestroy } from 'svelte';
 	import OverviewCards from '$lib/components/analytics/OverviewCards.svelte';
 	import DailyActivityChart from '$lib/components/analytics/DailyActivityChart.svelte';
 	import ModelUsageBreakdown from '$lib/components/analytics/ModelUsageBreakdown.svelte';
@@ -12,14 +11,10 @@
 	import { usageStore } from '$lib/stores';
 	import { RefreshCw, FileQuestion } from 'lucide-svelte';
 	import type { DateRangeFilter } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 
 	onMount(() => {
 		usageStore.load();
-		usageStore.startPolling(60_000);
-	});
-
-	onDestroy(() => {
-		usageStore.stopPolling();
 	});
 
 	function handleRefresh() {
@@ -31,7 +26,7 @@
 	}
 </script>
 
-<Header title="Usage Analytics" subtitle="Visualize your Claude Code usage patterns" />
+<Header title={m.page_analytics_title()} subtitle={m.page_analytics_subtitle()} />
 
 <div class="flex-1 overflow-auto p-6 space-y-6">
 	{#if usageStore.isLoading}
@@ -52,11 +47,13 @@
 		>
 			<div class="text-gray-400 dark:text-gray-500 mb-4">
 				<FileQuestion class="w-12 h-12 mx-auto mb-3 opacity-50" />
-				<p class="text-lg font-medium">No usage data found</p>
+				<p class="text-lg font-medium">{m.empty_no_tool_usage_data()}</p>
 				<p class="text-sm mt-1">
-					Claude Code stores analytics in <code class="text-xs bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">{usageStore.filePath}</code>
+					{@html m.analytics_data_stored_at({
+						file: `<code class="text-xs bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">${usageStore.filePath}</code>`
+					})}
 				</p>
-				<p class="text-sm mt-1">Use Claude Code to generate usage data, then refresh this page.</p>
+				<p class="text-sm mt-1">{m.analytics_generate_usage_hint()}</p>
 			</div>
 		</div>
 	{:else if usageStore.stats}
@@ -76,10 +73,10 @@
 				onclick={handleRefresh}
 				disabled={usageStore.isRefreshing}
 				class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-				title="Refresh analytics"
+				title={m.action_refresh()}
 			>
 				<RefreshCw class="w-3.5 h-3.5 {usageStore.isRefreshing ? 'animate-spin' : ''}" />
-				{usageStore.isRefreshing ? 'Refreshing…' : 'Refresh'}
+				{usageStore.isRefreshing ? m.analytics_refreshing() : m.action_refresh()}
 			</button>
 		</div>
 
@@ -106,12 +103,12 @@
 		<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 			<div class="lg:col-span-2">
 				<DailyCostChart
-					data={usageStore.filteredDailyCosts}
+					data={usageStore.filteredDailyTokens}
 					models={usageStore.allModels}
 				/>
 			</div>
 			<CostProjectionsCard
-				dailyCosts={usageStore.filteredDailyCosts}
+				dailyCosts={usageStore.filteredDailyTokens}
 				totalCostUSD={usageStore.totalCostUSD}
 			/>
 		</div>

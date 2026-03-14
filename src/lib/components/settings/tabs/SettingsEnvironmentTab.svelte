@@ -3,6 +3,7 @@
 	import { EnvVarsEditor } from '$lib/components/env-vars';
 	import { claudeSettingsLibrary } from '$lib/stores';
 	import type { ClaudeSettingsScope } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 
 	function getSettingCount(scope: ClaudeSettingsScope): number {
 		if (!claudeSettingsLibrary.settings) return 0;
@@ -21,7 +22,7 @@
 	{#snippet children({ settings, save })}
 		<EnvVarsEditor
 			{settings}
-			onsave={(s) => save(s, 'Environment variables saved', 'Failed to save environment variables')}
+			onsave={(s) => save(s, m.settings_env_saved(), m.settings_env_save_failed())}
 		/>
 	{/snippet}
 </ScopedSettingsWrapper>

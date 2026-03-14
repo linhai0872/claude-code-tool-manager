@@ -3,6 +3,8 @@
 	import { mcpLibrary, projectsStore, notifications, skillLibrary, subagentLibrary, commandLibrary } from '$lib/stores';
 	import { X, Plus, Minus, FolderOpen, Plug, Globe, Server, Sparkles, Bot, ChevronDown, Terminal, Search } from 'lucide-svelte';
 	import { invoke } from '@tauri-apps/api/core';
+	import * as m from '$lib/paraglide/messages.js';
+	import { getEditorDisplayName } from '$lib/utils/editorI18n';
 
 	type Props = {
 		project: Project;
@@ -127,9 +129,9 @@
 		try {
 			await projectsStore.assignMcpToProject(project.id, mcp.id);
 			await projectsStore.syncProjectConfig(project.id);
-			notifications.success(`Added ${mcp.name} to ${project.name}`);
+			notifications.success(m.notify_added({ entity: m.entity_mcp() }));
 		} catch (err) {
-			notifications.error('Failed to add MCP');
+			notifications.error(m.notify_add_failed({ entity: m.entity_mcp() }));
 			console.error(err);
 		}
 	}
@@ -139,9 +141,9 @@
 			const mcp = mcpLibrary.getMcpById(mcpId);
 			await projectsStore.removeMcpFromProject(project.id, mcpId);
 			await projectsStore.syncProjectConfig(project.id);
-			notifications.success(`Removed ${mcp?.name || 'MCP'} from ${project.name}`);
+			notifications.success(m.notify_removed({ entity: m.entity_mcp() }));
 		} catch (err) {
-			notifications.error('Failed to remove MCP');
+			notifications.error(m.notify_remove_failed({ entity: m.entity_mcp() }));
 			console.error(err);
 		}
 	}
@@ -151,7 +153,7 @@
 			await projectsStore.toggleProjectMcp(assignmentId, enabled);
 			await projectsStore.syncProjectConfig(project.id);
 		} catch (err) {
-			notifications.error('Failed to toggle MCP');
+			notifications.error(m.notify_toggle_failed({ entity: m.entity_mcp() }));
 			console.error(err);
 		}
 	}
@@ -162,9 +164,9 @@
 			await skillLibrary.assignToProject(project.id, skill.id);
 			await projectsStore.syncProjectConfig(project.id);
 			await loadProjectData();
-			notifications.success(`Added ${skill.name} to ${project.name}`);
+			notifications.success(m.notify_added({ entity: m.entity_skill() }));
 		} catch (err) {
-			notifications.error('Failed to add skill');
+			notifications.error(m.notify_add_failed({ entity: m.entity_skill() }));
 			console.error(err);
 		}
 	}
@@ -175,9 +177,9 @@
 			await skillLibrary.removeFromProject(project.id, skillId);
 			await projectsStore.syncProjectConfig(project.id);
 			await loadProjectData();
-			notifications.success(`Removed ${skill?.name || 'Skill'} from ${project.name}`);
+			notifications.success(m.notify_removed({ entity: m.entity_skill() }));
 		} catch (err) {
-			notifications.error('Failed to remove skill');
+			notifications.error(m.notify_remove_failed({ entity: m.entity_skill() }));
 			console.error(err);
 		}
 	}
@@ -188,7 +190,7 @@
 			await projectsStore.syncProjectConfig(project.id);
 			await loadProjectData();
 		} catch (err) {
-			notifications.error('Failed to toggle skill');
+			notifications.error(m.notify_toggle_failed({ entity: m.entity_skill() }));
 			console.error(err);
 		}
 	}
@@ -199,9 +201,9 @@
 			await subagentLibrary.assignToProject(project.id, agent.id);
 			await projectsStore.syncProjectConfig(project.id);
 			await loadProjectData();
-			notifications.success(`Added ${agent.name} to ${project.name}`);
+			notifications.success(m.notify_added({ entity: m.entity_sub_agent() }));
 		} catch (err) {
-			notifications.error('Failed to add agent');
+			notifications.error(m.notify_add_failed({ entity: m.entity_sub_agent() }));
 			console.error(err);
 		}
 	}
@@ -212,9 +214,9 @@
 			await subagentLibrary.removeFromProject(project.id, agentId);
 			await projectsStore.syncProjectConfig(project.id);
 			await loadProjectData();
-			notifications.success(`Removed ${agent?.name || 'Agent'} from ${project.name}`);
+			notifications.success(m.notify_removed({ entity: m.entity_sub_agent() }));
 		} catch (err) {
-			notifications.error('Failed to remove agent');
+			notifications.error(m.notify_remove_failed({ entity: m.entity_sub_agent() }));
 			console.error(err);
 		}
 	}
@@ -225,7 +227,7 @@
 			await projectsStore.syncProjectConfig(project.id);
 			await loadProjectData();
 		} catch (err) {
-			notifications.error('Failed to toggle agent');
+			notifications.error(m.notify_toggle_failed({ entity: m.entity_sub_agent() }));
 			console.error(err);
 		}
 	}
@@ -236,9 +238,9 @@
 			await commandLibrary.assignToProject(project.id, command.id);
 			await projectsStore.syncProjectConfig(project.id);
 			await loadProjectData();
-			notifications.success(`Added ${command.name} to ${project.name}`);
+			notifications.success(m.notify_added({ entity: m.entity_command() }));
 		} catch (err) {
-			notifications.error('Failed to add command');
+			notifications.error(m.notify_add_failed({ entity: m.entity_command() }));
 			console.error(err);
 		}
 	}
@@ -249,9 +251,9 @@
 			await commandLibrary.removeFromProject(project.id, commandId);
 			await projectsStore.syncProjectConfig(project.id);
 			await loadProjectData();
-			notifications.success(`Removed ${command?.name || 'Command'} from ${project.name}`);
+			notifications.success(m.notify_removed({ entity: m.entity_command() }));
 		} catch (err) {
-			notifications.error('Failed to remove command');
+			notifications.error(m.notify_remove_failed({ entity: m.entity_command() }));
 			console.error(err);
 		}
 	}
@@ -262,7 +264,7 @@
 			await projectsStore.syncProjectConfig(project.id);
 			await loadProjectData();
 		} catch (err) {
-			notifications.error('Failed to toggle command');
+			notifications.error(m.notify_toggle_failed({ entity: m.entity_command() }));
 			console.error(err);
 		}
 	}
@@ -277,18 +279,14 @@
 		try {
 			await invoke('update_project_editor_type', { projectId: project.id, editorType });
 			await projectsStore.loadProjects();
-			notifications.success(`Switched to ${editorType === 'claude_code' ? 'Claude Code' : 'OpenCode'}`);
+			notifications.success(m.notify_switched_editor({ name: getEditorDisplayName(editorType) }));
 		} catch (err) {
-			notifications.error('Failed to change editor');
+			notifications.error(m.notify_switch_editor_failed());
 			console.error(err);
 		} finally {
 			updatingEditor = false;
 			showEditorDropdown = false;
 		}
-	}
-
-	function getEditorDisplayName(editorType: string): string {
-		return editorType === 'claude_code' ? 'Claude Code' : 'OpenCode';
 	}
 
 	// Clear search when switching tabs
@@ -300,10 +298,10 @@
 	// Get search placeholder based on active tab
 	function getSearchPlaceholder(): string {
 		switch (activeTab) {
-			case 'mcps': return 'Search available MCPs...';
-			case 'skills': return 'Search available skills...';
-			case 'agents': return 'Search available agents...';
-			case 'commands': return 'Search available commands...';
+			case 'mcps': return m.placeholder_search_mcps();
+			case 'skills': return m.placeholder_search_skills();
+			case 'agents': return m.placeholder_search_agents();
+			case 'commands': return m.placeholder_search_commands();
 		}
 	}
 
@@ -355,14 +353,14 @@
 										class="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {project.editorType === 'claude_code' ? 'text-primary-600 dark:text-primary-400' : 'text-gray-700 dark:text-gray-300'}"
 									>
 										<span class="w-4 h-4 rounded-sm bg-primary-500 text-white flex items-center justify-center text-[9px] font-bold">C</span>
-										Claude Code
+										{getEditorDisplayName('claude_code')}
 									</button>
 									<button
 										onclick={() => handleChangeEditorType('opencode')}
 										class="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {project.editorType === 'opencode' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-700 dark:text-gray-300'}"
 									>
 										<span class="w-4 h-4 rounded-sm bg-emerald-500 text-white flex items-center justify-center text-[9px] font-bold">O</span>
-										OpenCode
+										{getEditorDisplayName('opencode')}
 									</button>
 								</div>
 							{/if}
@@ -386,28 +384,28 @@
 				class="flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors {activeTab === 'mcps' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}"
 			>
 				<Plug class="w-4 h-4" />
-				MCPs ({project.assignedMcps.length})
+				{m.project_tab_mcps()} ({project.assignedMcps.length})
 			</button>
 			<button
 				onclick={() => handleTabChange('skills')}
 				class="flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors {activeTab === 'skills' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}"
 			>
 				<Sparkles class="w-4 h-4" />
-				Skills ({projectSkills.length})
+				{m.project_tab_skills()} ({projectSkills.length})
 			</button>
 			<button
 				onclick={() => handleTabChange('agents')}
 				class="flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors {activeTab === 'agents' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}"
 			>
 				<Bot class="w-4 h-4" />
-				Agents ({projectSubAgents.length})
+				{m.project_tab_agents()} ({projectSubAgents.length})
 			</button>
 			<button
 				onclick={() => handleTabChange('commands')}
 				class="flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors {activeTab === 'commands' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}"
 			>
 				<Terminal class="w-4 h-4" />
-				Commands ({projectCommands.length})
+				{m.project_tab_commands()} ({projectCommands.length})
 			</button>
 		</div>
 
@@ -417,7 +415,7 @@
 				<!-- Assigned MCPs -->
 				<div>
 					<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-						Assigned MCPs ({project.assignedMcps.length})
+						{m.project_assigned_mcps({ count: project.assignedMcps.length })}
 					</h3>
 					{#if project.assignedMcps.length > 0}
 						<div class="space-y-2">
@@ -442,7 +440,7 @@
 											class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {assignment.isEnabled ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'}"
 											role="switch"
 											aria-checked={assignment.isEnabled}
-											title={assignment.isEnabled ? 'Disable' : 'Enable'}
+											title={assignment.isEnabled ? m.action_disable() : m.action_enable()}
 										>
 											<span
 												class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {assignment.isEnabled ? 'translate-x-4' : 'translate-x-0'}"
@@ -452,7 +450,7 @@
 										<button
 											onclick={() => handleRemoveMcp(assignment.mcpId)}
 											class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-											title="Remove from project"
+											title={m.action_remove_from_project()}
 										>
 											<Minus class="w-4 h-4" />
 										</button>
@@ -462,8 +460,8 @@
 						</div>
 					{:else}
 						<div class="text-center py-6 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
-							<p class="text-gray-500 dark:text-gray-400">No MCPs assigned yet</p>
-							<p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Add MCPs from the library below</p>
+							<p class="text-gray-500 dark:text-gray-400">{m.project_empty_no_mcps()}</p>
+							<p class="text-sm text-gray-400 dark:text-gray-500 mt-1">{m.project_empty_add_mcps_hint()}</p>
 						</div>
 					{/if}
 				</div>
@@ -472,7 +470,7 @@
 				<div>
 					<div class="flex items-center justify-between mb-3">
 						<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-							Available MCPs ({availableMcps.length})
+							{m.project_available_mcps({ count: availableMcps.length })}
 						</h3>
 						{#if availableMcps.length > 3}
 							<div class="relative w-48">
@@ -503,7 +501,7 @@
 										<button
 											onclick={() => handleAddMcp(mcp)}
 											class="p-1.5 text-gray-400 hover:text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
-											title="Add to project"
+											title={m.action_add_to_project()}
 										>
 											<Plus class="w-4 h-4" />
 										</button>
@@ -512,12 +510,12 @@
 							</div>
 						{:else}
 							<div class="text-center py-4 text-sm text-gray-500 dark:text-gray-400">
-								No MCPs match "{searchQuery}"
+								{m.project_no_mcps_match({ query: searchQuery })}
 							</div>
 						{/if}
 					{:else}
 						<div class="text-center py-6 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
-							<p class="text-gray-500 dark:text-gray-400">All MCPs are assigned</p>
+							<p class="text-gray-500 dark:text-gray-400">{m.project_all_mcps_assigned()}</p>
 						</div>
 					{/if}
 				</div>
@@ -525,7 +523,7 @@
 				<!-- Assigned Skills -->
 				<div>
 					<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-						Assigned Skills ({projectSkills.length})
+						{m.project_assigned_skills({ count: projectSkills.length })}
 					</h3>
 					{#if projectSkills.length > 0}
 						<div class="space-y-2">
@@ -552,7 +550,7 @@
 											class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {assignment.isEnabled ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'}"
 											role="switch"
 											aria-checked={assignment.isEnabled}
-											title={assignment.isEnabled ? 'Disable' : 'Enable'}
+											title={assignment.isEnabled ? m.action_disable() : m.action_enable()}
 										>
 											<span
 												class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {assignment.isEnabled ? 'translate-x-4' : 'translate-x-0'}"
@@ -562,7 +560,7 @@
 										<button
 											onclick={() => handleRemoveSkill(assignment.skillId)}
 											class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-											title="Remove from project"
+											title={m.action_remove_from_project()}
 										>
 											<Minus class="w-4 h-4" />
 										</button>
@@ -572,8 +570,8 @@
 						</div>
 					{:else}
 						<div class="text-center py-6 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
-							<p class="text-gray-500 dark:text-gray-400">No skills assigned yet</p>
-							<p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Add skills from the library below</p>
+							<p class="text-gray-500 dark:text-gray-400">{m.project_empty_no_skills()}</p>
+							<p class="text-sm text-gray-400 dark:text-gray-500 mt-1">{m.project_empty_add_skills_hint()}</p>
 						</div>
 					{/if}
 				</div>
@@ -582,7 +580,7 @@
 				<div>
 					<div class="flex items-center justify-between mb-3">
 						<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-							Available Skills ({availableSkills.length})
+							{m.project_available_skills({ count: availableSkills.length })}
 						</h3>
 						{#if availableSkills.length > 3}
 							<div class="relative w-48">
@@ -615,7 +613,7 @@
 										<button
 											onclick={() => handleAddSkill(skill)}
 											class="p-1.5 text-gray-400 hover:text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors flex-shrink-0"
-											title="Add to project"
+											title={m.action_add_to_project()}
 										>
 											<Plus class="w-4 h-4" />
 										</button>
@@ -624,12 +622,12 @@
 							</div>
 						{:else}
 							<div class="text-center py-4 text-sm text-gray-500 dark:text-gray-400">
-								No skills match "{searchQuery}"
+								{m.project_no_skills_match({ query: searchQuery })}
 							</div>
 						{/if}
 					{:else}
 						<div class="text-center py-6 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
-							<p class="text-gray-500 dark:text-gray-400">All skills are assigned</p>
+							<p class="text-gray-500 dark:text-gray-400">{m.project_all_skills_assigned()}</p>
 						</div>
 					{/if}
 				</div>
@@ -637,7 +635,7 @@
 				<!-- Assigned SubAgents -->
 				<div>
 					<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-						Assigned Agents ({projectSubAgents.length})
+						{m.project_assigned_agents({ count: projectSubAgents.length })}
 					</h3>
 					{#if projectSubAgents.length > 0}
 						<div class="space-y-2">
@@ -664,7 +662,7 @@
 											class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {assignment.isEnabled ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'}"
 											role="switch"
 											aria-checked={assignment.isEnabled}
-											title={assignment.isEnabled ? 'Disable' : 'Enable'}
+											title={assignment.isEnabled ? m.action_disable() : m.action_enable()}
 										>
 											<span
 												class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {assignment.isEnabled ? 'translate-x-4' : 'translate-x-0'}"
@@ -674,7 +672,7 @@
 										<button
 											onclick={() => handleRemoveSubAgent(assignment.subagentId)}
 											class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-											title="Remove from project"
+											title={m.action_remove_from_project()}
 										>
 											<Minus class="w-4 h-4" />
 										</button>
@@ -684,8 +682,8 @@
 						</div>
 					{:else}
 						<div class="text-center py-6 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
-							<p class="text-gray-500 dark:text-gray-400">No agents assigned yet</p>
-							<p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Add agents from the library below</p>
+							<p class="text-gray-500 dark:text-gray-400">{m.project_empty_no_agents()}</p>
+							<p class="text-sm text-gray-400 dark:text-gray-500 mt-1">{m.project_empty_add_agents_hint()}</p>
 						</div>
 					{/if}
 				</div>
@@ -694,7 +692,7 @@
 				<div>
 					<div class="flex items-center justify-between mb-3">
 						<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-							Available Agents ({availableSubAgents.length})
+							{m.project_available_agents({ count: availableSubAgents.length })}
 						</h3>
 						{#if availableSubAgents.length > 3}
 							<div class="relative w-48">
@@ -727,7 +725,7 @@
 										<button
 											onclick={() => handleAddSubAgent(agent)}
 											class="p-1.5 text-gray-400 hover:text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors flex-shrink-0"
-											title="Add to project"
+											title={m.action_add_to_project()}
 										>
 											<Plus class="w-4 h-4" />
 										</button>
@@ -736,12 +734,12 @@
 							</div>
 						{:else}
 							<div class="text-center py-4 text-sm text-gray-500 dark:text-gray-400">
-								No agents match "{searchQuery}"
+								{m.project_no_agents_match({ query: searchQuery })}
 							</div>
 						{/if}
 					{:else}
 						<div class="text-center py-6 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
-							<p class="text-gray-500 dark:text-gray-400">All agents are assigned</p>
+							<p class="text-gray-500 dark:text-gray-400">{m.project_all_agents_assigned()}</p>
 						</div>
 					{/if}
 				</div>
@@ -749,7 +747,7 @@
 				<!-- Assigned Commands -->
 				<div>
 					<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-						Assigned Commands ({projectCommands.length})
+						{m.project_assigned_commands({ count: projectCommands.length })}
 					</h3>
 					{#if projectCommands.length > 0}
 						<div class="space-y-2">
@@ -776,7 +774,7 @@
 											class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {assignment.isEnabled ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'}"
 											role="switch"
 											aria-checked={assignment.isEnabled}
-											title={assignment.isEnabled ? 'Disable' : 'Enable'}
+											title={assignment.isEnabled ? m.action_disable() : m.action_enable()}
 										>
 											<span
 												class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {assignment.isEnabled ? 'translate-x-4' : 'translate-x-0'}"
@@ -786,7 +784,7 @@
 										<button
 											onclick={() => handleRemoveCommand(assignment.commandId)}
 											class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-											title="Remove from project"
+											title={m.action_remove_from_project()}
 										>
 											<Minus class="w-4 h-4" />
 										</button>
@@ -796,8 +794,8 @@
 						</div>
 					{:else}
 						<div class="text-center py-6 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
-							<p class="text-gray-500 dark:text-gray-400">No commands assigned yet</p>
-							<p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Add commands from the library below</p>
+							<p class="text-gray-500 dark:text-gray-400">{m.project_empty_no_commands()}</p>
+							<p class="text-sm text-gray-400 dark:text-gray-500 mt-1">{m.project_empty_add_commands_hint()}</p>
 						</div>
 					{/if}
 				</div>
@@ -806,7 +804,7 @@
 				<div>
 					<div class="flex items-center justify-between mb-3">
 						<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-							Available Commands ({availableCommands.length})
+							{m.project_available_commands({ count: availableCommands.length })}
 						</h3>
 						{#if availableCommands.length > 3}
 							<div class="relative w-48">
@@ -839,7 +837,7 @@
 										<button
 											onclick={() => handleAddCommand(command)}
 											class="p-1.5 text-gray-400 hover:text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors flex-shrink-0"
-											title="Add to project"
+											title={m.action_add_to_project()}
 										>
 											<Plus class="w-4 h-4" />
 										</button>
@@ -848,12 +846,12 @@
 							</div>
 						{:else}
 							<div class="text-center py-4 text-sm text-gray-500 dark:text-gray-400">
-								No commands match "{searchQuery}"
+								{m.project_no_commands_match({ query: searchQuery })}
 							</div>
 						{/if}
 					{:else}
 						<div class="text-center py-6 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
-							<p class="text-gray-500 dark:text-gray-400">All commands are assigned</p>
+							<p class="text-gray-500 dark:text-gray-400">{m.project_all_commands_assigned()}</p>
 						</div>
 					{/if}
 				</div>

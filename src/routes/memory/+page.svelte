@@ -11,6 +11,7 @@
 	import { memoryLibrary, projectsStore, notifications } from '$lib/stores';
 	import type { MemoryScope } from '$lib/types';
 	import { RefreshCw, FolderOpen, Eye, EyeOff, Plus, Trash2, Save, Undo2, FileText } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let showDeleteConfirm = $state(false);
 	let pendingScopeSwitch = $state<MemoryScope | null>(null);
@@ -50,18 +51,18 @@
 	async function handleSave() {
 		try {
 			await memoryLibrary.save();
-			notifications.success('Memory file saved');
+			notifications.success(m.notify_saved({ entity: m.entity_memory() }));
 		} catch {
-			notifications.error('Failed to save memory file');
+			notifications.error(m.notify_save_failed({ entity: m.entity_memory() }));
 		}
 	}
 
 	async function handleCreate() {
 		try {
 			await memoryLibrary.createFile();
-			notifications.success('Memory file created');
+			notifications.success(m.notify_created({ entity: m.entity_memory() }));
 		} catch {
-			notifications.error('Failed to create memory file');
+			notifications.error(m.notify_create_failed({ entity: m.entity_memory() }));
 		}
 	}
 
@@ -69,20 +70,20 @@
 		showDeleteConfirm = false;
 		try {
 			await memoryLibrary.deleteFile();
-			notifications.success('Memory file deleted');
+			notifications.success(m.notify_deleted({ entity: m.entity_memory() }));
 		} catch {
-			notifications.error('Failed to delete memory file');
+			notifications.error(m.notify_delete_failed({ entity: m.entity_memory() }));
 		}
 	}
 
 	function handleDiscard() {
 		memoryLibrary.discardChanges();
-		notifications.success('Changes discarded');
+		notifications.success(m.notify_changes_discarded());
 	}
 
 	async function handleRefresh() {
 		await memoryLibrary.load();
-		notifications.success('Memory files refreshed');
+		notifications.success(m.notify_refreshed({ entity: m.entity_memory() }));
 	}
 
 	function handleContentChange(content: string) {
@@ -98,8 +99,8 @@
 </script>
 
 <Header
-	title="Memory Files"
-	subtitle="Manage CLAUDE.md memory files — persistent instructions loaded at startup"
+	title={m.page_memory_title()}
+	subtitle={m.page_memory_subtitle()}
 />
 
 <div class="flex-1 overflow-auto p-6">
@@ -113,7 +114,7 @@
 				onchange={handleProjectChange}
 				class="input text-sm"
 			>
-				<option value="">No project</option>
+				<option value="">{m.project_none_selected()}</option>
 				{#each projectsStore.projects as project}
 					<option value={project.path}>{project.name}</option>
 				{/each}
@@ -135,19 +136,19 @@
 			<button
 				onclick={handleTogglePreview}
 				class="btn btn-secondary"
-				title={memoryLibrary.showPreview ? 'Hide preview' : 'Show preview'}
+				title={memoryLibrary.showPreview ? m.memory_hide_preview() : m.memory_show_preview()}
 			>
 				{#if memoryLibrary.showPreview}
 					<EyeOff class="w-4 h-4 mr-2" />
 				{:else}
 					<Eye class="w-4 h-4 mr-2" />
 				{/if}
-				Preview
+				{memoryLibrary.showPreview ? m.memory_hide_preview() : m.memory_show_preview()}
 			</button>
 			<button
 				onclick={handleRefresh}
 				class="btn btn-ghost"
-				title="Refresh from disk"
+				title={m.memory_refresh_from_disk()}
 			>
 				<RefreshCw class="w-4 h-4" />
 			</button>
@@ -188,7 +189,7 @@
 					class="btn btn-primary"
 				>
 					<Save class="w-4 h-4 mr-2" />
-					Save
+					{m.action_save()}
 				</button>
 				<button
 					onclick={handleDiscard}
@@ -196,11 +197,11 @@
 					class="btn btn-secondary"
 				>
 					<Undo2 class="w-4 h-4 mr-2" />
-					Discard
+					{m.action_discard()}
 				</button>
 
 				{#if memoryLibrary.hasUnsavedChanges}
-					<span class="text-xs text-amber-600 dark:text-amber-400">Unsaved changes</span>
+					<span class="text-xs text-amber-600 dark:text-amber-400">{m.memory_unsaved_changes()}</span>
 				{/if}
 
 				<div class="flex-1"></div>
@@ -210,7 +211,7 @@
 					class="btn text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
 				>
 					<Trash2 class="w-4 h-4 mr-2" />
-					Delete File
+					{m.action_delete_file()}
 				</button>
 			</div>
 		{:else}
@@ -218,14 +219,14 @@
 			<div class="text-center py-16 bg-gray-50 dark:bg-gray-800/30 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
 				<div class="text-gray-400 dark:text-gray-500 mb-4">
 					<FileText class="w-12 h-12 mx-auto mb-3 opacity-50" />
-					<p class="text-lg font-medium">No memory file found</p>
+					<p class="text-lg font-medium">{m.memory_file_not_exists()}</p>
 					<p class="text-sm mt-1">
 						{#if memoryLibrary.selectedScope === 'user'}
-							Create a global CLAUDE.md file with instructions that apply to all projects.
+							{m.memory_scope_user_desc()}
 						{:else if memoryLibrary.selectedScope === 'project'}
-							Create a project CLAUDE.md file with instructions shared with your team.
+							{m.memory_scope_project_desc()}
 						{:else}
-							Create a local CLAUDE.local.md file for personal overrides (not committed to git).
+							{m.memory_scope_local_desc()}
 						{/if}
 					</p>
 				</div>
@@ -234,13 +235,13 @@
 					class="btn btn-primary"
 				>
 					<Plus class="w-4 h-4 mr-2" />
-					Create File
+					{m.action_create_file()}
 				</button>
 			</div>
 		{/if}
 	{:else}
 		<div class="text-center py-20 text-gray-400 dark:text-gray-500">
-			<p>Select a scope to view memory files</p>
+			<p>{m.memory_select_scope()}</p>
 		</div>
 	{/if}
 </div>
@@ -248,9 +249,9 @@
 <!-- Delete confirmation -->
 <ConfirmDialog
 	open={showDeleteConfirm}
-	title="Delete Memory File"
-	message="Are you sure you want to delete this memory file? This action cannot be undone."
-	confirmText="Delete"
+	title={m.confirm_delete_title({ entity: m.entity_memory_file() })}
+	message={m.confirm_delete_memory_message()}
+	confirmText={m.action_delete()}
 	variant="danger"
 	onConfirm={handleDelete}
 	onCancel={() => (showDeleteConfirm = false)}
@@ -259,9 +260,9 @@
 <!-- Unsaved changes confirmation on scope switch -->
 <ConfirmDialog
 	open={pendingScopeSwitch !== null}
-	title="Unsaved Changes"
-	message="You have unsaved changes. Switching scopes will discard them. Continue?"
-	confirmText="Discard & Switch"
+	title={m.confirm_unsaved_title()}
+	message={m.confirm_unsaved_message()}
+	confirmText={m.action_discard_switch()}
 	variant="warning"
 	onConfirm={confirmScopeSwitch}
 	onCancel={cancelScopeSwitch}

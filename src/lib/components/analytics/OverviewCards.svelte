@@ -2,6 +2,7 @@
 	import { Hash, MessageSquare, Wrench, Calendar, Clock, DollarSign } from 'lucide-svelte';
 	import type { LongestSession } from '$lib/types';
 	import { formatCompactNumber, formatDuration, formatCost } from '$lib/types/usage';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		totalSessions: number | null;
@@ -38,42 +39,42 @@
 
 	const cards = $derived([
 		{
-			label: 'Total Sessions',
+			label: m.analytics_total_sessions(),
 			value: totalSessions != null ? formatCompactNumber(totalSessions) : '0',
 			icon: Hash,
 			color: 'bg-blue-500'
 		},
 		{
-			label: 'Total Messages',
+			label: m.analytics_total_messages(),
 			value: totalMessages != null ? formatCompactNumber(totalMessages) : '0',
 			icon: MessageSquare,
 			color: 'bg-purple-500'
 		},
 		{
-			label: 'Tool Calls',
+			label: m.analytics_tool_calls(),
 			value: formatCompactNumber(totalToolCalls),
 			icon: Wrench,
 			color: 'bg-amber-500'
 		},
 		{
-			label: 'First Session',
+			label: m.analytics_first_session(),
 			value: formatDate(firstSessionDate),
 			icon: Calendar,
 			color: 'bg-green-500'
 		},
 		{
-			label: 'Longest Session',
+			label: m.analytics_longest_session(),
 			value: longestSession ? formatDuration(longestSession.duration) : 'N/A',
-			subtitle: longestSession ? `${longestSession.messageCount} messages` : undefined,
+			subtitle: longestSession ? m.analytics_message_count({ count: longestSession.messageCount }) : undefined,
 			icon: Clock,
 			color: 'bg-rose-500'
 		},
 		...(totalCostUSD != null
 			? [
 					{
-						label: 'Est. API Cost',
+						label: m.label_est_cost(),
 						value: formatCost(totalCostUSD),
-						subtitle: 'if billed at API rates',
+						subtitle: m.analytics_if_billed_api_rates(),
 						icon: DollarSign,
 						color: 'bg-emerald-500'
 					}
@@ -105,6 +106,6 @@
 
 {#if lastComputedDate}
 	<p class="text-xs text-gray-400 dark:text-gray-500 mt-2">
-		Last updated: {formatDate(lastComputedDate)}
+		{m.analytics_last_updated({ date: formatDate(lastComputedDate) })}
 	</p>
 {/if}

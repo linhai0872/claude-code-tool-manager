@@ -2,6 +2,7 @@
 	import type { Project } from '$lib/types';
 	import { goto } from '$app/navigation';
 	import { projectsStore } from '$lib/stores';
+	import * as m from '$lib/paraglide/messages.js';
 	import ProjectCard from './ProjectCard.svelte';
 	import { SearchBar } from '$lib/components/shared';
 	import { FolderOpen, Plus } from 'lucide-svelte';
@@ -41,15 +42,15 @@
 	<!-- Header -->
 	<div class="flex items-center justify-between">
 		<div>
-			<h3 class="text-lg font-semibold text-gray-900 dark:text-white">Projects</h3>
+			<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{m.page_projects_title()}</h3>
 			<p class="text-sm text-gray-500 dark:text-gray-400">
-				Click a project to open its dashboard
+				{m.project_click_to_open()}
 			</p>
 		</div>
 		{#if onAddProject}
 			<button onclick={onAddProject} class="btn btn-primary">
 				<Plus class="w-4 h-4 mr-2" />
-				Add Project
+				{m.project_add_project()}
 			</button>
 		{/if}
 	</div>
@@ -57,7 +58,7 @@
 	<!-- Search Bar -->
 	{#if projectsStore.projects.length > 0}
 		<div class="max-w-md">
-			<SearchBar bind:value={searchQuery} placeholder="Search projects..." />
+			<SearchBar bind:value={searchQuery} placeholder={m.placeholder_search_projects()} />
 		</div>
 	{/if}
 
@@ -69,23 +70,23 @@
 	{:else if projectsStore.projects.length === 0}
 		<div class="text-center py-12 card">
 			<FolderOpen class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-			<h3 class="text-lg font-medium text-gray-900 dark:text-white">No projects added</h3>
+			<h3 class="text-lg font-medium text-gray-900 dark:text-white">{m.project_no_projects_added()}</h3>
 			<p class="text-gray-500 dark:text-gray-400 mt-1 mb-4">
-				Add a project folder to start managing MCPs
+				{m.project_add_folder_hint()}
 			</p>
 			{#if onAddProject}
 				<button onclick={onAddProject} class="btn btn-primary">
 					<Plus class="w-4 h-4 mr-2" />
-					Add Your First Project
+					{m.project_add_first_project()}
 				</button>
 			{/if}
 		</div>
 	{:else if filteredProjects.length === 0}
 		<div class="text-center py-12 card">
 			<FolderOpen class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-			<h3 class="text-lg font-medium text-gray-900 dark:text-white">No projects found</h3>
+			<h3 class="text-lg font-medium text-gray-900 dark:text-white">{m.project_no_projects_found()}</h3>
 			<p class="text-gray-500 dark:text-gray-400 mt-1">
-				No projects match "{searchQuery}"
+				{m.project_no_projects_match({ query: searchQuery })}
 			</p>
 		</div>
 	{:else}

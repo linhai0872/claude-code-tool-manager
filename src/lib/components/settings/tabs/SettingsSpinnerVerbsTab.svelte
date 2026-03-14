@@ -5,6 +5,7 @@
 	import { spinnerVerbLibrary, notifications } from '$lib/stores';
 	import type { SpinnerVerb } from '$lib/types';
 	import { Plus, RefreshCw } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let showAddVerb = $state(false);
 	let editingVerb = $state<SpinnerVerb | null>(null);
@@ -19,9 +20,9 @@
 		try {
 			await spinnerVerbLibrary.create(verb);
 			showAddVerb = false;
-			notifications.success('Spinner verb added');
+			notifications.success(m.notify_added({ entity: m.entity_verb() }));
 		} catch (err) {
-			notifications.error('Failed to add spinner verb: ' + String(err));
+			notifications.error(m.notify_add_failed({ entity: m.entity_verb() }));
 		}
 	}
 
@@ -30,9 +31,9 @@
 		try {
 			await spinnerVerbLibrary.update(editingVerb.id, verb, editingVerb.isEnabled);
 			editingVerb = null;
-			notifications.success('Spinner verb updated');
+			notifications.success(m.notify_updated({ entity: m.entity_verb() }));
 		} catch (err) {
-			notifications.error('Failed to update spinner verb: ' + String(err));
+			notifications.error(m.notify_update_failed({ entity: m.entity_verb() }));
 		}
 	}
 
@@ -40,9 +41,9 @@
 		if (!deletingVerb) return;
 		try {
 			await spinnerVerbLibrary.delete(deletingVerb.id);
-			notifications.success('Spinner verb deleted');
+			notifications.success(m.notify_deleted({ entity: m.entity_verb() }));
 		} catch (err) {
-			notifications.error('Failed to delete spinner verb');
+			notifications.error(m.notify_delete_failed({ entity: m.entity_verb() }));
 		} finally {
 			deletingVerb = null;
 		}
@@ -53,9 +54,9 @@
 		const mode = target.value as 'append' | 'replace';
 		try {
 			await spinnerVerbLibrary.setMode(mode);
-			notifications.success(`Mode set to "${mode}"`);
+			notifications.success(m.notify_mode_set({ mode }));
 		} catch (err) {
-			notifications.error('Failed to change mode');
+			notifications.error(m.notify_mode_change_failed());
 		}
 	}
 
@@ -63,9 +64,9 @@
 		isSyncing = true;
 		try {
 			await spinnerVerbLibrary.sync();
-			notifications.success('Spinner verbs synced to settings.json');
+			notifications.success(m.notify_spinner_synced());
 		} catch (err) {
-			notifications.error('Failed to sync: ' + String(err));
+			notifications.error(m.notify_sync_failed({ entity: m.entity_verb() }));
 		} finally {
 			isSyncing = false;
 		}
@@ -79,7 +80,7 @@
 			for="spinner-mode"
 			class="text-sm font-medium text-gray-700 dark:text-gray-300"
 		>
-			Mode:
+			{m.spinner_mode_label()}
 		</label>
 		<select
 			id="spinner-mode"
@@ -87,8 +88,8 @@
 			onchange={handleModeChange}
 			class="px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
 		>
-			<option value="append">Append (add to defaults)</option>
-			<option value="replace">Replace (use only these)</option>
+			<option value="append">{m.spinner_mode_append()}</option>
+			<option value="replace">{m.spinner_mode_replace()}</option>
 		</select>
 	</div>
 
@@ -99,11 +100,11 @@
 			class="btn btn-secondary flex items-center gap-2"
 		>
 			<RefreshCw class="w-4 h-4 {isSyncing ? 'animate-spin' : ''}" />
-			Sync to Settings
+			{m.spinner_sync_settings()}
 		</button>
 		<button onclick={() => (showAddVerb = true)} class="btn btn-primary">
 			<Plus class="w-4 h-4 mr-2" />
-			Add Verb
+			{m.spinner_add_verb()}
 		</button>
 	</div>
 </div>
@@ -120,7 +121,7 @@
 		<div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full mx-4">
 			<div class="p-6">
 				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-					Add Spinner Verb
+					{m.spinner_add_title()}
 				</h2>
 				<SpinnerVerbForm onSubmit={handleCreate} onCancel={() => (showAddVerb = false)} />
 			</div>
@@ -134,7 +135,7 @@
 		<div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full mx-4">
 			<div class="p-6">
 				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-					Edit Spinner Verb
+					{m.spinner_edit_title()}
 				</h2>
 				<SpinnerVerbForm
 					initialValues={editingVerb}
@@ -148,9 +149,9 @@
 
 <ConfirmDialog
 	open={!!deletingVerb}
-	title="Delete Spinner Verb"
-	message="Are you sure you want to delete '{deletingVerb?.verb}'? This cannot be undone."
-	confirmText="Delete"
+	title={m.confirm_delete_title({ entity: m.entity_spinner_verb() })}
+	message={m.confirm_delete_message_no_undo({ name: deletingVerb?.verb ?? '' })}
+	confirmText={m.action_delete()}
 	onConfirm={handleDelete}
 	onCancel={() => (deletingVerb = null)}
 />

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { hookLibrary, soundLibrary, notifications } from '$lib/stores';
+	import * as m from '$lib/paraglide/messages.js';
 	import { SOUND_HOOK_PRESETS, getDefaultSound, type HookEventType, type SoundMethod } from '$lib/types';
 	import { SoundPicker } from '$lib/components/sounds';
 	import {
@@ -44,6 +45,66 @@
 			default:
 				return Bell;
 		}
+	}
+
+	function getPresetName(id: string) {
+		switch (id) {
+			case 'task-complete':
+				return m.sound_hook_preset_task_complete_name();
+			case 'permission-required':
+				return m.sound_hook_preset_permission_required_name();
+			case 'full-suite':
+				return m.sound_hook_preset_full_suite_name();
+			default:
+				return id;
+		}
+	}
+
+	function getPresetDescription(id: string) {
+		switch (id) {
+			case 'task-complete':
+				return m.sound_hook_preset_task_complete_desc();
+			case 'permission-required':
+				return m.sound_hook_preset_permission_required_desc();
+			case 'full-suite':
+				return m.sound_hook_preset_full_suite_desc();
+			default:
+				return '';
+		}
+	}
+
+	function getEventLabel(event: HookEventType) {
+		switch (event) {
+			case 'Stop':
+				return m.sound_hook_event_stop_label();
+			case 'SubagentStop':
+				return m.sound_hook_event_subagent_stop_label();
+			case 'Notification':
+				return m.sound_hook_event_notification_label();
+			case 'SessionStart':
+				return m.sound_hook_event_session_start_label();
+			case 'SessionEnd':
+				return m.sound_hook_event_session_end_label();
+		}
+	}
+
+	function getEventDescription(event: HookEventType) {
+		switch (event) {
+			case 'Stop':
+				return m.sound_hook_event_stop_desc();
+			case 'SubagentStop':
+				return m.sound_hook_event_subagent_stop_desc();
+			case 'Notification':
+				return m.sound_hook_event_notification_desc();
+			case 'SessionStart':
+				return m.sound_hook_event_session_start_desc();
+			case 'SessionEnd':
+				return m.sound_hook_event_session_end_desc();
+		}
+	}
+
+	function getMethodLabel(method: SoundMethod) {
+		return method === 'shell' ? m.sound_hook_shell_command() : m.sound_hook_python_script();
 	}
 
 	function selectPreset(id: string) {
@@ -97,11 +158,11 @@
 				selectedMethod
 			);
 
-			notifications.success(`Created ${hooks.length} sound notification hooks`);
+			notifications.success(m.notify_created_count({ count: String(hooks.length) }));
 			onComplete?.();
 			onClose();
 		} catch (e) {
-			notifications.error('Failed to create hooks');
+			notifications.error(m.notify_create_failed({ entity: m.entity_hook() }));
 			console.error(e);
 		} finally {
 			isCreating = false;
@@ -109,11 +170,11 @@
 	}
 
 	const allEvents: { event: HookEventType; label: string; description: string }[] = [
-		{ event: 'Stop', label: 'Task Complete', description: 'When Claude finishes responding' },
-		{ event: 'SubagentStop', label: 'Subagent Complete', description: 'When a background agent finishes' },
-		{ event: 'Notification', label: 'Notification', description: 'System notifications (permission, idle)' },
-		{ event: 'SessionStart', label: 'Session Start', description: 'When a new session begins' },
-		{ event: 'SessionEnd', label: 'Session End', description: 'When a session ends' }
+		{ event: 'Stop', label: m.sound_hook_event_stop_label(), description: m.sound_hook_event_stop_desc() },
+		{ event: 'SubagentStop', label: m.sound_hook_event_subagent_stop_label(), description: m.sound_hook_event_subagent_stop_desc() },
+		{ event: 'Notification', label: m.sound_hook_event_notification_label(), description: m.sound_hook_event_notification_desc() },
+		{ event: 'SessionStart', label: m.sound_hook_event_session_start_label(), description: m.sound_hook_event_session_start_desc() },
+		{ event: 'SessionEnd', label: m.sound_hook_event_session_end_label(), description: m.sound_hook_event_session_end_desc() }
 	];
 </script>
 
@@ -126,11 +187,11 @@
 					<Volume2 class="w-5 h-5 text-orange-600 dark:text-orange-400" />
 				</div>
 				<div>
-					<h2 class="text-lg font-semibold text-gray-900 dark:text-white">Sound Notifications Setup</h2>
-					<p class="text-sm text-gray-500">Step {step} of 3</p>
+					<h2 class="text-lg font-semibold text-gray-900 dark:text-white">{m.modal_sound_setup_title()}</h2>
+					<p class="text-sm text-gray-500">{m.sound_hook_step_of({ step: String(step), total: '3' })}</p>
 				</div>
 			</div>
-			<button onclick={onClose} class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+			<button onclick={onClose} title={m.action_close()} class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
 				<X class="w-5 h-5" />
 			</button>
 		</div>
@@ -149,13 +210,13 @@
 				<!-- Step 1: Choose events -->
 				<div class="space-y-6">
 					<div>
-						<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Choose Events</h3>
-						<p class="text-sm text-gray-500">Select which events should trigger a sound notification</p>
+						<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">{m.modal_sound_step_events()}</h3>
+						<p class="text-sm text-gray-500">{m.sound_hook_choose_events_desc()}</p>
 					</div>
 
 					<!-- Presets -->
 					<div>
-						<p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Quick Presets</p>
+						<p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{m.sound_hook_quick_presets()}</p>
 						<div class="grid grid-cols-3 gap-3">
 							{#each SOUND_HOOK_PRESETS as preset (preset.id)}
 								{@const Icon = getPresetIcon(preset.id)}
@@ -167,8 +228,8 @@
 										: 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'}"
 								>
 									<Icon class="w-8 h-8 mb-2 {selectedPresetId === preset.id ? 'text-orange-600' : 'text-gray-400'}" />
-									<span class="text-sm font-medium text-gray-900 dark:text-white">{preset.name}</span>
-									<span class="text-xs text-gray-500 text-center mt-1">{preset.description}</span>
+									<span class="text-sm font-medium text-gray-900 dark:text-white">{getPresetName(preset.id)}</span>
+									<span class="text-xs text-gray-500 text-center mt-1">{getPresetDescription(preset.id)}</span>
 								</button>
 							{/each}
 						</div>
@@ -176,7 +237,7 @@
 
 					<!-- Individual events -->
 					<div>
-						<p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Or Select Individual Events</p>
+						<p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{m.sound_hook_select_individual_events()}</p>
 						<div class="space-y-2">
 							{#each allEvents as { event, label, description } (event)}
 								<button
@@ -207,8 +268,8 @@
 				<!-- Step 2: Choose sound -->
 				<div class="space-y-6">
 					<div>
-						<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Choose Sound</h3>
-						<p class="text-sm text-gray-500">Select the sound to play when events trigger</p>
+						<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">{m.modal_sound_step_sound()}</h3>
+						<p class="text-sm text-gray-500">{m.sound_hook_choose_sound_desc()}</p>
 					</div>
 
 					<div>
@@ -221,7 +282,7 @@
 					{#if selectedSound}
 						<div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
 							<p class="text-sm text-gray-600 dark:text-gray-400">
-								<span class="font-medium">Selected:</span>
+								<span class="font-medium">{m.sound_hook_selected()}</span>
 								<span class="font-mono text-xs ml-2">{selectedSound}</span>
 							</p>
 						</div>
@@ -231,8 +292,8 @@
 				<!-- Step 3: Choose method and review -->
 				<div class="space-y-6">
 					<div>
-						<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Playback Method</h3>
-						<p class="text-sm text-gray-500">Choose how the sound should be played</p>
+						<h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">{m.modal_sound_step_playback()}</h3>
+						<p class="text-sm text-gray-500">{m.sound_hook_choose_playback_desc()}</p>
 					</div>
 
 					<div class="grid grid-cols-2 gap-4">
@@ -244,8 +305,8 @@
 								: 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'}"
 						>
 							<Terminal class="w-8 h-8 mb-2 {selectedMethod === 'shell' ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400'}" />
-							<span class="font-medium text-gray-900 dark:text-white">Shell Command</span>
-							<span class="text-xs text-gray-500 text-center mt-1">Direct OS command (afplay/paplay)</span>
+							<span class="font-medium text-gray-900 dark:text-white">{m.sound_hook_shell_command()}</span>
+							<span class="text-xs text-gray-500 text-center mt-1">{m.sound_hook_shell_command_desc()}</span>
 						</button>
 
 						<button
@@ -256,36 +317,34 @@
 								: 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'}"
 						>
 							<FileCode class="w-8 h-8 mb-2 {selectedMethod === 'python' ? 'text-violet-600' : 'text-gray-400'}" />
-							<span class="font-medium text-gray-900 dark:text-white">Python Script</span>
-							<span class="text-xs text-gray-500 text-center mt-1">Cross-platform notification script</span>
+							<span class="font-medium text-gray-900 dark:text-white">{m.sound_hook_python_script()}</span>
+							<span class="text-xs text-gray-500 text-center mt-1">{m.sound_hook_python_script_desc()}</span>
 						</button>
 					</div>
 
 					<!-- Summary -->
 					<div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg space-y-3">
-						<p class="text-sm font-medium text-gray-700 dark:text-gray-300">Summary</p>
+						<p class="text-sm font-medium text-gray-700 dark:text-gray-300">{m.label_summary()}</p>
 						<div class="space-y-2 text-sm">
 							<div class="flex justify-between">
-								<span class="text-gray-500">Events:</span>
-								<span class="text-gray-900 dark:text-white">{selectedEvents.join(', ')}</span>
+								<span class="text-gray-500">{m.sound_hook_events()}</span>
+								<span class="text-gray-900 dark:text-white">{selectedEvents.map((event) => getEventLabel(event)).join(', ')}</span>
 							</div>
 							<div class="flex justify-between">
-								<span class="text-gray-500">Sound:</span>
+								<span class="text-gray-500">{m.sound_hook_sound()}</span>
 								<span class="text-gray-900 dark:text-white font-mono text-xs">
 									{selectedSound.split('/').pop()}
 								</span>
 							</div>
 							<div class="flex justify-between">
-								<span class="text-gray-500">Method:</span>
-								<span class="text-gray-900 dark:text-white">
-									{selectedMethod === 'shell' ? 'Shell Command' : 'Python Script'}
-								</span>
+								<span class="text-gray-500">{m.sound_hook_method()}</span>
+								<span class="text-gray-900 dark:text-white">{getMethodLabel(selectedMethod)}</span>
 							</div>
 						</div>
 					</div>
 
 					<p class="text-xs text-gray-500">
-						This will create {selectedEvents.length} hook{selectedEvents.length !== 1 ? 's' : ''} and enable them globally.
+						{m.sound_hook_create_summary({ count: String(selectedEvents.length) })}
 					</p>
 				</div>
 			{/if}
@@ -299,7 +358,7 @@
 				disabled={step === 1}
 			>
 				<ChevronLeft class="w-4 h-4 mr-1" />
-				Back
+				{m.action_back()}
 			</button>
 
 			{#if step < 3}
@@ -308,7 +367,7 @@
 					class="btn btn-primary"
 					disabled={!canProceed()}
 				>
-					Next
+					{m.action_next()}
 					<ChevronRight class="w-4 h-4 ml-1" />
 				</button>
 			{:else}
@@ -319,10 +378,10 @@
 				>
 					{#if isCreating}
 						<Loader2 class="w-4 h-4 mr-2 animate-spin" />
-						Creating...
+						{m.sound_hook_creating()}
 					{:else}
 						<Check class="w-4 h-4 mr-2" />
-						Create Hooks
+						{m.action_create_hooks()}
 					{/if}
 				</button>
 			{/if}

@@ -2,6 +2,7 @@
 	import type { SessionDetail } from '$lib/types';
 	import { formatCompactNumber, formatModelName } from '$lib/types/usage';
 	import { X, User, Bot, Wrench } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		detail: SessionDetail;
@@ -44,9 +45,9 @@
 	}
 
 	function roleLabel(role: string): string {
-		if (role === 'user') return 'User';
-		if (role === 'assistant') return 'Assistant';
-		if (role === 'tool_result') return 'Tool Result';
+		if (role === 'user') return m.session_role_user();
+		if (role === 'assistant') return m.session_role_assistant();
+		if (role === 'tool_result') return m.session_role_tool_result();
 		return role;
 	}
 </script>
@@ -58,9 +59,9 @@
 		class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between sticky top-0 bg-white dark:bg-gray-800 z-10"
 	>
 		<div>
-			<h3 class="text-sm font-semibold text-gray-900 dark:text-white">Session Transcript</h3>
+			<h3 class="text-sm font-semibold text-gray-900 dark:text-white">{m.session_transcript()}</h3>
 			<p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-				{detail.messages.length} messages
+				{m.analytics_message_count({ count: detail.messages.length })}
 			</p>
 		</div>
 		<button
@@ -116,10 +117,10 @@
 
 				{#if message.usage}
 					<div class="flex items-center gap-3 mt-2 text-xs text-gray-400 dark:text-gray-500">
-						<span>In: {formatCompactNumber(message.usage.inputTokens)}</span>
-						<span>Out: {formatCompactNumber(message.usage.outputTokens)}</span>
+						<span>{m.label_input()}: {formatCompactNumber(message.usage.inputTokens)}</span>
+						<span>{m.label_output()}: {formatCompactNumber(message.usage.outputTokens)}</span>
 						{#if message.usage.cacheReadInputTokens > 0}
-							<span>Cache: {formatCompactNumber(message.usage.cacheReadInputTokens)}</span>
+							<span>{m.label_cache_read()}: {formatCompactNumber(message.usage.cacheReadInputTokens)}</span>
 						{/if}
 					</div>
 				{/if}

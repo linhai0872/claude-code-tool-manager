@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "audit:i18n": "node ./scripts/audit-i18n-candidates.mjs",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
@@ -24,6 +25,8 @@
     "test:all": "npm run test:run && npm run test:e2e"
   },
   "dependencies": {
+    "@inlang/paraglide-js": "^2.14.0",
+    "@inlang/plugin-message-format": "^4.3.0",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-dialog": "^2.6.0",
     "@tauri-apps/plugin-fs": "^2",

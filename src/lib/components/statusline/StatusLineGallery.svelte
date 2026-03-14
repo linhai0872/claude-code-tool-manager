@@ -3,6 +3,7 @@
 	import StatusLineGalleryCard from './StatusLineGalleryCard.svelte';
 	import type { StatusLineGalleryEntry } from '$lib/types';
 	import { RefreshCw, Package } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		onInstall?: (entry: StatusLineGalleryEntry) => void;
@@ -36,20 +37,20 @@
 <div>
 	<div class="flex items-center justify-between mb-4">
 		<p class="text-sm text-gray-500 dark:text-gray-400">
-			Pre-made status lines you can install with one click
+			{m.statusline_gallery_desc()}
 		</p>
 		<button onclick={refresh} class="btn btn-secondary text-sm" disabled={statuslineLibrary.isGalleryLoading}>
 			<RefreshCw class="w-4 h-4 mr-1.5 {statuslineLibrary.isGalleryLoading ? 'animate-spin' : ''}" />
-			Refresh
+			{m.action_refresh()}
 		</button>
 	</div>
 
 	{#if statuslineLibrary.gallery.length === 0}
 		<div class="text-center py-12">
 			<Package class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
-			<p class="text-gray-500 dark:text-gray-400">No gallery entries available</p>
+			<p class="text-gray-500 dark:text-gray-400">{m.statusline_no_gallery_entries()}</p>
 			<p class="text-sm text-gray-400 dark:text-gray-500 mt-1">
-				Try refreshing or check your gallery URL in settings
+				{m.statusline_gallery_refresh_hint()}
 			</p>
 		</div>
 	{:else}

@@ -2,6 +2,7 @@
 	import { updater } from '$lib/stores/updater.svelte';
 	import { onMount } from 'svelte';
 	import { Download, RefreshCw, X, CheckCircle, AlertCircle } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	onMount(() => {
 		// Check for updates on mount (with a small delay to not block startup)
@@ -31,23 +32,23 @@
 			</div>
 			<div class="flex-1 min-w-0">
 				<h3 class="text-sm font-medium text-gray-900 dark:text-white">
-					Update Available
+					{m.update_available()}
 				</h3>
 				<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-					Version {updater.update.version} is ready to download.
+					{m.update_version_ready({ version: updater.update.version })}
 				</p>
 				<div class="mt-3 flex gap-2">
 					<button
 						onclick={handleDownload}
 						class="px-3 py-1.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md transition-colors"
 					>
-						Download
+						{m.action_download()}
 					</button>
 					<button
 						onclick={handleDismiss}
 						class="px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
 					>
-						Later
+						{m.action_later()}
 					</button>
 				</div>
 			</div>
@@ -66,7 +67,7 @@
 			</div>
 			<div class="flex-1 min-w-0">
 				<h3 class="text-sm font-medium text-gray-900 dark:text-white">
-					Downloading Update...
+					{m.update_downloading()}
 				</h3>
 				<div class="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
 					<div
@@ -87,17 +88,17 @@
 			</div>
 			<div class="flex-1 min-w-0">
 				<h3 class="text-sm font-medium text-gray-900 dark:text-white">
-					Update Ready
+					{m.update_ready()}
 				</h3>
 				<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-					Restart the app to apply the update.
+					{m.update_restart_message()}
 				</p>
 				<div class="mt-3">
 					<button
 						onclick={handleRestart}
 						class="px-3 py-1.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md transition-colors"
 					>
-						Restart Now
+						{m.action_restart_now()}
 					</button>
 				</div>
 			</div>
@@ -113,7 +114,7 @@
 			</div>
 			<div class="flex-1 min-w-0">
 				<h3 class="text-sm font-medium text-gray-900 dark:text-white">
-					Update Error
+					{m.update_error()}
 				</h3>
 				<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
 					{updater.error}
@@ -123,7 +124,7 @@
 						onclick={handleDismiss}
 						class="px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
 					>
-						Dismiss
+						{m.action_dismiss()}
 					</button>
 				</div>
 			</div>

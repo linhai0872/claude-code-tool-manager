@@ -1,9 +1,10 @@
 <script lang="ts">
-	import type { DailyCost } from '$lib/stores/usageStore.svelte';
+	import type { DailyModelTokens } from '$lib/types/usage';
 	import { getModelColor, formatModelName, formatCost } from '$lib/types/usage';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
-		data: DailyCost[];
+		data: DailyModelTokens[];
 		models: string[];
 	};
 
@@ -17,8 +18,12 @@
 	const plotWidth = chartWidth - padding.left - padding.right;
 	const plotHeight = chartHeight - padding.top - padding.bottom;
 
+	function entryTotal(d: DailyModelTokens): number {
+		return Object.values(d.tokensByModel).reduce((a, b) => a + b, 0);
+	}
+
 	const dayTotals = $derived(
-		data.map((d) => d.total)
+		data.map((d) => entryTotal(d))
 	);
 
 	const maxValue = $derived(Math.max(...dayTotals, 0.01));
@@ -56,7 +61,7 @@
 		const entry = data[i];
 		const parts = models
 			.map((m) => {
-				const v = entry.costByModel[m] ?? 0;
+				const v = entry.tokensByModel[m] ?? 0;
 				return v > 0 ? `${formatModelName(m)}: ${formatCost(v)}` : '';
 			})
 			.filter(Boolean)
@@ -64,7 +69,7 @@
 		tooltip = {
 			x: e.clientX - rect.left,
 			y: e.clientY - rect.top - 10,
-			label: `${formatDateLabel(entry.date)} — ${parts} (Total: ${formatCost(entry.total)})`
+			label: `${formatDateLabel(entry.date)} — ${parts} (Total: ${formatCost(entryTotal(entry))})`
 		};
 	}
 
@@ -77,7 +82,7 @@
 	class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4"
 >
 	<div class="flex items-center justify-between mb-4">
-		<h3 class="text-sm font-semibold text-gray-900 dark:text-white">Daily Cost</h3>
+		<h3 class="text-sm font-semibold text-gray-900 dark:text-white">{m.analytics_daily_cost()}</h3>
 		<!-- Legend -->
 		<div class="flex flex-wrap gap-3">
 			{#each models as m}
@@ -91,7 +96,7 @@
 
 	{#if data.length === 0}
 		<div class="flex items-center justify-center py-12 text-gray-400 dark:text-gray-500">
-			No cost data available
+			{m.empty_no_cost_data()}
 		</div>
 	{:else}
 		<div class="relative">
@@ -121,8 +126,8 @@
 				{#each data as entry, i}
 					{@const x = barX(i)}
 					{#each models as m, mi}
-						{@const val = entry.costByModel[m] ?? 0}
-						{@const prevTotal = models.slice(0, mi).reduce((s, pm) => s + (entry.costByModel[pm] ?? 0), 0)}
+						{@const val = entry.tokensByModel[m] ?? 0}
+						{@const prevTotal = models.slice(0, mi).reduce((s, pm) => s + (entry.tokensByModel[pm] ?? 0), 0)}
 						{#if val > 0}
 							<rect
 								{x}

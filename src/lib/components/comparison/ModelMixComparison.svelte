@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { ProjectComparisonData } from '$lib/stores/comparisonStore.svelte';
 	import { getModelColor, formatModelName } from '$lib/types/usage';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		data: ProjectComparisonData[];
@@ -35,11 +36,11 @@
 </script>
 
 <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-	<h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4">Model Mix</h3>
+	<h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4">{m.comparison_model_mix()}</h3>
 
 	{#if data.length === 0}
 		<div class="flex items-center justify-center py-12 text-gray-400 dark:text-gray-500">
-			Select projects to compare
+			{m.comparison_select_to_compare()}
 		</div>
 	{:else}
 		<div class="space-y-3">
@@ -62,7 +63,7 @@
 							</span>
 						{/each}
 						{#if d.project.modelsUsed.length === 0}
-							<span class="text-xs text-gray-400 dark:text-gray-500">No models recorded</span>
+							<span class="text-xs text-gray-400 dark:text-gray-500">{m.comparison_no_models_recorded()}</span>
 						{/if}
 					</div>
 				</div>
@@ -71,14 +72,14 @@
 			<!-- Summary -->
 			{#if modelSummaries.length > 0}
 				<div class="border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
-					<p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Summary</p>
+					<p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">{m.label_summary()}</p>
 					<div class="space-y-1">
 						{#each modelSummaries as ms}
 							<div class="flex items-center gap-2 text-xs">
 								<div class="w-2 h-2 rounded-full flex-shrink-0" style="background: {ms.color}"></div>
 								<span class="text-gray-700 dark:text-gray-300 font-medium">{ms.name}</span>
 								<span class="text-gray-400 dark:text-gray-500">
-									used by {ms.usedBy}/{data.length} project{data.length !== 1 ? 's' : ''}
+									{m.comparison_used_by({ count: ms.usedBy, total: data.length })}
 								</span>
 							</div>
 						{/each}

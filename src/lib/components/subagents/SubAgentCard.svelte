@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { SubAgent } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 	import { Bot, MoreVertical, Edit, Trash2, Heart } from 'lucide-svelte';
 
 	type Props = {
@@ -56,7 +57,7 @@
 						class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300 cursor-help"
 						title={subagent.sourcePath ? `Source: ${subagent.sourcePath}` : 'Auto-detected from filesystem'}
 					>
-						Auto
+						{m.subagent_auto()}
 					</span>
 				{/if}
 			</div>
@@ -76,7 +77,7 @@
 
 				{#if subagent.tools && subagent.tools.length > 0}
 					<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
-						{subagent.tools.length} tool{subagent.tools.length !== 1 ? 's' : ''}
+						{m.subagent_tool_count({ count: subagent.tools.length })}
 					</span>
 				{/if}
 
@@ -104,7 +105,7 @@
 						class="p-1.5 rounded-lg transition-colors {subagent.isFavorite
 							? 'text-rose-500 hover:text-rose-600'
 							: 'text-gray-300 hover:text-rose-400 dark:text-gray-600 dark:hover:text-rose-400'}"
-						title={subagent.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+						title={subagent.isFavorite ? m.project_favorite_remove() : m.project_favorite_add()}
 					>
 						<Heart class="w-4 h-4" fill={subagent.isFavorite ? 'currentColor' : 'none'} />
 					</button>
@@ -133,7 +134,7 @@
 									class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
 								>
 									<Edit class="w-4 h-4" />
-									Edit
+									{m.action_edit()}
 								</button>
 							{/if}
 							{#if onDelete}
@@ -145,7 +146,7 @@
 									class="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
 								>
 									<Trash2 class="w-4 h-4" />
-									Delete
+									{m.action_delete()}
 								</button>
 							{/if}
 						</div>

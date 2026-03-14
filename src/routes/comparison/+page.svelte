@@ -10,6 +10,7 @@
 	import ToolUsageComparisonChart from '$lib/components/comparison/ToolUsageComparisonChart.svelte';
 	import ModelMixComparison from '$lib/components/comparison/ModelMixComparison.svelte';
 	import { GitCompareArrows, FileQuestion } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	onMount(() => {
 		if (sessionStore.projects.length === 0) {
@@ -20,7 +21,7 @@
 	const hasEnoughSelected = $derived(comparisonStore.selectedFolders.size >= 2);
 </script>
 
-<Header title="Cross-Project Comparison" subtitle="Compare usage metrics across projects side-by-side" />
+<Header title={m.page_comparison_title()} subtitle={m.page_comparison_subtitle()} />
 
 <div class="flex-1 overflow-auto p-6 space-y-6">
 	{#if sessionStore.isLoadingProjects}
@@ -41,8 +42,8 @@
 		>
 			<div class="text-gray-400 dark:text-gray-500">
 				<FileQuestion class="w-12 h-12 mx-auto mb-3 opacity-50" />
-				<p class="text-lg font-medium">No projects found</p>
-				<p class="text-sm mt-1">Use Claude Code to generate session data, then refresh this page.</p>
+				<p class="text-lg font-medium">{m.project_no_projects_found()}</p>
+				<p class="text-sm mt-1">{m.sessions_generate_data_hint()}</p>
 			</div>
 		</div>
 	{:else}
@@ -55,9 +56,9 @@
 			>
 				<div class="text-gray-400 dark:text-gray-500">
 					<GitCompareArrows class="w-10 h-10 mx-auto mb-3 opacity-50" />
-					<p class="text-sm font-medium">Select at least 2 projects to compare</p>
+					<p class="text-sm font-medium">{m.comparison_select_minimum()}</p>
 					<p class="text-xs mt-1">
-						Choose 2–5 projects above to see side-by-side metrics
+						{m.comparison_select_range_hint()}
 					</p>
 				</div>
 			</div>

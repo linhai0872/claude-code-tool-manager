@@ -1,4 +1,7 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
+	import { getLocale } from '$lib/paraglide/runtime.js';
+
 	type Props = {
 		hourCounts: number[];
 	};
@@ -50,10 +53,7 @@
 	const hourLabels = $derived(
 		Array.from({ length: 8 }, (_, i) => {
 			const h = i * 3;
-			if (h === 0) return { hour: h, label: '12am' };
-			if (h === 12) return { hour: h, label: '12pm' };
-			if (h < 12) return { hour: h, label: `${h}am` };
-			return { hour: h, label: `${h - 12}pm` };
+			return { hour: h, label: formatHour(h) };
 		})
 	);
 
@@ -76,11 +76,12 @@
 		tooltip = null;
 	}
 
-	function formatHour(h: number): string {
-		if (h === 0) return '12:00 AM';
-		if (h === 12) return '12:00 PM';
-		if (h < 12) return `${h}:00 AM`;
-		return `${h - 12}:00 PM`;
+	function formatHour(hour: number, includeMinutes = false): string {
+		const formatter = new Intl.DateTimeFormat(getLocale(), {
+			hour: 'numeric',
+			minute: includeMinutes ? '2-digit' : undefined
+		});
+		return formatter.format(new Date(2024, 0, 1, hour, 0, 0));
 	}
 
 	// Use CSS media query to determine theme for bar colors
@@ -91,17 +92,17 @@
 	class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4"
 >
 	<div class="flex items-center justify-between mb-4">
-		<h3 class="text-sm font-semibold text-gray-900 dark:text-white">Peak Hours</h3>
+		<h3 class="text-sm font-semibold text-gray-900 dark:text-white">{m.analytics_peak_hours()}</h3>
 		{#if maxCount > 0}
 			<span class="text-xs text-gray-400 dark:text-gray-500">
-				Peak: {formatHour(peakHour)} ({maxCount} sessions)
+				{m.analytics_peak_info({ hour: formatHour(peakHour, true), count: maxCount })}
 			</span>
 		{/if}
 	</div>
 
 	{#if hourCounts.every((c) => c === 0)}
 		<div class="flex items-center justify-center py-12 text-gray-400 dark:text-gray-500">
-			No hour data available
+			{m.empty_no_hour_data()}
 		</div>
 	{:else}
 		<div class="relative">
@@ -175,7 +176,7 @@
 					class="absolute pointer-events-none bg-gray-900 dark:bg-gray-700 text-white text-xs rounded px-2 py-1 shadow-lg"
 					style="left: {tooltip.x}px; top: {tooltip.y}px; transform: translate(-50%, -100%);"
 				>
-					{formatHour(tooltip.hour)}: {tooltip.count} sessions
+					{formatHour(tooltip.hour, true)}: {m.analytics_sessions_count({ count: tooltip.count })}
 				</div>
 			{/if}
 		</div>

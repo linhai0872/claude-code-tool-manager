@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import type { PermissionTemplate, PermissionCategory } from '$lib/types';
 	import {
 		X,
@@ -32,22 +33,22 @@
 
 	const categoryConfig: Record<
 		PermissionCategory,
-		{ label: string; icon: typeof ShieldAlert; color: string; badgeColor: string }
+		{ label: () => string; icon: typeof ShieldAlert; color: string; badgeColor: string }
 	> = {
 		deny: {
-			label: 'Deny',
+			label: () => m.permission_category_deny(),
 			icon: ShieldAlert,
 			color: 'text-red-600 dark:text-red-400',
 			badgeColor: 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
 		},
 		ask: {
-			label: 'Ask',
+			label: () => m.permission_category_ask(),
 			icon: ShieldQuestion,
 			color: 'text-amber-600 dark:text-amber-400',
 			badgeColor: 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300'
 		},
 		allow: {
-			label: 'Allow',
+			label: () => m.permission_category_allow(),
 			icon: ShieldCheck,
 			color: 'text-green-600 dark:text-green-400',
 			badgeColor: 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
@@ -72,7 +73,7 @@
 		>
 			<div class="flex items-center gap-2">
 				<Sparkles class="w-5 h-5 text-primary-500" />
-				<h3 class="text-lg font-semibold text-gray-900 dark:text-white">Rule Templates</h3>
+				<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{m.permission_rule_templates()}</h3>
 			</div>
 			<button
 				onclick={onclose}
@@ -91,7 +92,7 @@
 					<div>
 						<div class="flex items-center gap-2 mb-3">
 							<svelte:component this={config.icon} class="w-4 h-4 {config.color}" />
-							<h4 class="text-sm font-semibold {config.color}">{config.label}</h4>
+							<h4 class="text-sm font-semibold {config.color}">{config.label()}</h4>
 						</div>
 						<div class="space-y-2">
 							{#each catTemplates as template}
@@ -124,7 +125,7 @@
 
 			{#if templates.length === 0}
 				<div class="text-center py-8 text-gray-400 dark:text-gray-500">
-					<p class="text-sm">No templates available</p>
+					<p class="text-sm">{m.permission_no_templates()}</p>
 				</div>
 			{/if}
 		</div>

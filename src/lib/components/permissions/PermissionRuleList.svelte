@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import type { PermissionCategory } from '$lib/types';
 	import { GripVertical, X, Plus, ShieldAlert, ShieldQuestion, ShieldCheck } from 'lucide-svelte';
 
@@ -17,7 +18,7 @@
 
 	const categoryConfig = {
 		deny: {
-			label: 'Deny',
+			label: () => m.permission_category_deny(),
 			icon: ShieldAlert,
 			borderColor: 'border-red-200 dark:border-red-800/50',
 			headerBg: 'bg-red-50 dark:bg-red-900/20',
@@ -28,7 +29,7 @@
 			btnClass: 'text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30'
 		},
 		ask: {
-			label: 'Ask',
+			label: () => m.permission_category_ask(),
 			icon: ShieldQuestion,
 			borderColor: 'border-amber-200 dark:border-amber-800/50',
 			headerBg: 'bg-amber-50 dark:bg-amber-900/20',
@@ -39,7 +40,7 @@
 			btnClass: 'text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30'
 		},
 		allow: {
-			label: 'Allow',
+			label: () => m.permission_category_allow(),
 			icon: ShieldCheck,
 			borderColor: 'border-green-200 dark:border-green-800/50',
 			headerBg: 'bg-green-50 dark:bg-green-900/20',
@@ -87,7 +88,7 @@
 	<div class="flex items-center justify-between px-4 py-2.5 {config.headerBg} rounded-t-lg">
 		<div class="flex items-center gap-2">
 			<svelte:component this={config.icon} class="w-4 h-4 {config.headerText}" />
-			<span class="text-sm font-semibold {config.headerText}">{config.label}</span>
+			<span class="text-sm font-semibold {config.headerText}">{config.label()}</span>
 			{#if rules.length > 0}
 				<span class="px-1.5 py-0.5 text-xs rounded-full {config.badgeBg} {config.badgeText}">
 					{rules.length}
@@ -111,7 +112,7 @@
 			>
 				<button
 					class="cursor-grab text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity"
-					title="Drag to reorder"
+					title={m.permission_drag_to_reorder()}
 				>
 					<GripVertical class="w-4 h-4" />
 				</button>
@@ -123,7 +124,7 @@
 				<button
 					onclick={() => onremove(index)}
 					class="p-1 rounded text-gray-400 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
-					title="Remove rule"
+					title={m.permission_remove_rule()}
 				>
 					<X class="w-4 h-4" />
 				</button>
@@ -132,7 +133,7 @@
 
 		{#if rules.length === 0}
 			<div class="px-4 py-6 text-center text-sm text-gray-400 dark:text-gray-500">
-				No {category} rules configured
+				{m.permission_no_category_rules({ category: config.label() })}
 			</div>
 		{/if}
 	</div>
@@ -144,7 +145,7 @@
 			class="flex items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-colors {config.btnClass}"
 		>
 			<Plus class="w-4 h-4" />
-			Add {config.label} Rule
+			{m.permission_add_category_rule({ category: config.label() })}
 		</button>
 	</div>
 </div>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { SandboxNetworkSettings } from '$lib/types';
 	import { Plus, X } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		network: SandboxNetworkSettings;
@@ -91,10 +92,10 @@
 	<div class="flex items-center justify-between">
 		<div>
 			<label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-				Allow All Unix Sockets
+				{m.settings_sandbox_net_all_unix_label()}
 			</label>
 			<p class="text-xs text-gray-500 dark:text-gray-400">
-				Allow connections to any Unix domain socket
+				{m.settings_sandbox_net_all_unix_desc()}
 			</p>
 		</div>
 		<button
@@ -114,16 +115,16 @@
 	<!-- Allow Unix Sockets (specific paths) -->
 	<div class:opacity-50={allowAllUnixSockets}>
 		<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-			Allowed Unix Sockets
+			{m.settings_sandbox_net_unix_sockets_label()}
 		</label>
 		<p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
-			Specific Unix socket paths to allow {allowAllUnixSockets ? '(disabled — all sockets allowed)' : ''}
+			{m.settings_sandbox_net_unix_sockets_desc()} {allowAllUnixSockets ? m.settings_sandbox_net_all_sockets_note() : ''}
 		</p>
 		<div class="flex gap-2 mb-2">
 			<input
 				type="text"
 				bind:value={newUnixSocket}
-				placeholder="/path/to/socket"
+				placeholder={m.placeholder_unix_socket_path()}
 				disabled={allowAllUnixSockets}
 				class="input text-sm flex-1"
 				onkeydown={(e) => e.key === 'Enter' && addUnixSocket()}
@@ -160,10 +161,10 @@
 	<div class="flex items-center justify-between">
 		<div>
 			<label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-				Allow Local Binding
+				{m.settings_sandbox_net_local_binding_label()}
 			</label>
 			<p class="text-xs text-gray-500 dark:text-gray-400">
-				Allow binding to local ports (macOS only)
+				{m.settings_sandbox_net_local_binding_desc()}
 			</p>
 		</div>
 		<button
@@ -183,16 +184,16 @@
 	<!-- Allowed Domains -->
 	<div>
 		<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-			Allowed Domains
+			{m.settings_sandbox_net_domains_label()}
 		</label>
 		<p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
-			Network domains the sandbox can access. Supports wildcards (e.g. <code>*.example.com</code>)
+			{m.settings_sandbox_net_domains_desc()}
 		</p>
 		<div class="flex gap-2 mb-2">
 			<input
 				type="text"
 				bind:value={newDomain}
-				placeholder="*.example.com"
+				placeholder={m.placeholder_domain_pattern()}
 				class="input text-sm flex-1"
 				onkeydown={(e) => e.key === 'Enter' && addDomain()}
 			/>
@@ -226,14 +227,14 @@
 	<!-- HTTP Proxy Port -->
 	<div>
 		<label for="http-proxy-port" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-			HTTP Proxy Port
+			{m.settings_sandbox_net_http_proxy()}
 		</label>
 		<input
 			id="http-proxy-port"
 			type="number"
 			bind:value={httpProxyPort}
 			onchange={handlePortChange}
-			placeholder="e.g. 8080"
+			placeholder={m.placeholder_http_proxy_port()}
 			min="1"
 			max="65535"
 			class="input text-sm w-full"
@@ -243,14 +244,14 @@
 	<!-- SOCKS Proxy Port -->
 	<div>
 		<label for="socks-proxy-port" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-			SOCKS Proxy Port
+			{m.settings_sandbox_net_socks_proxy()}
 		</label>
 		<input
 			id="socks-proxy-port"
 			type="number"
 			bind:value={socksProxyPort}
 			onchange={handlePortChange}
-			placeholder="e.g. 1080"
+			placeholder={m.placeholder_socks_proxy_port()}
 			min="1"
 			max="65535"
 			class="input text-sm w-full"

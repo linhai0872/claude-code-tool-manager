@@ -12,6 +12,7 @@
 	import type { StatusLine, CreateStatusLineRequest, StatusLineGalleryEntry } from '$lib/types';
 	import { parseSegmentsJson } from '$lib/types';
 	import { Plus, PenTool, Package } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let activeTab = $state<'library' | 'builder' | 'gallery'>('library');
 	let showAddRaw = $state(false);
@@ -27,18 +28,18 @@
 	async function handleActivate(sl: StatusLine) {
 		try {
 			await statuslineLibrary.activate(sl.id);
-			notifications.success(`Status line "${sl.name}" activated`);
+			notifications.success(m.notify_activated_with_name({ name: sl.name }));
 		} catch (err) {
-			notifications.error('Failed to activate status line');
+			notifications.error(m.notify_activate_failed({ entity: m.entity_status_line() }));
 		}
 	}
 
 	async function handleDeactivate() {
 		try {
 			await statuslineLibrary.deactivate();
-			notifications.success('Status line deactivated');
+			notifications.success(m.notify_deactivated({ entity: m.entity_status_line() }));
 		} catch (err) {
-			notifications.error('Failed to deactivate status line');
+			notifications.error(m.notify_deactivate_failed({ entity: m.entity_status_line() }));
 		}
 	}
 
@@ -46,9 +47,9 @@
 		if (!deletingStatusLine) return;
 		try {
 			await statuslineLibrary.delete(deletingStatusLine.id);
-			notifications.success('Status line deleted');
+			notifications.success(m.notify_deleted({ entity: m.entity_status_line() }));
 		} catch (err) {
-			notifications.error('Failed to delete status line');
+			notifications.error(m.notify_delete_failed({ entity: m.entity_status_line() }));
 		} finally {
 			deletingStatusLine = null;
 		}
@@ -58,9 +59,9 @@
 		try {
 			await statuslineLibrary.create(request);
 			showAddRaw = false;
-			notifications.success('Status line created');
+			notifications.success(m.notify_created({ entity: m.entity_status_line() }));
 		} catch (err) {
-			notifications.error('Failed to create status line');
+			notifications.error(m.notify_create_failed({ entity: m.entity_status_line() }));
 		}
 	}
 
@@ -69,9 +70,9 @@
 		try {
 			await statuslineLibrary.update(editingStatusLine.id, request);
 			editingStatusLine = null;
-			notifications.success('Status line updated');
+			notifications.success(m.notify_updated({ entity: m.entity_status_line() }));
 		} catch (err) {
-			notifications.error('Failed to update status line');
+			notifications.error(m.notify_update_failed({ entity: m.entity_status_line() }));
 		}
 	}
 
@@ -88,15 +89,15 @@
 		try {
 			if (editingInBuilder) {
 				await statuslineLibrary.update(editingInBuilder.id, request);
-				notifications.success(`Status line "${request.name}" updated`);
+				notifications.success(m.notify_updated_with_name({ name: request.name }));
 				editingInBuilder = null;
 			} else {
 				await statuslineLibrary.create(request);
-				notifications.success(`Status line "${request.name}" saved`);
+				notifications.success(m.notify_saved_with_name({ name: request.name }));
 			}
 			activeTab = 'library';
 		} catch (err) {
-			notifications.error('Failed to save status line');
+			notifications.error(m.notify_save_failed({ entity: m.entity_status_line() }));
 		}
 	}
 
@@ -110,26 +111,26 @@
 				sl = await statuslineLibrary.create(request);
 			}
 			await statuslineLibrary.activate(sl.id);
-			notifications.success(`Status line "${sl.name}" saved and activated`);
+			notifications.success(m.notify_saved_and_activated({ name: sl.name }));
 			activeTab = 'library';
 		} catch (err) {
-			notifications.error('Failed to save and activate status line');
+			notifications.error(m.notify_save_activate_failed({ entity: m.entity_status_line() }));
 		}
 	}
 
 	async function handleGalleryInstall(entry: StatusLineGalleryEntry) {
 		try {
 			const sl = await statuslineLibrary.installPremade(entry);
-			notifications.success(`"${sl.name}" added to library`);
+			notifications.success(m.notify_added_to_library({ name: sl.name }));
 		} catch (err) {
-			notifications.error('Failed to install status line');
+			notifications.error(m.notify_install_failed({ entity: m.entity_status_line() }));
 		}
 	}
 </script>
 
 <Header
-	title="Status Line"
-	subtitle="Customize the real-time info bar at the bottom of your Claude Code terminal"
+	title={m.page_statusline_title()}
+	subtitle={m.page_statusline_subtitle()}
 />
 
 <div class="flex-1 overflow-auto p-6">
@@ -143,7 +144,7 @@
 						? 'bg-primary-600 text-white'
 						: 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'}"
 			>
-				My Status Lines
+				{m.statusline_tab_library()}
 			</button>
 			<button
 				onclick={() => (activeTab = 'builder')}
@@ -154,7 +155,7 @@
 			>
 				<span class="flex items-center gap-1.5">
 					<PenTool class="w-3.5 h-3.5" />
-					Builder
+					{m.statusline_tab_builder()}
 				</span>
 			</button>
 			<button
@@ -166,7 +167,7 @@
 			>
 				<span class="flex items-center gap-1.5">
 					<Package class="w-3.5 h-3.5" />
-					Gallery
+					{m.statusline_tab_gallery()}
 				</span>
 			</button>
 		</div>
@@ -174,7 +175,7 @@
 		{#if activeTab === 'library'}
 			<button onclick={() => (showAddRaw = true)} class="btn btn-primary">
 				<Plus class="w-4 h-4 mr-2" />
-				Add Raw Command
+				{m.statusline_add_raw_command()}
 			</button>
 		{/if}
 	</div>
@@ -210,7 +211,7 @@
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
 		<div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full mx-4">
 			<div class="p-6">
-				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">Add Raw Status Line</h2>
+				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">{m.statusline_add_raw_title()}</h2>
 				<StatusLineForm
 					onSubmit={handleCreateRaw}
 					onCancel={() => (showAddRaw = false)}
@@ -225,7 +226,7 @@
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
 		<div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full mx-4">
 			<div class="p-6">
-				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">Edit Status Line</h2>
+				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">{m.modal_edit_title({ entity: m.entity_status_line() })}</h2>
 				<StatusLineForm
 					initialValues={editingStatusLine}
 					onSubmit={handleUpdateRaw}
@@ -238,9 +239,9 @@
 
 <ConfirmDialog
 	open={!!deletingStatusLine}
-	title="Delete Status Line"
-	message="Are you sure you want to delete '{deletingStatusLine?.name}'? This cannot be undone."
-	confirmText="Delete"
+	title={m.confirm_delete_title({ entity: m.entity_status_line() })}
+	message={m.confirm_delete_message_no_undo({ name: deletingStatusLine?.name ?? '' })}
+	confirmText={m.action_delete()}
 	onConfirm={handleDelete}
 	onCancel={() => (deletingStatusLine = null)}
 />

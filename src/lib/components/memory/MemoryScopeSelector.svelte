@@ -1,6 +1,6 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import type { MemoryScope, AllMemoryFiles } from '$lib/types';
-	import { MEMORY_SCOPE_LABELS } from '$lib/types';
 	import { User, FolderOpen, FileText } from 'lucide-svelte';
 
 	type Props = {
@@ -17,6 +17,18 @@
 		{ key: 'project', icon: FolderOpen },
 		{ key: 'local', icon: FileText }
 	];
+
+	const scopeLabels: Record<MemoryScope, () => string> = {
+		user: () => m.scope_user(),
+		project: () => m.scope_project(),
+		local: () => m.scope_local()
+	};
+
+	const scopeDescriptions: Record<MemoryScope, () => string> = {
+		user: () => m.memory_scope_user_desc(),
+		project: () => m.memory_scope_project_desc(),
+		local: () => m.memory_scope_local_desc()
+	};
 
 	function fileExists(scope: MemoryScope): boolean {
 		if (!memoryFiles) return false;
@@ -45,15 +57,15 @@
 				: isDisabled
 					? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
 					: 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}"
-			title={MEMORY_SCOPE_LABELS[key].description}
+			title={scopeDescriptions[key]()}
 		>
 			<svelte:component this={icon} class="w-4 h-4" />
-			{MEMORY_SCOPE_LABELS[key].label}
+			{scopeLabels[key]()}
 			<span
 				class="w-2 h-2 rounded-full {exists
 					? 'bg-green-500'
 					: 'bg-gray-300 dark:bg-gray-500'}"
-				title={exists ? 'File exists' : 'File does not exist'}
+				title={exists ? m.memory_file_exists() : m.memory_file_not_exists()}
 			></span>
 		</button>
 	{/each}

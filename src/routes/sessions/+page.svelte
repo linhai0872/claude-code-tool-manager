@@ -8,6 +8,7 @@
 	import ToolUsageChart from '$lib/components/sessions/ToolUsageChart.svelte';
 	import { sessionStore } from '$lib/stores';
 	import { RefreshCw, FolderSearch, FileQuestion } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	onMount(() => {
 		sessionStore.loadProjects();
@@ -21,7 +22,7 @@
 	}
 </script>
 
-<Header title="Session Explorer" subtitle="Browse individual Claude Code sessions per project" />
+<Header title={m.page_sessions_title()} subtitle={m.page_sessions_subtitle()} />
 
 <div class="flex-1 overflow-auto p-6 space-y-6">
 	{#if sessionStore.isLoadingProjects}
@@ -42,14 +43,13 @@
 		>
 			<div class="text-gray-400 dark:text-gray-500 mb-4">
 				<FileQuestion class="w-12 h-12 mx-auto mb-3 opacity-50" />
-				<p class="text-lg font-medium">No session data found</p>
+				<p class="text-lg font-medium">{m.empty_no_session_data()}</p>
 				<p class="text-sm mt-1">
-					Claude Code stores sessions in <code
-						class="text-xs bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded"
-						>~/.claude/projects/</code
-					>
+					{@html m.sessions_data_stored_at({
+						path: '<code class="text-xs bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">~/.claude/projects/</code>'
+					})}
 				</p>
-				<p class="text-sm mt-1">Use Claude Code to create sessions, then refresh this page.</p>
+				<p class="text-sm mt-1">{m.sessions_create_data_hint()}</p>
 			</div>
 		</div>
 	{:else}
@@ -61,10 +61,10 @@
 				onclick={handleRefresh}
 				disabled={sessionStore.isRefreshingProjects}
 				class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-				title="Refresh sessions"
+				title={m.action_refresh()}
 			>
 				<RefreshCw class="w-3.5 h-3.5 {sessionStore.isRefreshingProjects ? 'animate-spin' : ''}" />
-				{sessionStore.isRefreshingProjects ? 'Refreshing…' : 'Refresh'}
+				{sessionStore.isRefreshingProjects ? m.analytics_refreshing() : m.action_refresh()}
 			</button>
 		</div>
 
@@ -84,7 +84,7 @@
 				>
 					<div class="text-center text-gray-400 dark:text-gray-500">
 						<FolderSearch class="w-8 h-8 mx-auto mb-2 opacity-50" />
-						<p class="text-sm">Select a project to see tool usage</p>
+						<p class="text-sm">{m.sessions_select_project_tool_usage()}</p>
 					</div>
 				</div>
 			{/if}
@@ -117,7 +117,7 @@
 				class="text-center py-8 bg-gray-50 dark:bg-gray-800/30 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700"
 			>
 				<p class="text-sm text-gray-400 dark:text-gray-500">
-					No sessions found in this project
+					{m.sessions_no_project_sessions()}
 				</p>
 			</div>
 		{/if}
@@ -138,7 +138,6 @@
 		{:else if sessionStore.sessionDetail}
 			<SessionDetailPanel
 				detail={sessionStore.sessionDetail}
-				sessionSummary={sessionStore.selectedSessionSummary}
 				onClose={() => sessionStore.clearSession()}
 			/>
 		{/if}

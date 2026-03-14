@@ -2,9 +2,13 @@
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import { claudeSettingsLibrary, projectsStore, notifications } from '$lib/stores';
+	import * as m from '$lib/paraglide/messages.js';
 	import type { ClaudeSettings, ClaudeSettingsScope } from '$lib/types';
-	import { CLAUDE_SETTINGS_SCOPE_LABELS } from '$lib/types';
 	import { RefreshCw, FolderOpen, User, FileText } from 'lucide-svelte';
+	import {
+		getClaudeSettingsScopeDescription,
+		getClaudeSettingsScopeLabel
+	} from '$lib/utils/claudeSettingsScopeI18n';
 
 	type Props = {
 		getSettingCount: (scope: ClaudeSettingsScope) => number;
@@ -27,7 +31,7 @@
 
 	async function handleRefresh() {
 		await claudeSettingsLibrary.load();
-		notifications.success('Settings refreshed');
+		notifications.success(m.notify_refreshed({ entity: m.entity_settings() }));
 	}
 
 	async function save(settings: ClaudeSettings, successMsg: string, errorMsg: string) {
@@ -54,7 +58,7 @@
 			onchange={handleProjectChange}
 			class="input text-sm"
 		>
-			<option value="">No project</option>
+			<option value="">{m.project_none_selected()}</option>
 			{#each projectsStore.projects as project}
 				<option value={project.path}>{project.name}</option>
 			{/each}
@@ -76,10 +80,10 @@
 						: isDisabled
 							? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
 							: 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}"
-					title={CLAUDE_SETTINGS_SCOPE_LABELS[key].description}
+					title={getClaudeSettingsScopeDescription(key)}
 				>
 					<svelte:component this={icon} class="w-4 h-4" />
-					{CLAUDE_SETTINGS_SCOPE_LABELS[key].label}
+					{getClaudeSettingsScopeLabel(key)}
 					{#if count > 0}
 						<span
 							class="ml-1 px-1.5 py-0.5 text-xs rounded-full
@@ -99,7 +103,7 @@
 		<button
 			onclick={handleRefresh}
 			class="btn btn-ghost"
-			title="Refresh from settings files"
+			title={m.project_refresh_settings()}
 		>
 			<RefreshCw class="w-4 h-4" />
 		</button>
@@ -122,6 +126,6 @@
 	{@render children({ settings: claudeSettingsLibrary.currentScopeSettings, save })}
 {:else}
 	<div class="text-center py-20 text-gray-400 dark:text-gray-500">
-		<p>Select a scope to view settings</p>
+		<p>{m.settings_select_scope()}</p>
 	</div>
 {/if}

@@ -3,6 +3,7 @@
 	import { SandboxConfigEditor } from '$lib/components/sandbox';
 	import { claudeSettingsLibrary } from '$lib/stores';
 	import type { ClaudeSettingsScope } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 
 	function getSettingCount(scope: ClaudeSettingsScope): number {
 		if (!claudeSettingsLibrary.settings) return 0;
@@ -29,7 +30,7 @@
 	{#snippet children({ settings, save })}
 		<SandboxConfigEditor
 			{settings}
-			onsave={(s) => save(s, 'Sandbox settings saved', 'Failed to save sandbox settings')}
+			onsave={(s) => save(s, m.settings_sandbox_saved(), m.settings_sandbox_save_failed())}
 		/>
 	{/snippet}
 </ScopedSettingsWrapper>

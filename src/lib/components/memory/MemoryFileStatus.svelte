@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import type { MemoryFileInfo } from '$lib/types';
 	import { Copy, Check } from 'lucide-svelte';
 
@@ -17,10 +18,10 @@
 		const diffHours = Math.floor(diffMins / 60);
 		const diffDays = Math.floor(diffHours / 24);
 
-		if (diffMins < 1) return 'just now';
-		if (diffMins < 60) return `${diffMins}m ago`;
-		if (diffHours < 24) return `${diffHours}h ago`;
-		if (diffDays < 30) return `${diffDays}d ago`;
+		if (diffMins < 1) return m.time_just_now();
+		if (diffMins < 60) return m.time_minutes_ago({ count: diffMins });
+		if (diffHours < 24) return m.time_hours_ago({ count: diffHours });
+		if (diffDays < 30) return m.time_days_ago({ count: diffDays });
 		return date.toLocaleDateString();
 	}
 
@@ -48,7 +49,7 @@
 		<button
 			onclick={copyPath}
 			class="flex-shrink-0 p-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-			title="Copy path"
+			title={m.memory_copy_path()}
 		>
 			{#if copied}
 				<Check class="w-3.5 h-3.5 text-green-500" />
@@ -65,13 +66,13 @@
 			? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
 			: 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}"
 	>
-		{file.exists ? 'Exists' : 'Not created'}
+		{file.exists ? m.memory_file_exists() : m.memory_file_not_created()}
 	</span>
 
 	<!-- Last modified -->
 	{#if file.lastModified}
 		<span class="text-gray-400 dark:text-gray-500 text-xs">
-			Modified: {formatRelativeTime(file.lastModified)}
+			{m.memory_modified({ time: formatRelativeTime(file.lastModified) })}
 		</span>
 	{/if}
 

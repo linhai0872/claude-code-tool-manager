@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { ModelUsageDetail } from '$lib/types';
 	import { getModelColor, formatModelName, formatCompactNumber, estimateModelCost, formatCost } from '$lib/types/usage';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		modelUsage: Record<string, ModelUsageDetail>;
@@ -56,11 +57,11 @@
 <div
 	class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4"
 >
-	<h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4">Model Usage</h3>
+	<h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4">{m.analytics_model_usage()}</h3>
 
 	{#if entries.length === 0}
 		<div class="flex items-center justify-center py-12 text-gray-400 dark:text-gray-500">
-			No model usage data
+			{m.empty_no_model_usage_data()}
 		</div>
 	{:else}
 		<div class="flex flex-col items-center gap-4">
@@ -97,7 +98,7 @@
 					class="fill-gray-400 dark:fill-gray-500"
 					font-size="11"
 				>
-					total tokens
+					{m.analytics_total_tokens()}
 				</text>
 			</svg>
 
@@ -120,25 +121,25 @@
 					<thead>
 						<tr class="border-b border-gray-200 dark:border-gray-700">
 							<th class="text-left py-2 px-1 font-medium text-gray-500 dark:text-gray-400">
-								Model
+								{m.label_model()}
 							</th>
 							<th class="text-right py-2 px-1 font-medium text-gray-500 dark:text-gray-400">
-								Input
+								{m.label_input()}
 							</th>
 							<th class="text-right py-2 px-1 font-medium text-gray-500 dark:text-gray-400">
-								Output
+								{m.label_output()}
 							</th>
 							<th class="text-right py-2 px-1 font-medium text-gray-500 dark:text-gray-400">
-								Cache Read
+								{m.label_cache_read()}
 							</th>
 							<th class="text-right py-2 px-1 font-medium text-gray-500 dark:text-gray-400">
-								Cache Write
+								{m.label_cache_write()}
 							</th>
 							<th class="text-right py-2 px-1 font-medium text-gray-500 dark:text-gray-400">
-								Total
+								{m.label_total()}
 							</th>
 							<th class="text-right py-2 px-1 font-medium text-gray-500 dark:text-gray-400">
-								Est. Cost
+								{m.label_est_cost()}
 							</th>
 						</tr>
 					</thead>

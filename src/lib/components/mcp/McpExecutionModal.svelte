@@ -9,6 +9,7 @@
 		ToolContent,
 		ExecutionHistoryEntry
 	} from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 	import JsonSchemaForm from './JsonSchemaForm.svelte';
 	import {
 		X,
@@ -197,15 +198,15 @@
 			class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700"
 		>
 			<div>
-				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">Execute: {mcp.name}</h2>
+				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">{m.mcp_execute_title({ name: mcp.name })}</h2>
 				<p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
 					{#if sessionId}
-						<span class="text-green-600 dark:text-green-400">Connected</span> &bull;
-						{tools.length} tools available
+						<span class="text-green-600 dark:text-green-400">{m.mcp_status_connected()}</span> &bull;
+						{m.mcp_tools_available({ count: tools.length })}
 					{:else if isConnecting}
-						Connecting...
+						{m.mcp_status_connecting()}
 					{:else}
-						<span class="text-red-600 dark:text-red-400">Disconnected</span>
+						<span class="text-red-600 dark:text-red-400">{m.mcp_status_disconnected()}</span>
 					{/if}
 				</p>
 			</div>
@@ -217,7 +218,7 @@
 					class:dark:bg-blue-900={showHistory}
 					class:text-blue-600={showHistory}
 					class:dark:text-blue-400={showHistory}
-					title="Execution history"
+					title={m.mcp_execution_history()}
 				>
 					<History class="w-5 h-5" />
 				</button>
@@ -235,15 +236,15 @@
 			{#if isConnecting}
 				<div class="flex-1 flex flex-col items-center justify-center py-12">
 					<Loader2 class="w-10 h-10 text-primary-600 animate-spin mb-4" />
-					<p class="text-gray-600 dark:text-gray-400">Starting session...</p>
+					<p class="text-gray-600 dark:text-gray-400">{m.mcp_starting_session()}</p>
 					<p class="text-sm text-gray-400 dark:text-gray-500 mt-1">
-						This may take a few seconds
+						{m.mcp_may_take_seconds()}
 					</p>
 				</div>
 			{:else if connectionError}
 				<div class="flex-1 flex flex-col items-center justify-center py-12 px-8">
 					<AlertCircle class="w-12 h-12 text-red-500 mb-4" />
-					<p class="text-lg font-medium text-gray-900 dark:text-white mb-2">Connection Failed</p>
+					<p class="text-lg font-medium text-gray-900 dark:text-white mb-2">{m.mcp_connection_failed()}</p>
 					<p class="text-sm text-gray-600 dark:text-gray-400 text-center max-w-md">
 						{connectionError}
 					</p>
@@ -251,7 +252,7 @@
 						onclick={startSession}
 						class="mt-4 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
 					>
-						Retry
+						{m.action_retry()}
 					</button>
 				</div>
 			{:else if showHistory}
@@ -259,7 +260,7 @@
 				<div class="flex-1 overflow-auto p-4">
 					<div class="flex items-center justify-between mb-4">
 						<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300">
-							Execution History ({history.length})
+							{m.mcp_execution_history_count({ count: history.length })}
 						</h3>
 						{#if history.length > 0}
 							<button
@@ -267,7 +268,7 @@
 								class="flex items-center gap-1 px-2 py-1 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
 							>
 								<Trash2 class="w-3 h-3" />
-								Clear
+								{m.action_clear()}
 							</button>
 						{/if}
 					</div>
@@ -275,7 +276,7 @@
 					{#if history.length === 0}
 						<div class="text-center py-12 text-gray-500 dark:text-gray-400">
 							<History class="w-8 h-8 mx-auto mb-2 opacity-50" />
-							<p class="text-sm">No execution history yet</p>
+							<p class="text-sm">{m.mcp_no_history()}</p>
 						</div>
 					{:else}
 						<div class="space-y-2">
@@ -318,7 +319,7 @@
 						<input
 							type="text"
 							bind:value={toolSearch}
-							placeholder="Search tools..."
+							placeholder={m.placeholder_search_tools()}
 							class="w-full px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 						/>
 					</div>
@@ -347,7 +348,7 @@
 
 						{#if filteredTools.length === 0}
 							<p class="text-center py-4 text-sm text-gray-500 dark:text-gray-400">
-								No tools found
+								{m.mcp_no_tools_found()}
 							</p>
 						{/if}
 					</div>
@@ -383,7 +384,7 @@
 									{:else}
 										<ChevronRight class="w-4 h-4" />
 									{/if}
-									View input schema
+									{m.mcp_view_input_schema()}
 								</button>
 								{#if expandedTools.has('schema') && selectedTool.inputSchema}
 									<pre
@@ -393,7 +394,7 @@
 
 							<!-- Arguments Form -->
 							<div class="border-t border-gray-200 dark:border-gray-700 pt-4">
-								<h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Arguments</h4>
+								<h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{m.label_arguments()}</h4>
 								<JsonSchemaForm
 									schema={selectedTool.inputSchema}
 									value={arguments_}
@@ -411,10 +412,10 @@
 								>
 									{#if isExecuting}
 										<Loader2 class="w-4 h-4 animate-spin" />
-										Executing...
+										{m.mcp_executing()}
 									{:else}
 										<Play class="w-4 h-4" />
-										Execute
+										{m.mcp_execute()}
 									{/if}
 								</button>
 
@@ -424,7 +425,7 @@
 										disabled={isExecuting}
 										class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
 									>
-										Clear
+										{m.action_clear()}
 									</button>
 								{/if}
 							</div>
@@ -439,12 +440,12 @@
 											{#if executionResult.success}
 												<CheckCircle class="w-5 h-5 text-green-500" />
 												<span class="text-sm font-medium text-green-600 dark:text-green-400">
-													Success
+													{m.mcp_result_success()}
 												</span>
 											{:else}
 												<XCircle class="w-5 h-5 text-red-500" />
 												<span class="text-sm font-medium text-red-600 dark:text-red-400">
-													{executionResult.isError ? 'Error' : 'Failed'}
+													{executionResult.isError ? m.mcp_result_error() : m.mcp_result_failed()}
 												</span>
 											{/if}
 											<span class="text-sm text-gray-500 dark:text-gray-400">
@@ -459,7 +460,7 @@
 														.join('\n')
 												)}
 											class="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-											title="Copy result"
+											title={m.mcp_copy_result()}
 										>
 											<Copy class="w-4 h-4" />
 										</button>
@@ -486,7 +487,7 @@
 												{:else if content.type === 'image'}
 													<img
 														src={`data:${content.mimeType};base64,${content.data}`}
-														alt="Tool output"
+														alt={m.mcp_tool_output()}
 														class="max-w-full rounded"
 													/>
 												{:else if content.type === 'resource'}
@@ -512,8 +513,8 @@
 					{:else}
 						<div class="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400">
 							<Wrench class="w-12 h-12 mb-4 opacity-50" />
-							<p class="text-lg font-medium">Select a tool</p>
-							<p class="text-sm mt-1">Choose a tool from the list to execute it</p>
+							<p class="text-lg font-medium">{m.mcp_select_tool()}</p>
+							<p class="text-sm mt-1">{m.mcp_select_tool_hint()}</p>
 						</div>
 					{/if}
 				</div>
@@ -522,7 +523,7 @@
 
 		<!-- Footer -->
 		<div class="flex items-center justify-end p-4 border-t border-gray-200 dark:border-gray-700">
-			<button onclick={onClose} class="btn btn-secondary"> Close </button>
+			<button onclick={onClose} class="btn btn-secondary"> {m.action_close()} </button>
 		</div>
 	</div>
 </div>

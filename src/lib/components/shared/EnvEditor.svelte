@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Plus, Trash2 } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		values: Record<string, string>;
@@ -10,8 +11,8 @@
 
 	let {
 		values = $bindable({}),
-		keyPlaceholder = 'Variable name',
-		valuePlaceholder = 'Value',
+		keyPlaceholder = m.placeholder_env_key(),
+		valuePlaceholder = m.placeholder_env_value(),
 		readonly = false
 	}: Props = $props();
 
@@ -90,7 +91,7 @@
 			class="btn btn-ghost text-gray-500 w-full justify-center border-2 border-dashed border-gray-200 dark:border-gray-700"
 		>
 			<Plus class="w-4 h-4 mr-2" />
-			Add variable
+			{m.action_add_variable()}
 		</button>
 	{/if}
 </div>

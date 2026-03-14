@@ -3,6 +3,7 @@
 	import { soundLibrary, notifications } from '$lib/stores';
 	import type { SystemSound, CustomSound } from '$lib/types';
 	import { Play, Pause, Volume2, Upload, Trash2, FolderOpen, X } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		onSelect?: (sound: SystemSound) => void;
@@ -15,7 +16,7 @@
 
 	let activeTab = $state<'system' | 'custom'>('system');
 	let dragOver = $state(false);
-	let fileInput: HTMLInputElement;
+	let fileInput = $state<HTMLInputElement | null>(null);
 
 	onMount(async () => {
 		if (soundLibrary.systemSounds.length === 0) {
@@ -37,16 +38,16 @@
 
 		for (const file of files) {
 			if (!file.name.match(/\.(wav|mp3|aiff|ogg|m4a)$/i)) {
-				notifications.error(`Invalid file type: ${file.name}`);
+				notifications.error(m.notify_upload_failed_name({ name: file.name }));
 				continue;
 			}
 
 			try {
 				const data = new Uint8Array(await file.arrayBuffer());
 				await soundLibrary.uploadSound(file.name, data);
-				notifications.success(`Uploaded: ${file.name}`);
+				notifications.success(m.notify_uploaded_name({ name: file.name }));
 			} catch (e) {
-				notifications.error(`Failed to upload ${file.name}`);
+				notifications.error(m.notify_upload_failed_name({ name: file.name }));
 			}
 		}
 	}
@@ -55,9 +56,9 @@
 		e.stopPropagation();
 		try {
 			await soundLibrary.deleteSound(sound.name);
-			notifications.success(`Deleted: ${sound.name}`);
+			notifications.success(m.notify_deleted_name({ name: sound.name }));
 		} catch (e) {
-			notifications.error('Failed to delete sound');
+			notifications.error(m.notify_delete_failed({ entity: m.entity_sound() }));
 		}
 	}
 
@@ -83,7 +84,7 @@
 	<div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
 		<div class="flex items-center gap-2">
 			<Volume2 class="w-5 h-5 text-gray-500" />
-			<h3 class="text-lg font-semibold text-gray-900 dark:text-white">Sound Browser</h3>
+			<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{m.sound_browser_title()}</h3>
 		</div>
 		{#if onClose}
 			<button onclick={onClose} class="p-1 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
@@ -100,7 +101,7 @@
 				? 'text-orange-600 border-b-2 border-orange-500'
 				: 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}"
 		>
-			System Sounds ({soundLibrary.systemSounds.length})
+			{m.sound_system_sounds_count({ count: String(soundLibrary.systemSounds.length) })}
 		</button>
 		<button
 			onclick={() => (activeTab = 'custom')}
@@ -108,7 +109,7 @@
 				? 'text-orange-600 border-b-2 border-orange-500'
 				: 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}"
 		>
-			Custom Sounds ({soundLibrary.customSounds.length})
+			{m.sound_custom_sounds_count({ count: String(soundLibrary.customSounds.length) })}
 		</button>
 	</div>
 
@@ -123,7 +124,7 @@
 			{#if soundLibrary.systemSounds.length === 0}
 				<div class="text-center py-12 text-gray-500">
 					<Volume2 class="w-12 h-12 mx-auto mb-4 opacity-50" />
-					<p>No system sounds found</p>
+					<p>{m.sound_no_system_sounds()}</p>
 				</div>
 			{:else}
 				<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
@@ -164,6 +165,8 @@
 					ondrop={handleDrop}
 					ondragover={handleDragOver}
 					ondragleave={handleDragLeave}
+					role="region"
+					aria-label={m.sound_drag_drop_hint()}
 					class="mb-4 p-6 border-2 border-dashed rounded-xl transition-colors
 						{dragOver
 						? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
@@ -172,13 +175,13 @@
 					<div class="flex flex-col items-center text-center">
 						<Upload class="w-8 h-8 text-gray-400 mb-2" />
 						<p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
-							Drag and drop sound files here, or
+							{m.sound_drag_drop_hint()}
 						</p>
 						<button
 							onclick={() => fileInput?.click()}
 							class="btn btn-secondary text-sm"
 						>
-							Browse Files
+							{m.sound_browse_files()}
 						</button>
 						<input
 							bind:this={fileInput}
@@ -188,7 +191,7 @@
 							class="hidden"
 							onchange={(e) => handleFileUpload((e.target as HTMLInputElement).files)}
 						/>
-						<p class="text-xs text-gray-500 mt-2">Supports: WAV, MP3, AIFF, OGG, M4A</p>
+						<p class="text-xs text-gray-500 mt-2">{m.sound_supported_formats()}</p>
 					</div>
 				</div>
 			{/if}
@@ -197,8 +200,8 @@
 			{#if soundLibrary.customSounds.length === 0}
 				<div class="text-center py-8 text-gray-500">
 					<FolderOpen class="w-12 h-12 mx-auto mb-4 opacity-50" />
-					<p>No custom sounds yet</p>
-					<p class="text-sm mt-1">Upload sounds to use them in hooks</p>
+					<p>{m.sound_no_custom_sounds()}</p>
+					<p class="text-sm mt-1">{m.sound_upload_to_hooks_hint()}</p>
 				</div>
 			{:else}
 				<div class="space-y-2">
@@ -234,7 +237,7 @@
 							<button
 								onclick={(e) => handleDelete(sound, e)}
 								class="p-2 text-gray-400 hover:text-red-500 transition-colors"
-								title="Delete sound"
+								title={m.action_delete()}
 							>
 								<Trash2 class="w-4 h-4" />
 							</button>

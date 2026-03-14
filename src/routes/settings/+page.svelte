@@ -18,6 +18,8 @@
 		SettingsAdminTab,
 		SettingsEditorSyncTab
 	} from '$lib/components/settings/tabs';
+	import * as m from '$lib/paraglide/messages.js';
+	import { getSettingsCategoryLabel } from '$lib/utils/settingsCategoryI18n';
 
 	const scopedCategories = SETTINGS_CATEGORIES.filter(c => c.type === 'scoped');
 	const standaloneCategories = SETTINGS_CATEGORIES.filter(c => c.type === 'standalone');
@@ -29,26 +31,26 @@
 		goto(`/settings?tab=${tabId}`, { replaceState: true });
 	}
 
-	const TAB_SUBTITLES: Record<string, string> = {
-		'models': 'Configure model defaults, output behavior, and git attribution',
-		'security': 'Configure bash command isolation, network access, and security settings',
-		'plugins': 'Manage enabled plugins and custom marketplace sources',
-		'environment': 'Configure environment variables for Claude Code runtime',
-		'interface': 'Control visual and interaction preferences for Claude Code',
-		'files': 'Configure custom @ file autocomplete suggestions',
-		'session': 'Configure session cleanup, updates, teammate mode, and plans',
-		'authentication': 'Configure scripts that provide authentication credentials and API keys',
-		'mcp-approval': 'Control which project-level MCP servers are automatically approved',
-		'keybindings': 'Customize keyboard shortcuts for Claude Code',
-		'spinner-verbs': 'Customize the action verbs shown in Claude Code\'s spinner',
-		'admin': 'View enterprise managed settings deployed by your IT administrator',
-		'editor-sync': 'Configure editors, servers, tokens, paths, and backups'
+	const TAB_SUBTITLES: Record<string, () => string> = {
+		'models': m.page_settings_subtitle_models,
+		'security': m.page_settings_subtitle_security,
+		'plugins': m.page_settings_subtitle_plugins,
+		'environment': m.page_settings_subtitle_environment,
+		'interface': m.page_settings_subtitle_interface,
+		'files': m.page_settings_subtitle_files,
+		'session': m.page_settings_subtitle_session,
+		'authentication': m.page_settings_subtitle_authentication,
+		'mcp-approval': m.page_settings_subtitle_mcp_approval,
+		'keybindings': m.page_settings_subtitle_keybindings,
+		'spinner-verbs': m.page_settings_subtitle_spinner_verbs,
+		'admin': m.page_settings_subtitle_admin,
+		'editor-sync': m.page_settings_subtitle_editor_sync
 	};
 </script>
 
 <Header
-	title="Settings"
-	subtitle={TAB_SUBTITLES[activeTab] ?? 'Configure Claude Code settings'}
+	title={m.page_settings_title()}
+	subtitle={TAB_SUBTITLES[activeTab]?.() ?? m.page_settings_subtitle_default()}
 />
 
 <div class="flex-1 overflow-hidden flex">
@@ -56,7 +58,7 @@
 	<nav class="w-52 border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 overflow-y-auto flex-shrink-0">
 		<div class="p-3">
 			<p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 px-3 mb-2">
-				Configuration
+				{m.settings_section_configuration()}
 			</p>
 			{#each scopedCategories as category}
 				{@const isActive = activeTab === category.id}
@@ -68,14 +70,14 @@
 							: 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/50'}"
 				>
 					<svelte:component this={category.icon} class="w-4 h-4 flex-shrink-0" />
-					{category.label}
+					{getSettingsCategoryLabel(category.id)}
 				</button>
 			{/each}
 
 			<div class="border-t border-gray-200 dark:border-gray-700 my-3"></div>
 
 			<p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 px-3 mb-2">
-				Other
+				{m.settings_section_other()}
 			</p>
 			{#each standaloneCategories as category}
 				{@const isActive = activeTab === category.id}
@@ -87,7 +89,7 @@
 							: 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/50'}"
 				>
 					<svelte:component this={category.icon} class="w-4 h-4 flex-shrink-0" />
-					{category.label}
+					{getSettingsCategoryLabel(category.id)}
 				</button>
 			{/each}
 		</div>

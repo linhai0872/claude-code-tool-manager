@@ -42,3 +42,6 @@ npm-debug.log*
 # Coverage
 /coverage/
 homebrew-tap/
+
+# Paraglide JS (compiled i18n)
+src/lib/paraglide/

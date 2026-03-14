@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { SessionFacet } from '$lib/types';
-	import { FRICTION_LABELS } from '$lib/types/insights';
+	import { getFrictionLabel } from '$lib/utils/insightsI18n';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		facets: SessionFacet[];
@@ -32,12 +33,12 @@
 	class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4"
 >
 	<h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-		Friction Categories
+		{m.analytics_friction_categories()}
 	</h3>
 
 	{#if frictionCounts.length === 0}
 		<div class="flex items-center justify-center py-12 text-gray-400 dark:text-gray-500">
-			No friction data recorded
+			{m.empty_no_friction_data()}
 		</div>
 	{:else}
 		<div class="space-y-3">
@@ -47,7 +48,7 @@
 				<div>
 					<div class="flex items-center justify-between mb-1">
 						<span class="text-xs font-medium text-gray-600 dark:text-gray-300">
-							{FRICTION_LABELS[key] || key}
+							{getFrictionLabel(key)}
 						</span>
 						<span class="text-xs text-gray-400 dark:text-gray-500">
 							{count}

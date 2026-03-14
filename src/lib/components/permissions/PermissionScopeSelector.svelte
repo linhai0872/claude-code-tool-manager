@@ -1,6 +1,6 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import type { PermissionScope, AllPermissions } from '$lib/types';
-	import { PERMISSION_SCOPE_LABELS } from '$lib/types';
 	import { User, FolderOpen, FileText } from 'lucide-svelte';
 
 	type Props = {
@@ -17,6 +17,18 @@
 		{ key: 'project', icon: FolderOpen },
 		{ key: 'local', icon: FileText }
 	];
+
+	const scopeLabels: Record<PermissionScope, () => string> = {
+		user: () => m.scope_user(),
+		project: () => m.scope_project(),
+		local: () => m.scope_local()
+	};
+
+	const scopeDescriptions: Record<PermissionScope, () => string> = {
+		user: () => m.permission_scope_user_desc(),
+		project: () => m.permission_scope_project_desc(),
+		local: () => m.permission_scope_local_desc()
+	};
 
 	function getRuleCount(scope: PermissionScope): number {
 		if (!permissions) return 0;
@@ -45,10 +57,10 @@
 				: isDisabled
 					? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
 					: 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}"
-			title={PERMISSION_SCOPE_LABELS[key].description}
+			title={scopeDescriptions[key]()}
 		>
 			<svelte:component this={icon} class="w-4 h-4" />
-			{PERMISSION_SCOPE_LABELS[key].label}
+			{scopeLabels[key]()}
 			{#if count > 0}
 				<span
 					class="ml-1 px-1.5 py-0.5 text-xs rounded-full

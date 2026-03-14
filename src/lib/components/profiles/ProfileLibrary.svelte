@@ -3,6 +3,7 @@
 	import type { Profile } from '$lib/types';
 	import { Search } from 'lucide-svelte';
 	import ProfileCard from './ProfileCard.svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		onActivate?: (profile: Profile) => void;
@@ -22,7 +23,7 @@
 			<Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
 			<input
 				type="text"
-				placeholder="Search profiles..."
+				placeholder={m.placeholder_search_profiles()}
 				value={profileLibrary.searchQuery}
 				oninput={(e) => profileLibrary.setSearch(e.currentTarget.value)}
 				class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
@@ -37,11 +38,11 @@
 	</div>
 {:else if profileLibrary.profiles.length === 0}
 	<div class="text-center py-12">
-		<p class="text-gray-500 dark:text-gray-400">No profiles yet. Create one to get started.</p>
+		<p class="text-gray-500 dark:text-gray-400">{m.empty_no_profiles()}</p>
 	</div>
 {:else if profileLibrary.filteredProfiles.length === 0}
 	<div class="text-center py-12">
-		<p class="text-gray-500 dark:text-gray-400">No profiles match your search.</p>
+		<p class="text-gray-500 dark:text-gray-400">{m.empty_no_profiles_match()}</p>
 	</div>
 {:else}
 	<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">

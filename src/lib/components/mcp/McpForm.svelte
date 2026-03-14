@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { CreateMcpRequest, McpType, Mcp } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 	import McpTypeSelector from './McpTypeSelector.svelte';
 	import { EnvEditor } from '$lib/components/shared';
 	import { parseMcpFromClipboard, type ParsedMcp } from '$lib/utils/mcpPasteParser';
@@ -59,7 +60,7 @@
 		}
 
 		pasteStatus = 'success';
-		pasteMessage = `Imported "${mcp.name}" (${mcp.type})`;
+		pasteMessage = m.mcp_paste_imported({ name: mcp.name, type: mcp.type });
 
 		// Reset status after 3 seconds
 		setTimeout(() => {
@@ -80,7 +81,7 @@
 
 			// If multiple MCPs were found, notify user
 			if (result.mcps.length > 1) {
-				pasteMessage += ` (+${result.mcps.length - 1} more available)`;
+				pasteMessage += ` (+${result.mcps.length - 1} ${m.mcp_paste_more_available()})`;
 			}
 		}
 		// If parsing fails, let the default paste behavior happen
@@ -95,7 +96,7 @@
 				applyParsedMcp(result.mcps[0]);
 			} else {
 				pasteStatus = 'error';
-				pasteMessage = result.error ?? 'Could not parse clipboard content';
+				pasteMessage = result.error ?? m.mcp_paste_parse_failed();
 				setTimeout(() => {
 					pasteStatus = 'idle';
 					pasteMessage = '';
@@ -103,7 +104,7 @@
 			}
 		} catch {
 			pasteStatus = 'error';
-			pasteMessage = 'Could not access clipboard';
+			pasteMessage = m.mcp_paste_clipboard_failed();
 			setTimeout(() => {
 				pasteStatus = 'idle';
 				pasteMessage = '';
@@ -115,23 +116,23 @@
 		errors = {};
 
 		if (!name.trim()) {
-			errors.name = 'Name is required';
+			errors.name = m.validation_name_required();
 		} else if (!/^[a-zA-Z0-9_-]+$/.test(name.trim())) {
-			errors.name = 'Name can only contain letters, numbers, hyphens, and underscores';
+			errors.name = m.validation_name_format();
 		}
 
 		if (mcpType === 'stdio') {
 			if (!command.trim()) {
-				errors.command = 'Command is required';
+				errors.command = m.validation_command_required();
 			}
 		} else {
 			if (!url.trim()) {
-				errors.url = 'URL is required';
+				errors.url = m.validation_url_required();
 			} else {
 				try {
 					new URL(url);
 				} catch {
-					errors.url = 'Invalid URL format';
+					errors.url = m.validation_url_format();
 				}
 			}
 		}
@@ -186,10 +187,10 @@
 						</p>
 					{:else}
 						<p class="text-sm font-medium text-gray-700 dark:text-gray-300">
-							Quick Import
+							{m.mcp_quick_import()}
 						</p>
 						<p class="text-xs text-gray-500 dark:text-gray-400">
-							Paste a <code class="px-1 bg-gray-200 dark:bg-gray-700 rounded">claude mcp add</code> command or JSON config
+							{m.mcp_quick_import_hint()}
 						</p>
 					{/if}
 				</div>
@@ -200,7 +201,7 @@
 				class="btn btn-secondary text-sm"
 			>
 				<Clipboard class="w-4 h-4 mr-1.5" />
-				Paste
+				{m.mcp_action_paste()}
 			</button>
 		</div>
 	</div>
@@ -208,7 +209,7 @@
 	<!-- Name -->
 	<div>
 		<label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-			Name <span class="text-red-500">*</span>
+			{m.label_name()} <span class="text-red-500">*</span>
 		</label>
 		<input
 			type="text"
@@ -216,7 +217,7 @@
 			bind:value={name}
 			class="input mt-1"
 			class:border-red-500={errors.name}
-			placeholder="my-mcp-server"
+			placeholder={m.placeholder_mcp_name()}
 		/>
 		{#if errors.name}
 			<p class="mt-1 text-sm text-red-500">{errors.name}</p>
@@ -226,14 +227,14 @@
 	<!-- Description -->
 	<div>
 		<label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-			Description
+			{m.label_description()}
 		</label>
 		<textarea
 			id="description"
 			bind:value={description}
 			rows={2}
 			class="input mt-1 resize-none"
-			placeholder="Optional description of what this MCP does..."
+			placeholder={m.placeholder_mcp_description()}
 		></textarea>
 	</div>
 
@@ -245,7 +246,7 @@
 		<div class="space-y-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
 			<div>
 				<label for="command" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-					Command <span class="text-red-500">*</span>
+					{m.label_command()} <span class="text-red-500">*</span>
 				</label>
 				<input
 					type="text"
@@ -253,7 +254,7 @@
 					bind:value={command}
 					class="input mt-1 font-mono"
 					class:border-red-500={errors.command}
-					placeholder="npx"
+					placeholder={m.placeholder_mcp_command()}
 				/>
 				{#if errors.command}
 					<p class="mt-1 text-sm text-red-500">{errors.command}</p>
@@ -262,17 +263,17 @@
 
 			<div>
 				<label for="args" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-					Arguments
+					{m.label_arguments()}
 				</label>
 				<input
 					type="text"
 					id="args"
 					bind:value={args}
 					class="input mt-1 font-mono"
-					placeholder="-y @package/mcp-server"
+					placeholder={m.placeholder_mcp_args()}
 				/>
 				<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-					Space-separated arguments
+					{m.mcp_args_hint()}
 				</p>
 			</div>
 		</div>
@@ -280,7 +281,7 @@
 		<div class="space-y-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
 			<div>
 				<label for="url" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-					URL <span class="text-red-500">*</span>
+					{m.label_url()} <span class="text-red-500">*</span>
 				</label>
 				<input
 					type="url"
@@ -288,7 +289,7 @@
 					bind:value={url}
 					class="input mt-1 font-mono"
 					class:border-red-500={errors.url}
-					placeholder={mcpType === 'sse' ? 'https://mcp.service.com/sse' : 'https://api.service.com/mcp'}
+					placeholder={mcpType === 'sse' ? m.placeholder_mcp_sse_url() : m.placeholder_mcp_http_url()}
 				/>
 				{#if errors.url}
 					<p class="mt-1 text-sm text-red-500">{errors.url}</p>
@@ -298,12 +299,12 @@
 			{#if mcpType === 'http'}
 				<div>
 					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-						Headers
+						{m.label_headers()}
 					</label>
 					<EnvEditor
 						bind:values={headers}
-						keyPlaceholder="Header name"
-						valuePlaceholder={'Header value (use ${VAR} for env vars)'}
+						keyPlaceholder={m.placeholder_header_name()}
+						valuePlaceholder={m.placeholder_header_value()}
 					/>
 				</div>
 			{/if}
@@ -313,7 +314,7 @@
 	<!-- Environment Variables -->
 	<div>
 		<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-			Environment Variables
+			{m.label_env_variables()}
 		</label>
 		<EnvEditor bind:values={env} />
 	</div>
@@ -321,10 +322,10 @@
 	<!-- Actions -->
 	<div class="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
 		<button type="button" onclick={onCancel} class="btn btn-secondary">
-			Cancel
+			{m.action_cancel()}
 		</button>
 		<button type="submit" class="btn btn-primary" disabled={isSubmitting}>
-			{initialValues.name ? 'Update MCP' : 'Create MCP'}
+			{initialValues.name ? m.mcp_action_update() : m.mcp_action_create()}
 		</button>
 	</div>
 </form>

@@ -5,6 +5,7 @@
 	import { skillLibrary, notifications } from '$lib/stores';
 	import type { Skill } from '$lib/types';
 	import { Plus } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let editTab = $state<'details' | 'files'>('details');
 
@@ -16,9 +17,9 @@
 		try {
 			await skillLibrary.create(values);
 			showAddSkill = false;
-			notifications.success('Skill created successfully');
+			notifications.success(m.notify_created({ entity: m.entity_skill() }));
 		} catch (err) {
-			notifications.error('Failed to create skill');
+			notifications.error(m.notify_create_failed({ entity: m.entity_skill() }));
 		}
 	}
 
@@ -27,9 +28,9 @@
 		try {
 			await skillLibrary.update(editingSkill.id, values);
 			editingSkill = null;
-			notifications.success('Skill updated successfully');
+			notifications.success(m.notify_updated({ entity: m.entity_skill() }));
 		} catch (err) {
-			notifications.error('Failed to update skill');
+			notifications.error(m.notify_update_failed({ entity: m.entity_skill() }));
 		}
 	}
 
@@ -37,9 +38,9 @@
 		if (!deletingSkill) return;
 		try {
 			await skillLibrary.delete(deletingSkill.id);
-			notifications.success('Skill deleted');
+			notifications.success(m.notify_deleted({ entity: m.entity_skill() }));
 		} catch (err) {
-			notifications.error('Failed to delete skill');
+			notifications.error(m.notify_delete_failed({ entity: m.entity_skill() }));
 		} finally {
 			deletingSkill = null;
 		}
@@ -47,15 +48,15 @@
 </script>
 
 <Header
-	title="Skills"
-	subtitle="Agent skills Claude invokes automatically based on context"
+	title={m.page_skills_title()}
+	subtitle={m.page_skills_subtitle()}
 />
 
 <div class="flex-1 overflow-auto p-6">
 	<div class="flex justify-end mb-6">
 		<button onclick={() => (showAddSkill = true)} class="btn btn-primary">
 			<Plus class="w-4 h-4 mr-2" />
-			Add Skill
+			{m.action_add_skill()}
 		</button>
 	</div>
 
@@ -70,7 +71,7 @@
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
 		<div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto">
 			<div class="p-6">
-				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">Add New Skill</h2>
+				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">{m.modal_add_title({ entity: m.entity_skill() })}</h2>
 				<SkillForm onSubmit={handleCreateSkill} onCancel={() => (showAddSkill = false)} />
 			</div>
 		</div>
@@ -82,7 +83,7 @@
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
 		<div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto">
 			<div class="p-6">
-				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Edit Skill</h2>
+				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">{m.modal_edit_title({ entity: m.entity_skill() })}</h2>
 
 				<!-- Tabs for editing -->
 				<div class="flex border-b border-gray-200 dark:border-gray-700 mb-6">
@@ -91,14 +92,14 @@
 						onclick={() => editTab = 'details'}
 						class="px-4 py-2 text-sm font-medium border-b-2 transition-colors {editTab === 'details' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400'}"
 					>
-						Details
+						{m.tab_details()}
 					</button>
 					<button
 						type="button"
 						onclick={() => editTab = 'files'}
 						class="px-4 py-2 text-sm font-medium border-b-2 transition-colors {editTab === 'files' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400'}"
 					>
-						Files
+						{m.tab_files()}
 					</button>
 				</div>
 
@@ -116,7 +117,7 @@
 							onclick={() => { editingSkill = null; editTab = 'details'; }}
 							class="btn btn-secondary"
 						>
-							Close
+							{m.action_close()}
 						</button>
 					</div>
 				{/if}
@@ -127,9 +128,9 @@
 
 <ConfirmDialog
 	open={!!deletingSkill}
-	title="Delete Skill"
-	message="Are you sure you want to delete '{deletingSkill?.name}'? This will remove it from all projects."
-	confirmText="Delete"
+	title={m.confirm_delete_title({ entity: m.entity_skill() })}
+	message={m.confirm_delete_message({ name: deletingSkill?.name ?? '' })}
+	confirmText={m.action_delete()}
 	onConfirm={handleDeleteSkill}
 	onCancel={() => (deletingSkill = null)}
 />

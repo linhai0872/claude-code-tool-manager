@@ -5,6 +5,7 @@
 	import { projectsStore, claudeSettingsLibrary, mcpLibrary, hookLibrary } from '$lib/stores';
 	import { ProjectDashboard } from '$lib/components/projects';
 	import { ArrowLeft, FolderOpen } from 'lucide-svelte';
+import * as m from '$lib/paraglide/messages.js';
 
 	let isReady = $state(false);
 	let loadError = $state<string | null>(null);
@@ -58,11 +59,11 @@
 		<div class="w-16 h-16 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
 			<FolderOpen class="w-8 h-8 text-red-400" />
 		</div>
-		<h2 class="text-lg font-semibold text-gray-900 dark:text-white">Project Not Found</h2>
+		<h2 class="text-lg font-semibold text-gray-900 dark:text-white">{m.project_not_found()}</h2>
 		<p class="text-gray-500 dark:text-gray-400 text-center max-w-md">{loadError}</p>
 		<button onclick={() => goto('/projects')} class="btn btn-primary mt-2">
 			<ArrowLeft class="w-4 h-4 mr-2" />
-			Back to Projects
+			{m.project_back_to_projects()}
 		</button>
 	</div>
 {:else if !isReady || !project}

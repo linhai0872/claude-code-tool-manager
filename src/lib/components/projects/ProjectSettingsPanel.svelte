@@ -1,10 +1,15 @@
 <script lang="ts">
 	import type { Project } from '$lib/types';
 	import type { ClaudeSettings, ClaudeSettingsScope } from '$lib/types';
-	import { CLAUDE_SETTINGS_SCOPE_LABELS } from '$lib/types';
 	import { claudeSettingsLibrary, notifications } from '$lib/stores';
+	import * as m from '$lib/paraglide/messages.js';
 	import { SETTINGS_CATEGORIES } from '$lib/components/settings';
 	import { FolderOpen, FileText, RefreshCw, Info } from 'lucide-svelte';
+	import {
+		getClaudeSettingsScopeDescription,
+		getClaudeSettingsScopeLabel
+	} from '$lib/utils/claudeSettingsScopeI18n';
+	import { getSettingsCategoryLabel } from '$lib/utils/settingsCategoryI18n';
 
 	import { ModelConfigEditor, AttributionEditor } from '$lib/components/claude-settings';
 	import { SandboxConfigEditor } from '$lib/components/sandbox';
@@ -27,8 +32,18 @@
 	const scopedCategories = SETTINGS_CATEGORIES.filter(c => c.type === 'scoped');
 
 	const scopes: { key: ClaudeSettingsScope; icon: typeof FolderOpen; label: string; description: string }[] = [
-		{ key: 'project', icon: FolderOpen, label: CLAUDE_SETTINGS_SCOPE_LABELS['project'].label, description: CLAUDE_SETTINGS_SCOPE_LABELS['project'].description },
-		{ key: 'local', icon: FileText, label: CLAUDE_SETTINGS_SCOPE_LABELS['local'].label, description: CLAUDE_SETTINGS_SCOPE_LABELS['local'].description }
+		{
+			key: 'project',
+			icon: FolderOpen,
+			label: getClaudeSettingsScopeLabel('project'),
+			description: getClaudeSettingsScopeDescription('project')
+		},
+		{
+			key: 'local',
+			icon: FileText,
+			label: getClaudeSettingsScopeLabel('local'),
+			description: getClaudeSettingsScopeDescription('local')
+		}
 	];
 
 	function handleSectionChange(sectionId: string) {
@@ -37,7 +52,7 @@
 
 	async function handleRefresh() {
 		await claudeSettingsLibrary.load();
-		notifications.success('Settings refreshed');
+		notifications.success(m.notify_refreshed({ entity: m.entity_settings() }));
 	}
 
 	async function save(settings: ClaudeSettings, successMsg: string, errorMsg: string) {
@@ -73,7 +88,7 @@
 		<button
 			onclick={handleRefresh}
 			class="btn btn-ghost"
-			title="Refresh from settings files"
+			title={m.project_refresh_settings()}
 		>
 			<RefreshCw class="w-4 h-4" />
 		</button>
@@ -94,7 +109,7 @@
 								: 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700/50'}"
 					>
 						<svelte:component this={category.icon} class="w-4 h-4 flex-shrink-0" />
-						{category.label}
+						{getSettingsCategoryLabel(category.id)}
 					</button>
 				{/each}
 			</div>
@@ -117,7 +132,7 @@
 					<div class="flex items-start gap-3 mb-6 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
 						<Info class="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
 						<p class="text-sm text-blue-700 dark:text-blue-300">
-							No project settings file exists yet. Saving will create <code class="bg-blue-100 dark:bg-blue-800/50 px-1 rounded">.claude/settings.json</code> in the project folder.
+							{m.project_no_settings_file_hint({ file: '.claude/settings.json' })}
 						</p>
 					</div>
 				{/if}
@@ -126,63 +141,63 @@
 					<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 						<ModelConfigEditor
 							{settings}
-							onsave={(s) => save(s, 'Model settings saved', 'Failed to save model settings')}
+							onsave={(s) => save(s, m.notify_settings_saved(), m.notify_settings_save_failed())}
 						/>
 						<AttributionEditor
 							{settings}
-							onsave={(s) => save(s, 'Attribution settings saved', 'Failed to save attribution settings')}
+							onsave={(s) => save(s, m.notify_settings_saved(), m.notify_settings_save_failed())}
 						/>
 					</div>
 				{:else if activeSection === 'security'}
 					<SandboxConfigEditor
 						{settings}
-						onsave={(s) => save(s, 'Security settings saved', 'Failed to save security settings')}
+						onsave={(s) => save(s, m.notify_settings_saved(), m.notify_settings_save_failed())}
 					/>
 				{:else if activeSection === 'plugins'}
 					<div class="space-y-6">
 						<PluginListEditor
 							{settings}
-							onsave={(s) => save(s, 'Plugin settings saved', 'Failed to save plugin settings')}
+							onsave={(s) => save(s, m.notify_settings_saved(), m.notify_settings_save_failed())}
 						/>
 						<MarketplaceEditor
 							{settings}
-							onsave={(s) => save(s, 'Marketplace settings saved', 'Failed to save marketplace settings')}
+							onsave={(s) => save(s, m.notify_settings_saved(), m.notify_settings_save_failed())}
 						/>
 					</div>
 				{:else if activeSection === 'environment'}
 					<EnvVarsEditor
 						{settings}
-						onsave={(s) => save(s, 'Environment variables saved', 'Failed to save environment variables')}
+						onsave={(s) => save(s, m.notify_settings_saved(), m.notify_settings_save_failed())}
 					/>
 				{:else if activeSection === 'interface'}
 					<UITogglesEditor
 						{settings}
-						onsave={(s) => save(s, 'Interface settings saved', 'Failed to save interface settings')}
+						onsave={(s) => save(s, m.notify_settings_saved(), m.notify_settings_save_failed())}
 					/>
 				{:else if activeSection === 'files'}
 					<FileSuggestionEditor
 						{settings}
-						onsave={(s) => save(s, 'File settings saved', 'Failed to save file settings')}
+						onsave={(s) => save(s, m.notify_settings_saved(), m.notify_settings_save_failed())}
 					/>
 				{:else if activeSection === 'session'}
 					<SessionCleanupEditor
 						{settings}
-						onsave={(s) => save(s, 'Session settings saved', 'Failed to save session settings')}
+						onsave={(s) => save(s, m.notify_settings_saved(), m.notify_settings_save_failed())}
 					/>
 				{:else if activeSection === 'authentication'}
 					<AuthHelpersEditor
 						{settings}
-						onsave={(s) => save(s, 'Auth settings saved', 'Failed to save auth settings')}
+						onsave={(s) => save(s, m.notify_settings_saved(), m.notify_settings_save_failed())}
 					/>
 				{:else if activeSection === 'mcp-approval'}
 					<McpApprovalEditor
 						{settings}
-						onsave={(s) => save(s, 'MCP approval settings saved', 'Failed to save MCP approval settings')}
+						onsave={(s) => save(s, m.notify_settings_saved(), m.notify_settings_save_failed())}
 					/>
 				{/if}
 			{:else}
 				<div class="text-center py-20 text-gray-400 dark:text-gray-500">
-					<p>No settings available for this scope</p>
+					<p>{m.project_no_settings_available()}</p>
 				</div>
 			{/if}
 		</div>

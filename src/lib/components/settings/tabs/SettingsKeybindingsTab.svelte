@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { KeybindingsEditor } from '$lib/components/keybindings';
 	import { keybindingsLibrary, notifications } from '$lib/stores';
+	import * as m from '$lib/paraglide/messages.js';
 	import { RefreshCw } from 'lucide-svelte';
 
 	onMount(async () => {
@@ -11,12 +12,12 @@
 
 	async function handleRefresh() {
 		await keybindingsLibrary.load();
-		notifications.success('Keybindings refreshed');
+		notifications.success(m.notify_refreshed({ entity: m.entity_keybinding() }));
 	}
 </script>
 
 <div class="flex items-center justify-end mb-4">
-	<button onclick={handleRefresh} class="btn btn-ghost" title="Refresh from file">
+	<button onclick={handleRefresh} class="btn btn-ghost" title={m.keybindings_refresh_from_file()}>
 		<RefreshCw class="w-4 h-4" />
 	</button>
 </div>

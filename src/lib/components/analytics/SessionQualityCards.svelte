@@ -1,11 +1,8 @@
 <script lang="ts">
 	import type { SessionFacet } from '$lib/types';
-	import {
-		OUTCOME_LABELS,
-		OUTCOME_COLORS,
-		HELPFULNESS_LABELS,
-		HELPFULNESS_COLORS
-	} from '$lib/types/insights';
+	import { OUTCOME_COLORS, HELPFULNESS_COLORS } from '$lib/types/insights';
+	import { getOutcomeLabel, getHelpfulnessLabel } from '$lib/utils/insightsI18n';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		facets: SessionFacet[];
@@ -73,12 +70,12 @@
 		class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4"
 	>
 		<h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-			Session Outcomes
+			{m.analytics_session_outcomes()}
 		</h3>
 
 		{#if outcomeCounts.length === 0}
 			<div class="flex items-center justify-center py-12 text-gray-400 dark:text-gray-500">
-				No outcome data available
+				{m.empty_no_outcome_data()}
 			</div>
 		{:else}
 			<div class="flex flex-col items-center gap-4">
@@ -114,7 +111,7 @@
 						class="fill-gray-400 dark:fill-gray-500"
 						font-size="10"
 					>
-						sessions
+						{m.analytics_sessions()}
 					</text>
 				</svg>
 
@@ -126,7 +123,7 @@
 								style="background: {seg.color}"
 							></div>
 							<span class="text-xs text-gray-600 dark:text-gray-300">
-								{OUTCOME_LABELS[seg.key] || seg.key}
+								{getOutcomeLabel(seg.key)}
 							</span>
 							<span class="text-xs text-gray-400 dark:text-gray-500">
 								{seg.count}
@@ -143,12 +140,12 @@
 		class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4"
 	>
 		<h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-			Claude Helpfulness
+			{m.analytics_claude_helpfulness()}
 		</h3>
 
 		{#if helpfulnessCounts.length === 0}
 			<div class="flex items-center justify-center py-12 text-gray-400 dark:text-gray-500">
-				No helpfulness data available
+				{m.empty_no_helpfulness_data()}
 			</div>
 		{:else}
 			<div class="flex flex-col items-center gap-4">
@@ -184,7 +181,7 @@
 						class="fill-gray-400 dark:fill-gray-500"
 						font-size="10"
 					>
-						sessions
+						{m.analytics_sessions()}
 					</text>
 				</svg>
 
@@ -196,7 +193,7 @@
 								style="background: {seg.color}"
 							></div>
 							<span class="text-xs text-gray-600 dark:text-gray-300">
-								{HELPFULNESS_LABELS[seg.key] || seg.key}
+								{getHelpfulnessLabel(seg.key)}
 							</span>
 							<span class="text-xs text-gray-400 dark:text-gray-500">
 								{seg.count}

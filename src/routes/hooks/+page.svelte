@@ -7,6 +7,7 @@
 	import { hookLibrary, soundLibrary, notifications } from '$lib/stores';
 	import type { Hook, CreateHookRequest } from '$lib/types';
 	import { Plus, Volume2, Download, Music } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let showAddHook = $state(false);
 	let editingHook = $state<Hook | null>(null);
@@ -29,9 +30,9 @@
 		try {
 			await hookLibrary.create(values);
 			showAddHook = false;
-			notifications.success('Hook created successfully');
+			notifications.success(m.notify_created({ entity: m.entity_hook() }));
 		} catch (err) {
-			notifications.error('Failed to create hook');
+			notifications.error(m.notify_create_failed({ entity: m.entity_hook() }));
 		}
 	}
 
@@ -40,9 +41,9 @@
 		try {
 			await hookLibrary.update(editingHook.id, values);
 			editingHook = null;
-			notifications.success('Hook updated successfully');
+			notifications.success(m.notify_updated({ entity: m.entity_hook() }));
 		} catch (err) {
-			notifications.error('Failed to update hook');
+			notifications.error(m.notify_update_failed({ entity: m.entity_hook() }));
 		}
 	}
 
@@ -50,9 +51,9 @@
 		if (!deletingHook) return;
 		try {
 			await hookLibrary.delete(deletingHook.id);
-			notifications.success('Hook deleted');
+			notifications.success(m.notify_deleted({ entity: m.entity_hook() }));
 		} catch (err) {
-			notifications.error('Failed to delete hook');
+			notifications.error(m.notify_delete_failed({ entity: m.entity_hook() }));
 		} finally {
 			deletingHook = null;
 		}
@@ -72,35 +73,35 @@
 				timeout: hook.timeout,
 				tags: hook.tags
 			});
-			notifications.success('Hook duplicated');
+			notifications.success(m.notify_duplicated({ entity: m.entity_hook() }));
 		} catch (err) {
-			notifications.error('Failed to duplicate hook');
+			notifications.error(m.notify_duplicate_failed({ entity: m.entity_hook() }));
 		}
 	}
 </script>
 
 <Header
-	title="Hooks Library"
-	subtitle="Event-driven automations - run commands or inject prompts on Claude Code events"
+	title={m.page_hooks_title()}
+	subtitle={m.page_hooks_subtitle()}
 />
 
 <div class="flex-1 overflow-auto p-6">
 	<div class="flex flex-wrap gap-3 justify-end mb-6">
 		<button onclick={() => (showSoundWizard = true)} class="btn btn-secondary">
 			<Volume2 class="w-4 h-4 mr-2" />
-			Sound Notifications
+			{m.action_sound_notifications()}
 		</button>
 		<button onclick={() => (showExportModal = true)} class="btn btn-secondary">
 			<Download class="w-4 h-4 mr-2" />
-			Export
+			{m.action_export()}
 		</button>
 		<button onclick={() => (showSoundBrowser = true)} class="btn btn-secondary">
 			<Music class="w-4 h-4 mr-2" />
-			Manage Sounds
+			{m.action_manage_sounds()}
 		</button>
 		<button onclick={() => (showAddHook = true)} class="btn btn-primary">
 			<Plus class="w-4 h-4 mr-2" />
-			Add Hook
+			{m.action_add_hook()}
 		</button>
 	</div>
 
@@ -118,7 +119,7 @@
 			class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto"
 		>
 			<div class="p-6">
-				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">Add New Hook</h2>
+				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">{m.modal_add_title({ entity: m.entity_hook() })}</h2>
 				<HookForm
 					templates={hookLibrary.templates}
 					onSubmit={handleCreateHook}
@@ -136,7 +137,7 @@
 			class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto"
 		>
 			<div class="p-6">
-				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">Edit Hook</h2>
+				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">{m.modal_edit_title({ entity: m.entity_hook() })}</h2>
 				<HookForm
 					initialValues={editingHook}
 					templates={hookLibrary.templates}
@@ -150,9 +151,9 @@
 
 <ConfirmDialog
 	open={!!deletingHook}
-	title="Delete Hook"
-	message="Are you sure you want to delete '{deletingHook?.name}'? This will remove it from all projects and global settings."
-	confirmText="Delete"
+	title={m.confirm_delete_title({ entity: m.entity_hook() })}
+	message={m.confirm_delete_message({ name: deletingHook?.name ?? '' })}
+	confirmText={m.action_delete()}
 	onConfirm={handleDeleteHook}
 	onCancel={() => (deletingHook = null)}
 />

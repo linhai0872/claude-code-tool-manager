@@ -13,6 +13,8 @@ import {
 	TERMINAL_CONFLICT_KEYS,
 	getActionsForContext
 } from '$lib/types';
+import { getKeybindingActionDescription, getKeybindingActionLabel } from '$lib/utils/keybindingActionI18n';
+import * as m from '$lib/paraglide/messages.js';
 
 class KeybindingsLibraryState {
 	overrides = $state<ContextBindings[]>([]);
@@ -291,8 +293,8 @@ class KeybindingsLibraryState {
 
 				merged.push({
 					action: action.action,
-					label: action.label,
-					description: action.description,
+					label: getKeybindingActionLabel(action.action, action.label),
+					description: getKeybindingActionDescription(action.action, action.description),
 					context: ctx,
 					defaultKeys: action.defaultKeys,
 					currentKeys,
@@ -313,7 +315,7 @@ class KeybindingsLibraryState {
 							label: actionOrNull.startsWith('command:')
 								? actionOrNull.slice('command:'.length)
 								: actionOrNull,
-							description: 'Custom binding',
+							description: m.keybindings_custom_binding(),
 							context: ctx,
 							defaultKeys: [],
 							currentKeys: Array.from(actionKeyMap.get(actionOrNull) ?? []),

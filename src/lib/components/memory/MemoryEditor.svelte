@@ -1,4 +1,6 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
+
 	type Props = {
 		content: string;
 		onchange: (content: string) => void;
@@ -37,6 +39,6 @@
 		rounded-lg resize-none
 		focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
 		placeholder:text-gray-400 dark:placeholder:text-gray-500"
-	placeholder="# CLAUDE.md&#10;&#10;Write your instructions for Claude here...&#10;&#10;- Project guidelines&#10;- Code conventions&#10;- Important context"
+	placeholder={m.memory_editor_placeholder()}
 	spellcheck="false"
 ></textarea>

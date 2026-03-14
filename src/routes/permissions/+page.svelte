@@ -14,6 +14,7 @@
 	import { permissionLibrary, projectsStore, notifications } from '$lib/stores';
 	import type { PermissionCategory, PermissionTemplate } from '$lib/types';
 	import { Sparkles, Layers, RefreshCw, FolderOpen } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let showRuleForm = $state(false);
 	let ruleFormCategory = $state<PermissionCategory>('allow');
@@ -36,18 +37,18 @@
 		try {
 			await permissionLibrary.addRule(ruleFormCategory, rule);
 			showRuleForm = false;
-			notifications.success(`Rule added to ${ruleFormCategory}`);
+			notifications.success(m.notify_rule_added_to({ category: ruleFormCategory }));
 		} catch (err) {
-			notifications.error('Failed to add rule');
+			notifications.error(m.notify_rule_add_failed());
 		}
 	}
 
 	async function handleRemoveRule(category: PermissionCategory, index: number) {
 		try {
 			await permissionLibrary.removeRule(category, index);
-			notifications.success('Rule removed');
+			notifications.success(m.notify_rule_removed());
 		} catch (err) {
-			notifications.error('Failed to remove rule');
+			notifications.error(m.notify_rule_remove_failed());
 		}
 	}
 
@@ -55,7 +56,7 @@
 		try {
 			await permissionLibrary.reorderRules(category, rules);
 		} catch (err) {
-			notifications.error('Failed to reorder rules');
+			notifications.error(m.notify_reorder_failed());
 		}
 	}
 
@@ -63,27 +64,27 @@
 		try {
 			await permissionLibrary.applyTemplate(template);
 			showTemplatePanel = false;
-			notifications.success(`Applied template: ${template.name}`);
+			notifications.success(m.notify_template_applied({ name: template.name }));
 		} catch (err) {
-			notifications.error('Failed to apply template');
+			notifications.error(m.notify_template_apply_failed());
 		}
 	}
 
 	async function handleDefaultModeChange(mode: string | null) {
 		try {
 			await permissionLibrary.setDefaultMode(mode);
-			notifications.success('Default mode updated');
+			notifications.success(m.notify_default_mode_updated());
 		} catch (err) {
-			notifications.error('Failed to update default mode');
+			notifications.error(m.notify_default_mode_update_failed());
 		}
 	}
 
 	async function handleDirectoriesChange(dirs: string[]) {
 		try {
 			await permissionLibrary.setAdditionalDirectories(dirs);
-			notifications.success('Additional directories updated');
+			notifications.success(m.notify_directories_updated());
 		} catch (err) {
-			notifications.error('Failed to update directories');
+			notifications.error(m.notify_directories_update_failed());
 		}
 	}
 
@@ -96,13 +97,13 @@
 
 	async function handleRefresh() {
 		await permissionLibrary.load();
-		notifications.success('Permissions refreshed');
+		notifications.success(m.notify_permissions_refreshed());
 	}
 </script>
 
 <Header
-	title="Permissions"
-	subtitle="Manage Claude Code permission rules — control what tools Claude can use"
+	title={m.page_permissions_title()}
+	subtitle={m.page_permissions_subtitle()}
 />
 
 <div class="flex-1 overflow-auto p-6">
@@ -116,7 +117,7 @@
 				onchange={handleProjectChange}
 				class="input text-sm"
 			>
-				<option value="">No project</option>
+				<option value="">{m.project_none_selected()}</option>
 				{#each projectsStore.projects as project}
 					<option value={project.path}>{project.name}</option>
 				{/each}
@@ -140,19 +141,19 @@
 				class="btn btn-secondary"
 			>
 				<Sparkles class="w-4 h-4 mr-2" />
-				Templates
+				{m.permission_rule_templates()}
 			</button>
 			<button
 				onclick={() => (showMergedView = true)}
 				class="btn btn-secondary"
 			>
 				<Layers class="w-4 h-4 mr-2" />
-				Merged View
+				{m.permission_merged_view_title()}
 			</button>
 			<button
 				onclick={handleRefresh}
 				class="btn btn-ghost"
-				title="Refresh from settings files"
+				title={m.project_refresh_settings()}
 			>
 				<RefreshCw class="w-4 h-4" />
 			</button>
@@ -186,7 +187,7 @@
 		<div class="mb-4 max-w-md">
 			<SearchBar
 				value={permissionLibrary.searchQuery}
-				placeholder="Filter rules..."
+				placeholder={m.permission_filter_rules()}
 				onchange={(v) => permissionLibrary.setSearch(v)}
 			/>
 		</div>
@@ -219,7 +220,7 @@
 		</div>
 	{:else}
 		<div class="text-center py-20 text-gray-400 dark:text-gray-500">
-			<p>Select a scope to view permissions</p>
+			<p>{m.settings_select_scope()}</p>
 		</div>
 	{/if}
 </div>

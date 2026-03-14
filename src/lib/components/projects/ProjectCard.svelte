@@ -1,8 +1,10 @@
 <script lang="ts">
 	import type { Project, ProjectSkill, ProjectSubAgent } from '$lib/types';
 	import { projectsStore, notifications, skillLibrary, subagentLibrary } from '$lib/stores';
+	import * as m from '$lib/paraglide/messages.js';
 	import { FolderOpen, MoreVertical, Trash2, RefreshCw, ExternalLink, Plug, Sparkles, Bot, Heart } from 'lucide-svelte';
 	import { open } from '@tauri-apps/plugin-shell';
+	import { getEditorDisplayName } from '$lib/utils/editorI18n';
 
 	type Props = {
 		project: Project;
@@ -86,12 +88,12 @@
 				{#if project.editorType === 'opencode'}
 					<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
 						<span class="w-3 h-3 rounded-sm bg-emerald-500 text-white flex items-center justify-center text-[8px] font-bold">O</span>
-						OpenCode
+						{getEditorDisplayName('opencode')}
 					</span>
 				{:else}
 					<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary-100 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300">
 						<span class="w-3 h-3 rounded-sm bg-primary-500 text-white flex items-center justify-center text-[8px] font-bold">C</span>
-						Claude
+						{getEditorDisplayName('claude_code')}
 					</span>
 				{/if}
 				{#if project.hasMcpFile}
@@ -115,7 +117,7 @@
 					class="p-1.5 rounded-lg transition-colors {project.isFavorite
 						? 'text-rose-500 hover:text-rose-600'
 						: 'text-gray-300 hover:text-rose-400 dark:text-gray-600 dark:hover:text-rose-400'}"
-					title={project.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+					title={project.isFavorite ? m.project_favorite_remove() : m.project_favorite_add()}
 				>
 					<Heart class="w-4 h-4" fill={project.isFavorite ? 'currentColor' : 'none'} />
 				</button>
@@ -141,27 +143,27 @@
 					<button
 						onclick={() => {
 							projectsStore.syncProjectConfig(project.id);
-							notifications.success('Config synced');
+							notifications.success(m.notify_synced({ entity: m.entity_config() }));
 							closeMenu();
 						}}
 						class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
 					>
 						<RefreshCw class="w-4 h-4" />
-						Sync Config
+						{m.project_sync_config()}
 					</button>
 					<button
 						onclick={async () => {
 							try {
 								await open(project.path);
 							} catch (e) {
-								notifications.error('Failed to open folder');
+								notifications.error(m.notify_open_failed({ entity: m.entity_folder() }));
 							}
 							closeMenu();
 						}}
 						class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
 					>
 						<ExternalLink class="w-4 h-4" />
-						Open Folder
+						{m.project_open_folder()}
 					</button>
 					{#if onRemove}
 						<button
@@ -172,7 +174,7 @@
 							class="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
 						>
 							<Trash2 class="w-4 h-4" />
-							Remove
+							{m.action_remove()}
 						</button>
 					{/if}
 				</div>

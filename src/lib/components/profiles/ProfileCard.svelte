@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Profile } from '$lib/types';
 	import { Layers, Play, Camera, Edit, Trash2, MoreVertical, X } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		profile: Profile;
@@ -42,7 +43,7 @@
 						<h3 class="font-medium text-gray-900 dark:text-white truncate">{profile.name}</h3>
 						{#if profile.isActive}
 							<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400">
-								Active
+								{m.profile_active()}
 							</span>
 						{/if}
 					</div>
@@ -73,14 +74,14 @@
 							class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
 						>
 							<Edit class="w-4 h-4" />
-							Edit
+							{m.action_edit()}
 						</button>
 						<button
 							onclick={() => { showMenu = false; onCapture?.(profile); }}
 							class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
 						>
 							<Camera class="w-4 h-4" />
-							Capture Current
+							{m.profile_capture_current()}
 						</button>
 						<hr class="my-1 border-gray-200 dark:border-gray-700" />
 						<button
@@ -88,7 +89,7 @@
 							class="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
 						>
 							<Trash2 class="w-4 h-4" />
-							Delete
+							{m.action_delete()}
 						</button>
 					</div>
 				{/if}
@@ -103,7 +104,7 @@
 					class="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
 				>
 					<X class="w-3.5 h-3.5" />
-					Deactivate
+					{m.action_deactivate()}
 				</button>
 			{:else}
 				<button
@@ -111,7 +112,7 @@
 					class="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg bg-primary-600 text-white hover:bg-primary-700 transition-colors"
 				>
 					<Play class="w-3.5 h-3.5" />
-					Activate
+					{m.action_activate()}
 				</button>
 			{/if}
 		</div>

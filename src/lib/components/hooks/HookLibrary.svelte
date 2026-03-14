@@ -2,6 +2,8 @@
 	import type { Hook, HookEventType, GlobalHook, ProjectHook } from '$lib/types';
 	import { HOOK_EVENT_TYPES } from '$lib/types';
 	import { hookLibrary } from '$lib/stores';
+	import * as m from '$lib/paraglide/messages.js';
+	import { getHookEventLabel } from '$lib/utils/hookEventI18n';
 	import HookCard from './HookCard.svelte';
 	import { SearchBar } from '$lib/components/shared';
 	import { Zap, List, FolderTree, Globe, FolderOpen, Inbox } from 'lucide-svelte';
@@ -33,56 +35,56 @@
 			text: 'text-green-600 dark:text-green-400',
 			badgeBg: 'bg-green-100 dark:bg-green-900/50',
 			badgeText: 'text-green-700 dark:text-green-300',
-			label: 'Session Start'
+			label: getHookEventLabel('SessionStart')
 		},
 		UserPromptSubmit: {
 			bg: 'bg-blue-50 dark:bg-blue-900/20',
 			text: 'text-blue-600 dark:text-blue-400',
 			badgeBg: 'bg-blue-100 dark:bg-blue-900/50',
 			badgeText: 'text-blue-700 dark:text-blue-300',
-			label: 'User Prompt Submit'
+			label: getHookEventLabel('UserPromptSubmit')
 		},
 		PreToolUse: {
 			bg: 'bg-amber-50 dark:bg-amber-900/20',
 			text: 'text-amber-600 dark:text-amber-400',
 			badgeBg: 'bg-amber-100 dark:bg-amber-900/50',
 			badgeText: 'text-amber-700 dark:text-amber-300',
-			label: 'Pre Tool Use'
+			label: getHookEventLabel('PreToolUse')
 		},
 		PostToolUse: {
 			bg: 'bg-purple-50 dark:bg-purple-900/20',
 			text: 'text-purple-600 dark:text-purple-400',
 			badgeBg: 'bg-purple-100 dark:bg-purple-900/50',
 			badgeText: 'text-purple-700 dark:text-purple-300',
-			label: 'Post Tool Use'
+			label: getHookEventLabel('PostToolUse')
 		},
 		Notification: {
 			bg: 'bg-cyan-50 dark:bg-cyan-900/20',
 			text: 'text-cyan-600 dark:text-cyan-400',
 			badgeBg: 'bg-cyan-100 dark:bg-cyan-900/50',
 			badgeText: 'text-cyan-700 dark:text-cyan-300',
-			label: 'Notification'
+			label: getHookEventLabel('Notification')
 		},
 		Stop: {
 			bg: 'bg-red-50 dark:bg-red-900/20',
 			text: 'text-red-600 dark:text-red-400',
 			badgeBg: 'bg-red-100 dark:bg-red-900/50',
 			badgeText: 'text-red-700 dark:text-red-300',
-			label: 'Stop'
+			label: getHookEventLabel('Stop')
 		},
 		SubagentStop: {
 			bg: 'bg-orange-50 dark:bg-orange-900/20',
 			text: 'text-orange-600 dark:text-orange-400',
 			badgeBg: 'bg-orange-100 dark:bg-orange-900/50',
 			badgeText: 'text-orange-700 dark:text-orange-300',
-			label: 'Subagent Stop'
+			label: getHookEventLabel('SubagentStop')
 		},
 		SessionEnd: {
 			bg: 'bg-gray-50 dark:bg-gray-800/50',
 			text: 'text-gray-600 dark:text-gray-400',
 			badgeBg: 'bg-gray-100 dark:bg-gray-700',
 			badgeText: 'text-gray-700 dark:text-gray-300',
-			label: 'Session End'
+			label: getHookEventLabel('SessionEnd')
 		}
 	};
 
@@ -193,7 +195,7 @@
 	<!-- Filters -->
 	<div class="flex flex-wrap items-center gap-4">
 		<div class="flex-1 max-w-sm">
-			<SearchBar bind:value={hookLibrary.searchQuery} placeholder="Search hooks..." />
+			<SearchBar bind:value={hookLibrary.searchQuery} placeholder={m.placeholder_search_hooks_library()} />
 		</div>
 
 		<select
@@ -202,9 +204,9 @@
 			onchange={(e) =>
 				hookLibrary.setEventFilter((e.target as HTMLSelectElement).value as HookEventType | '')}
 		>
-			<option value="">All Events</option>
+			<option value="">{m.hook_all_events()}</option>
 			{#each HOOK_EVENT_TYPES as event}
-				<option value={event.value}>{event.label}</option>
+				<option value={event.value}>{getHookEventLabel(event.value)}</option>
 			{/each}
 		</select>
 
@@ -218,7 +220,7 @@
 					: 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}"
 			>
 				<List class="w-4 h-4" />
-				All
+				{m.hook_view_all()}
 			</button>
 			<button
 				onclick={() => hookLibrary.setViewMode('byScope')}
@@ -228,12 +230,12 @@
 					: 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}"
 			>
 				<FolderTree class="w-4 h-4" />
-				By Scope
+				{m.hook_view_by_scope()}
 			</button>
 		</div>
 
 		<div class="text-sm text-gray-500 dark:text-gray-400">
-			{hookLibrary.filteredHooks.length} hook{hookLibrary.filteredHooks.length !== 1 ? 's' : ''}
+			{m.hook_count({ count: hookLibrary.filteredHooks.length })}
 		</div>
 	</div>
 
@@ -248,12 +250,12 @@
 			<div class="text-center py-12">
 				<Zap class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
 				{#if hookLibrary.searchQuery || hookLibrary.eventFilter}
-					<h3 class="text-lg font-medium text-gray-900 dark:text-white">No matching hooks</h3>
-					<p class="text-gray-500 dark:text-gray-400 mt-1">Try adjusting your filters</p>
+					<h3 class="text-lg font-medium text-gray-900 dark:text-white">{m.empty_no_matching_hooks()}</h3>
+					<p class="text-gray-500 dark:text-gray-400 mt-1">{m.empty_try_adjusting_filters()}</p>
 				{:else}
-					<h3 class="text-lg font-medium text-gray-900 dark:text-white">No hooks in library</h3>
+					<h3 class="text-lg font-medium text-gray-900 dark:text-white">{m.empty_no_hooks_in_library()}</h3>
 					<p class="text-gray-500 dark:text-gray-400 mt-1">
-						Add your first hook to automate Claude Code actions
+						{m.empty_add_first_hook()}
 					</p>
 				{/if}
 			</div>
@@ -286,12 +288,12 @@
 			<div class="text-center py-12">
 				<Zap class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
 				{#if hookLibrary.searchQuery || hookLibrary.eventFilter}
-					<h3 class="text-lg font-medium text-gray-900 dark:text-white">No matching hooks</h3>
-					<p class="text-gray-500 dark:text-gray-400 mt-1">Try adjusting your filters</p>
+					<h3 class="text-lg font-medium text-gray-900 dark:text-white">{m.empty_no_matching_hooks()}</h3>
+					<p class="text-gray-500 dark:text-gray-400 mt-1">{m.empty_try_adjusting_filters()}</p>
 				{:else}
-					<h3 class="text-lg font-medium text-gray-900 dark:text-white">No hooks assigned</h3>
+					<h3 class="text-lg font-medium text-gray-900 dark:text-white">{m.empty_no_hooks_assigned()}</h3>
 					<p class="text-gray-500 dark:text-gray-400 mt-1">
-						Create hooks and assign them to global or project scope
+						{m.empty_create_hooks_assign()}
 					</p>
 				{/if}
 			</div>
@@ -304,7 +306,7 @@
 							<div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
 								<Globe class="w-4 h-4 text-blue-600 dark:text-blue-400" />
 							</div>
-							<h3 class="text-lg font-semibold text-gray-900 dark:text-white">Global Hooks</h3>
+							<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{m.hook_global_hooks()}</h3>
 							<span class="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
 								{filteredGlobalHooks.length}
 							</span>
@@ -381,7 +383,7 @@
 							<div class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
 								<Inbox class="w-4 h-4 text-gray-500 dark:text-gray-400" />
 							</div>
-							<h3 class="text-lg font-semibold text-gray-900 dark:text-white">Unassigned</h3>
+							<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{m.hook_unassigned()}</h3>
 							<span class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
 								{filteredUnassignedHooks.length}
 							</span>

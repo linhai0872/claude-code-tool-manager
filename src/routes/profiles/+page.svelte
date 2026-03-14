@@ -6,6 +6,7 @@
 	import { profileLibrary, mcpLibrary, skillLibrary, commandLibrary, subagentLibrary, hookLibrary, notifications } from '$lib/stores';
 	import type { Profile, CreateProfileRequest } from '$lib/types';
 	import { Plus } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let showAddProfile = $state(false);
 	let editingProfile = $state<Profile | null>(null);
@@ -20,9 +21,9 @@
 		try {
 			await profileLibrary.create(values);
 			showAddProfile = false;
-			notifications.success('Profile created');
+			notifications.success(m.notify_created({ entity: m.entity_profile() }));
 		} catch (err) {
-			notifications.error('Failed to create profile');
+			notifications.error(m.notify_create_failed({ entity: m.entity_profile() }));
 		}
 	}
 
@@ -31,9 +32,9 @@
 		try {
 			await profileLibrary.update(editingProfile.id, values);
 			editingProfile = null;
-			notifications.success('Profile updated');
+			notifications.success(m.notify_updated({ entity: m.entity_profile() }));
 		} catch (err) {
-			notifications.error('Failed to update profile');
+			notifications.error(m.notify_update_failed({ entity: m.entity_profile() }));
 		}
 	}
 
@@ -41,9 +42,9 @@
 		if (!deletingProfile) return;
 		try {
 			await profileLibrary.delete(deletingProfile.id);
-			notifications.success('Profile deleted');
+			notifications.success(m.notify_deleted({ entity: m.entity_profile() }));
 		} catch (err) {
-			notifications.error('Failed to delete profile');
+			notifications.error(m.notify_delete_failed({ entity: m.entity_profile() }));
 		} finally {
 			deletingProfile = null;
 		}
@@ -61,41 +62,41 @@
 				hookLibrary.load(),
 				hookLibrary.loadGlobalHooks()
 			]);
-			notifications.success(`Profile "${profile.name}" activated`);
+			notifications.success(m.notify_profile_activated({ name: profile.name }));
 		} catch (err) {
-			notifications.error('Failed to activate profile');
+			notifications.error(m.notify_activate_failed({ entity: m.entity_profile() }));
 		}
 	}
 
 	async function handleDeactivate() {
 		try {
 			await profileLibrary.deactivate();
-			notifications.success('Profile deactivated');
+			notifications.success(m.notify_deactivated({ entity: m.entity_profile() }));
 		} catch (err) {
-			notifications.error('Failed to deactivate profile');
+			notifications.error(m.notify_deactivate_failed({ entity: m.entity_profile() }));
 		}
 	}
 
 	async function handleCapture(profile: Profile) {
 		try {
 			await profileLibrary.captureFromCurrent(profile.id);
-			notifications.success(`Captured current config into "${profile.name}"`);
+			notifications.success(m.notify_profile_captured({ name: profile.name }));
 		} catch (err) {
-			notifications.error('Failed to capture configuration');
+			notifications.error(m.notify_capture_failed());
 		}
 	}
 </script>
 
 <Header
-	title="Configuration Profiles"
-	subtitle="Save and switch between different sets of globally-enabled tools"
+	title={m.page_profiles_title()}
+	subtitle={m.page_profiles_subtitle()}
 />
 
 <div class="flex-1 overflow-auto p-6">
 	<div class="flex justify-end mb-6">
 		<button onclick={() => (showAddProfile = true)} class="btn btn-primary">
 			<Plus class="w-4 h-4 mr-2" />
-			Create Profile
+			{m.action_create_profile()}
 		</button>
 	</div>
 
@@ -113,7 +114,7 @@
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
 		<div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full mx-4">
 			<div class="p-6">
-				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">Create Profile</h2>
+				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">{m.modal_add_title({ entity: m.entity_profile() })}</h2>
 				<ProfileForm
 					onSubmit={handleCreate}
 					onCancel={() => (showAddProfile = false)}
@@ -128,7 +129,7 @@
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
 		<div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full mx-4">
 			<div class="p-6">
-				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">Edit Profile</h2>
+				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">{m.modal_edit_title({ entity: m.entity_profile() })}</h2>
 				<ProfileForm
 					initialValues={editingProfile}
 					onSubmit={handleUpdate}
@@ -141,9 +142,9 @@
 
 <ConfirmDialog
 	open={!!deletingProfile}
-	title="Delete Profile"
-	message="Are you sure you want to delete '{deletingProfile?.name}'? This cannot be undone."
-	confirmText="Delete"
+	title={m.confirm_delete_title({ entity: m.entity_profile() })}
+	message={m.confirm_delete_message_no_undo({ name: deletingProfile?.name ?? '' })}
+	confirmText={m.action_delete()}
 	onConfirm={handleDelete}
 	onCancel={() => (deletingProfile = null)}
 />

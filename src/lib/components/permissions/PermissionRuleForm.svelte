@@ -1,7 +1,9 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import type { PermissionCategory } from '$lib/types';
 	import { PERMISSION_TOOL_NAMES } from '$lib/types';
 	import { X, Code, Wand2 } from 'lucide-svelte';
+	import { getPermissionToolHint, getPermissionToolLabel } from '$lib/utils/permissionToolI18n';
 
 	type Props = {
 		category: PermissionCategory;
@@ -17,7 +19,10 @@
 	let rawRule = $state('');
 
 	const currentToolHint = $derived(
-		PERMISSION_TOOL_NAMES.find((t) => t.value === selectedTool)?.hint ?? ''
+		getPermissionToolHint(
+			selectedTool,
+			PERMISSION_TOOL_NAMES.find((t) => t.value === selectedTool)?.hint ?? ''
+		)
 	);
 
 	const preview = $derived.by(() => {
@@ -32,10 +37,10 @@
 		onsubmit(rule);
 	}
 
-	const categoryLabels: Record<PermissionCategory, string> = {
-		allow: 'Allow',
-		deny: 'Deny',
-		ask: 'Ask'
+	const categoryLabels: Record<PermissionCategory, () => string> = {
+		allow: () => m.permission_category_allow(),
+		deny: () => m.permission_category_deny(),
+		ask: () => m.permission_category_ask()
 	};
 
 	const categoryColors: Record<PermissionCategory, string> = {
@@ -55,7 +60,7 @@
 		<!-- Header -->
 		<div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
 			<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-				Add {categoryLabels[category]} Rule
+				{m.permission_add_rule_title({ category: categoryLabels[category]() })}
 			</h3>
 			<button
 				onclick={onclose}
@@ -75,7 +80,7 @@
 						{!rawMode ? 'bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}"
 				>
 					<Wand2 class="w-4 h-4" />
-					Builder
+					{m.permission_builder()}
 				</button>
 				<button
 					onclick={() => (rawMode = true)}
@@ -83,34 +88,35 @@
 						{rawMode ? 'bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}"
 				>
 					<Code class="w-4 h-4" />
-					Raw
+					{m.permission_raw()}
 				</button>
 			</div>
 
 			{#if rawMode}
 				<div>
-					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-						Permission Rule
+					<label for="permission-raw-rule" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+						{m.permission_rule_label()}
 					</label>
 					<input
+						id="permission-raw-rule"
 						type="text"
 						bind:value={rawRule}
-						placeholder="e.g. Bash(npm run *)"
+						placeholder={m.permission_rule_placeholder()}
 						class="input w-full font-mono"
 					/>
 					<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-						Format: ToolName or ToolName(specifier pattern)
+						{m.permission_rule_format_hint()}
 					</p>
 				</div>
 			{:else}
 				<!-- Tool selector -->
 				<div>
-					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-						Tool
+					<label for="permission-tool" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+						{m.permission_tool_label()}
 					</label>
-					<select bind:value={selectedTool} class="input w-full">
+					<select id="permission-tool" bind:value={selectedTool} class="input w-full">
 						{#each PERMISSION_TOOL_NAMES as tool}
-							<option value={tool.value}>{tool.label}</option>
+							<option value={tool.value}>{getPermissionToolLabel(tool.value, tool.label)}</option>
 						{/each}
 					</select>
 					<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{currentToolHint}</p>
@@ -118,37 +124,42 @@
 
 				<!-- Specifier -->
 				<div>
-					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-						Specifier <span class="text-gray-400">(optional)</span>
+					<label for="permission-specifier" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+						{m.permission_specifier_label()} <span class="text-gray-400">({m.label_optional()})</span>
 					</label>
 					<input
+						id="permission-specifier"
 						type="text"
 						bind:value={specifier}
-						placeholder={selectedTool === 'Bash' ? 'npm run *' : selectedTool === 'Read' ? '.env*' : ''}
+						placeholder={selectedTool === 'Bash'
+							? m.permission_specifier_placeholder_bash()
+							: selectedTool === 'Read'
+								? m.permission_specifier_placeholder_read()
+								: ''}
 						class="input w-full font-mono"
 					/>
 					<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-						Use * for wildcard matching. Leave empty to match all uses of this tool.
+						{m.permission_specifier_hint()}
 					</p>
 				</div>
 			{/if}
 
 			<!-- Preview -->
 			<div class="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3">
-				<p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Preview</p>
+				<p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{m.permission_preview()}</p>
 				<code class="text-sm font-mono text-gray-800 dark:text-gray-200">{preview || '...'}</code>
 			</div>
 		</div>
 
 		<!-- Footer -->
 		<div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-			<button onclick={onclose} class="btn btn-secondary">Cancel</button>
+			<button onclick={onclose} class="btn btn-secondary">{m.action_cancel()}</button>
 			<button
 				onclick={handleSubmit}
 				disabled={!preview}
 				class="btn text-white {categoryColors[category]} disabled:opacity-50 disabled:cursor-not-allowed"
 			>
-				Add Rule
+				{m.permission_add_rule()}
 			</button>
 		</div>
 	</div>

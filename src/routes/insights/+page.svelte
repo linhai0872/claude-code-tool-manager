@@ -7,6 +7,7 @@
 	import SessionSummaryList from '$lib/components/analytics/SessionSummaryList.svelte';
 	import { insightsStore } from '$lib/stores';
 	import { FileQuestion } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	onMount(() => {
 		insightsStore.load();
@@ -17,7 +18,7 @@
 	}
 </script>
 
-<Header title="Insights" subtitle="Session quality, friction analysis, and Claude's insights report" />
+<Header title={m.page_insights_title()} subtitle={m.page_insights_subtitle()} />
 
 <div class="flex-1 overflow-auto p-6 space-y-6">
 	<!-- Report Section -->
@@ -46,9 +47,11 @@
 		>
 			<div class="text-gray-400 dark:text-gray-500">
 				<FileQuestion class="w-10 h-10 mx-auto mb-3 opacity-50" />
-				<p class="text-sm font-medium">No insights report found</p>
+				<p class="text-sm font-medium">{m.insights_no_report_found()}</p>
 				<p class="text-xs mt-1">
-					Run <code class="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">/insights</code> in Claude Code to generate the report.
+					{@html m.insights_run_command_hint({
+						command: '<code class="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">/insights</code>'
+					})}
 				</p>
 			</div>
 		</div>
@@ -80,11 +83,13 @@
 		>
 			<div class="text-gray-400 dark:text-gray-500">
 				<FileQuestion class="w-10 h-10 mx-auto mb-3 opacity-50" />
-				<p class="text-sm font-medium">No session quality data found</p>
+				<p class="text-sm font-medium">{m.insights_no_quality_data()}</p>
 				<p class="text-xs mt-1">
-					Session facets are stored in <code class="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">~/.claude/usage-data/facets/</code>
+					{@html m.insights_facets_stored_at({
+						path: '<code class="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">~/.claude/usage-data/facets/</code>'
+					})}
 				</p>
-				<p class="text-xs mt-1">Use Claude Code to generate session data, then refresh this page.</p>
+				<p class="text-xs mt-1">{m.sessions_generate_data_hint()}</p>
 			</div>
 		</div>
 	{/if}

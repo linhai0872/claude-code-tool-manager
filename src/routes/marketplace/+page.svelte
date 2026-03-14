@@ -23,6 +23,7 @@
 		ArrowUpDown
 	} from 'lucide-svelte';
 	import type { Repo, RepoItem, CreateRepoRequest, ItemType, RegistryMcpEntry } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 
 	// State
 	let activeTab = $state<'mcps' | 'repos' | 'skills' | 'agents'>('mcps');
@@ -66,7 +67,7 @@
 
 		// Auto-sync if no items have been fetched yet
 		if (repoLibrary.repos.length > 0 && repoLibrary.items.length === 0) {
-			notifications.info('Syncing repositories for the first time...');
+			notifications.info(m.notify_syncing_first_time());
 			await handleSyncAll();
 		}
 	}
@@ -75,21 +76,21 @@
 		try {
 			const result = await repoLibrary.syncAllRepos();
 			if (result.errors.length > 0) {
-				notifications.warning(`Synced with ${result.errors.length} errors`);
+				notifications.warning(m.notify_synced_with_errors({ count: String(result.errors.length) }));
 			} else {
-				notifications.success(`Added ${result.added}, updated ${result.updated} items`);
+				notifications.success(m.notify_sync_result({ added: String(result.added), updated: String(result.updated) }));
 			}
 		} catch (e) {
-			notifications.error('Failed to sync repositories');
+			notifications.error(m.notify_sync_failed({ entity: m.entity_repositories() }));
 		}
 	}
 
 	async function handleSyncRepo(id: number) {
 		try {
 			const result = await repoLibrary.syncRepo(id);
-			notifications.success(`Added ${result.added}, updated ${result.updated} items`);
+			notifications.success(m.notify_sync_result({ added: String(result.added), updated: String(result.updated) }));
 		} catch (e) {
-			notifications.error('Failed to sync repository');
+			notifications.error(m.notify_sync_failed({ entity: m.entity_repository() }));
 		}
 	}
 
@@ -103,7 +104,7 @@
 				contentType: newRepoContentType
 			};
 			await repoLibrary.addRepo(request);
-			notifications.success('Repository added');
+			notifications.success(m.notify_added({ entity: m.entity_repository() }));
 			showAddRepoModal = false;
 			newRepoUrl = '';
 		} catch (e) {
@@ -113,12 +114,12 @@
 
 	async function handleRemoveRepo(repo: Repo) {
 		if (repo.isDefault) {
-			notifications.error('Cannot remove default repositories');
+			notifications.error(m.notify_cannot_remove_default());
 			return;
 		}
 		try {
 			await repoLibrary.removeRepo(repo.id);
-			notifications.success('Repository removed');
+			notifications.success(m.notify_removed({ entity: m.entity_repository() }));
 		} catch (e) {
 			notifications.error(String(e));
 		}
@@ -128,7 +129,7 @@
 		try {
 			await repoLibrary.toggleRepo(repo.id, !repo.isEnabled);
 		} catch (e) {
-			notifications.error('Failed to toggle repository');
+			notifications.error(m.notify_toggle_failed({ entity: m.entity_repository() }));
 		}
 	}
 
@@ -136,12 +137,12 @@
 		try {
 			const result = await repoLibrary.importItem(item.id);
 			if (result.success) {
-				notifications.success(`Imported ${item.name}`);
+				notifications.success(m.notify_imported_name({ name: item.name }));
 			} else {
-				notifications.warning(result.message || 'Already imported');
+				notifications.warning(result.message || m.notify_already_imported());
 			}
 		} catch (e) {
-			notifications.error('Failed to import item');
+			notifications.error(m.notify_import_failed({ entity: m.entity_item() }));
 		}
 	}
 
@@ -150,10 +151,10 @@
 			await invoke('reset_repos_to_defaults');
 			await repoLibrary.loadRepos();
 			await repoLibrary.loadItems();
-			notifications.success('Repos reset to defaults');
+			notifications.success(m.notify_repos_reset());
 			await handleSyncAll();
 		} catch (e) {
-			notifications.error('Failed to reset repos');
+			notifications.error(m.notify_repos_reset_failed());
 		}
 	}
 
@@ -180,10 +181,10 @@
 		isImportingMcp = true;
 		try {
 			await repoLibrary.importFromRegistry(entry);
-			notifications.success(`Imported ${entry.name} to your MCP Library`);
+			notifications.success(m.notify_imported_to_library({ name: entry.name }));
 			selectedRegistryMcp = null;
 		} catch (e) {
-			notifications.error(`Failed to import: ${e}`);
+			notifications.error(m.notify_import_failed_detail({ error: String(e) }));
 		} finally {
 			isImportingMcp = false;
 		}
@@ -220,14 +221,14 @@
 	};
 </script>
 
-<Header title="Marketplace" subtitle="Browse and import Skills and Agents from public repositories">
+<Header title={m.page_marketplace_title()} subtitle={m.page_marketplace_subtitle()}>
 	<button
 		onclick={handleSyncAll}
 		disabled={repoLibrary.isSyncing}
 		class="btn btn-secondary"
 	>
 		<RefreshCw class="w-4 h-4 mr-2 {repoLibrary.isSyncing ? 'animate-spin' : ''}" />
-		{repoLibrary.isSyncing ? 'Syncing...' : 'Sync All'}
+		{repoLibrary.isSyncing ? m.marketplace_syncing() : m.marketplace_sync_all()}
 	</button>
 </Header>
 
@@ -240,20 +241,20 @@
 		<div class="mb-4 flex items-center justify-between px-4 py-2.5 rounded-lg text-sm {isLow ? 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800' : 'bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700'}">
 			<div class="flex items-center gap-3">
 				<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium {isAuthenticated ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'}">
-					{isAuthenticated ? 'Authenticated' : 'Unauthenticated'}
+					{isAuthenticated ? m.marketplace_rate_authenticated() : m.marketplace_rate_unauthenticated()}
 				</span>
 				<span class="{isLow ? 'text-amber-700 dark:text-amber-400' : 'text-gray-600 dark:text-gray-400'}">
-					GitHub API: {info.remaining} / {info.limit} requests remaining
+					{m.marketplace_rate_remaining({ remaining: String(info.remaining), limit: String(info.limit) })}
 				</span>
 			</div>
 			{#if isLow && info.resetAt}
 				<span class="text-xs text-amber-600 dark:text-amber-400">
-					Resets at {new Date(info.resetAt).toLocaleTimeString()}
+					{m.marketplace_rate_resets_at({ time: new Date(info.resetAt).toLocaleTimeString() })}
 				</span>
 			{/if}
 			{#if !isAuthenticated}
 				<a href="/settings" class="text-xs text-primary-600 dark:text-primary-400 hover:underline">
-					Add token for 5,000 req/hr
+					{m.marketplace_add_token_hint()}
 				</a>
 			{/if}
 		</div>
@@ -269,7 +270,7 @@
 				: 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}"
 		>
 			<Server class="w-4 h-4" />
-			MCPs ({repoLibrary.registryMcps.length})
+			{m.marketplace_mcps_tab({ count: String(repoLibrary.registryMcps.length) })}
 		</button>
 		<button
 			onclick={() => (activeTab = 'skills')}
@@ -279,7 +280,7 @@
 				: 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}"
 		>
 			<FileCode class="w-4 h-4" />
-			Skills ({getFilteredItems('skill').length})
+			{m.marketplace_skills_tab({ count: String(getFilteredItems('skill').length) })}
 		</button>
 		<button
 			onclick={() => (activeTab = 'agents')}
@@ -289,7 +290,7 @@
 				: 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}"
 		>
 			<Bot class="w-4 h-4" />
-			Agents ({getFilteredItems('subagent').length})
+			{m.marketplace_agents_tab({ count: String(getFilteredItems('subagent').length) })}
 		</button>
 		<button
 			onclick={() => (activeTab = 'repos')}
@@ -299,7 +300,7 @@
 				: 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}"
 		>
 			<Github class="w-4 h-4" />
-			Repos ({repoLibrary.repos.length})
+			{m.marketplace_repos_tab({ count: String(repoLibrary.repos.length) })}
 		</button>
 	</div>
 
@@ -315,7 +316,7 @@
 						type="text"
 						bind:value={mcpSearchQuery}
 						onkeydown={handleMcpSearchKeydown}
-						placeholder="Search MCP servers (e.g., filesystem, github, slack...)"
+						placeholder={m.marketplace_search_mcps_placeholder()}
 						class="input w-full pl-10"
 					/>
 				</div>
@@ -325,8 +326,8 @@
 						bind:value={mcpSortBy}
 						class="input pr-8 appearance-none cursor-pointer"
 					>
-						<option value="updated">Recently Updated</option>
-						<option value="name">Name (A-Z)</option>
+						<option value="updated">{m.marketplace_sort_recently_updated()}</option>
+						<option value="name">{m.marketplace_sort_name_az()}</option>
 					</select>
 					<ArrowUpDown class="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
 				</div>
@@ -337,10 +338,10 @@
 				>
 					{#if repoLibrary.isSearchingRegistry}
 						<Loader2 class="w-4 h-4 mr-2 animate-spin" />
-						Searching...
+						{m.marketplace_searching()}
 					{:else}
 						<Search class="w-4 h-4 mr-2" />
-						Search
+						{m.action_search()}
 					{/if}
 				</button>
 			</div>
@@ -356,14 +357,14 @@
 			{#if repoLibrary.isSearchingRegistry && repoLibrary.registryMcps.length === 0}
 				<div class="text-center py-12">
 					<Loader2 class="w-8 h-8 mx-auto text-primary-500 animate-spin mb-4" />
-					<p class="text-gray-500 dark:text-gray-400">Loading MCPs from registry...</p>
+					<p class="text-gray-500 dark:text-gray-400">{m.marketplace_loading_registry_mcps()}</p>
 				</div>
 			{:else if repoLibrary.registryMcps.length === 0}
 				<div class="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
 					<Server class="w-12 h-12 mx-auto text-gray-400 mb-4" />
-					<p class="text-gray-500 dark:text-gray-400">No MCPs found</p>
+					<p class="text-gray-500 dark:text-gray-400">{m.marketplace_no_mcps_found()}</p>
 					<p class="text-sm text-gray-400 dark:text-gray-500 mt-1">
-						Try searching for an MCP server or wait for the registry to load
+						{m.marketplace_no_mcps_hint()}
 					</p>
 				</div>
 			{:else}
@@ -398,7 +399,7 @@
 								</div>
 								<span class="text-xs text-gray-400 flex items-center gap-1">
 									<Eye class="w-3 h-3" />
-									Click to preview
+									{m.marketplace_click_preview()}
 								</span>
 							</div>
 						</button>
@@ -415,9 +416,9 @@
 						>
 							{#if repoLibrary.isSearchingRegistry}
 								<Loader2 class="w-4 h-4 mr-2 animate-spin" />
-								Loading...
+								{m.label_loading()}
 							{:else}
-								Load More
+								{m.marketplace_load_more()}
 							{/if}
 						</button>
 					</div>
@@ -428,22 +429,22 @@
 		<!-- Repositories List -->
 		<div class="space-y-4">
 			<div class="flex justify-end gap-2">
-				<button onclick={handleResetRepos} class="btn btn-secondary" title="Reset to default repos">
+				<button onclick={handleResetRepos} class="btn btn-secondary" title={m.marketplace_reset_default_repos()}>
 					<RotateCcw class="w-4 h-4 mr-2" />
-					Reset Defaults
+					{m.marketplace_reset_defaults()}
 				</button>
 				<button onclick={() => (showAddRepoModal = true)} class="btn btn-primary">
 					<Plus class="w-4 h-4 mr-2" />
-					Add Repository
+					{m.marketplace_add_repository()}
 				</button>
 			</div>
 
 			{#if repoLibrary.repos.length === 0}
 				<div class="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
 					<Store class="w-12 h-12 mx-auto text-gray-400 mb-4" />
-					<p class="text-gray-500 dark:text-gray-400">No repositories configured</p>
+					<p class="text-gray-500 dark:text-gray-400">{m.marketplace_no_repositories()}</p>
 					<p class="text-sm text-gray-400 dark:text-gray-500 mt-1">
-						Add a repository to start browsing
+						{m.marketplace_add_repository_hint()}
 					</p>
 				</div>
 			{:else}
@@ -467,13 +468,13 @@
 											<span
 												class="px-2 py-0.5 text-xs bg-primary-100 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300 rounded"
 											>
-												Default
+												{m.permission_mode_default()}
 											</span>
 										{/if}
 										<span
 											class="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400 rounded"
 										>
-											{repo.repoType === 'file_based' ? 'Files' : 'README'}
+											{repo.repoType === 'file_based' ? m.marketplace_repo_type_files() : m.marketplace_repo_type_readme()}
 										</span>
 										<span
 											class="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400 rounded"
@@ -486,7 +487,7 @@
 									{/if}
 									{#if repo.lastFetchedAt}
 										<p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
-											Last synced: {new Date(repo.lastFetchedAt).toLocaleString()}
+											{m.marketplace_last_synced({ date: new Date(repo.lastFetchedAt).toLocaleString() })}
 										</p>
 									{/if}
 								</div>
@@ -500,7 +501,7 @@
 										: 'bg-gray-300 dark:bg-gray-600'}"
 									role="switch"
 									aria-checked={repo.isEnabled}
-									title={repo.isEnabled ? 'Disable' : 'Enable'}
+									title={repo.isEnabled ? m.action_disable() : m.action_enable()}
 								>
 									<span
 										class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {repo.isEnabled
@@ -513,7 +514,7 @@
 									onclick={() => handleSyncRepo(repo.id)}
 									disabled={repoLibrary.isSyncing}
 									class="p-2 text-gray-400 hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
-									title="Sync repository"
+									title={m.marketplace_sync_repository()}
 								>
 									<RefreshCw class="w-4 h-4 {repoLibrary.isSyncing ? 'animate-spin' : ''}" />
 								</button>
@@ -523,7 +524,7 @@
 									target="_blank"
 									rel="noopener noreferrer"
 									class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg transition-colors"
-									title="Open in GitHub"
+									title={m.action_view_github()}
 								>
 									<ExternalLink class="w-4 h-4" />
 								</a>
@@ -532,7 +533,7 @@
 									<button
 										onclick={() => handleRemoveRepo(repo)}
 										class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-										title="Remove repository"
+										title={m.marketplace_remove_repository()}
 									>
 										<Trash2 class="w-4 h-4" />
 									</button>
@@ -552,9 +553,9 @@
 			{@const EmptyIcon = typeIcons[itemType]}
 			<div class="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
 				<EmptyIcon class="w-12 h-12 mx-auto text-gray-400 mb-4" />
-				<p class="text-gray-500 dark:text-gray-400">No {activeTab} found</p>
+				<p class="text-gray-500 dark:text-gray-400">{m.marketplace_no_items_found({ itemType: activeTab })}</p>
 				<p class="text-sm text-gray-400 dark:text-gray-500 mt-1">
-					Sync repositories to discover items
+					{m.marketplace_sync_discover_hint()}
 				</p>
 			</div>
 		{:else}
@@ -574,7 +575,7 @@
 									<h3 class="font-medium text-gray-900 dark:text-white truncate">{item.name}</h3>
 									{#if item.isImported}
 										<span class="px-2 py-0.5 text-xs bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300 rounded">
-											Imported
+											{m.marketplace_imported_badge()}
 										</span>
 									{/if}
 								</div>
@@ -586,11 +587,11 @@
 						<div class="mt-auto flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
 							<span class="text-xs text-gray-400 flex items-center gap-1">
 								<Eye class="w-3 h-3" />
-								Click to preview
+								{m.marketplace_click_preview()}
 							</span>
 							{#if item.isImported}
 								<span class="px-2 py-1 text-xs bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300 rounded">
-									Imported
+									{m.marketplace_imported_badge()}
 								</span>
 							{/if}
 						</div>
@@ -615,49 +616,50 @@
 			class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full mx-4 p-6"
 			onclick={(e) => e.stopPropagation()}
 		>
-			<h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Add Repository</h2>
+			<h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{m.marketplace_add_repository()}</h2>
 
 			<div class="space-y-4">
 				<div>
-					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-						GitHub URL
+					<label for="marketplace-new-repo-url" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+						{m.label_git_url()}
 					</label>
 					<input
+						id="marketplace-new-repo-url"
 						type="url"
 						bind:value={newRepoUrl}
-						placeholder="https://github.com/owner/repo"
+						placeholder={m.marketplace_repo_url_placeholder()}
 						class="input w-full"
 					/>
 				</div>
 
 				<div>
-					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-						Repository Type
+					<label for="marketplace-new-repo-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+						{m.marketplace_repository_type()}
 					</label>
-					<select bind:value={newRepoType} class="input w-full">
-						<option value="readme_based">README-based (parses README for links)</option>
-						<option value="file_based">File-based (scans for .md files)</option>
+					<select id="marketplace-new-repo-type" bind:value={newRepoType} class="input w-full">
+						<option value="readme_based">{m.marketplace_repo_type_readme_desc()}</option>
+						<option value="file_based">{m.marketplace_repo_type_files_desc()}</option>
 					</select>
 				</div>
 
 				<div>
-					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-						Content Type
+					<label for="marketplace-new-content-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+						{m.marketplace_content_type()}
 					</label>
-					<select bind:value={newRepoContentType} class="input w-full">
-						<option value="mixed">Mixed (Skills & Agents)</option>
-						<option value="skill">Skills only</option>
-						<option value="subagent">Agents only</option>
+					<select id="marketplace-new-content-type" bind:value={newRepoContentType} class="input w-full">
+						<option value="mixed">{m.marketplace_content_type_mixed()}</option>
+						<option value="skill">{m.marketplace_content_type_skills()}</option>
+						<option value="subagent">{m.marketplace_content_type_agents()}</option>
 					</select>
 				</div>
 			</div>
 
 			<div class="mt-6 flex justify-end gap-3">
 				<button onclick={() => (showAddRepoModal = false)} class="btn btn-secondary">
-					Cancel
+					{m.action_cancel()}
 				</button>
 				<button onclick={handleAddRepo} disabled={!newRepoUrl} class="btn btn-primary">
-					Add Repository
+					{m.marketplace_add_repository()}
 				</button>
 			</div>
 		</div>
@@ -693,7 +695,7 @@
 							</span>
 							{#if selectedItem.isImported}
 								<span class="px-2 py-0.5 text-xs bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300 rounded">
-									Imported
+									{m.label_imported()}
 								</span>
 							{/if}
 						</div>
@@ -714,7 +716,7 @@
 			<div class="flex-1 overflow-auto p-6">
 				{#if selectedItem.rawContent}
 					<div class="mb-4">
-						<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Content Preview</h3>
+						<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{m.marketplace_content_preview()}</h3>
 						<pre class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 text-sm text-gray-800 dark:text-gray-200 overflow-x-auto whitespace-pre-wrap font-mono max-h-64 overflow-y-auto">{selectedItem.rawContent}</pre>
 					</div>
 				{/if}
@@ -723,7 +725,7 @@
 					{@const metadata = JSON.parse(selectedItem.metadata)}
 					{#if Object.keys(metadata).length > 0}
 						<div class="mb-4">
-							<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Metadata</h3>
+							<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{m.marketplace_metadata()}</h3>
 							<div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
 								<dl class="grid grid-cols-2 gap-2 text-sm">
 									{#each Object.entries(metadata) as [key, value]}
@@ -738,14 +740,14 @@
 
 				{#if selectedItem.filePath}
 					<div class="mb-4">
-						<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">File Path</h3>
+						<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{m.label_file_path()}</h3>
 						<code class="text-sm text-gray-600 dark:text-gray-400">{selectedItem.filePath}</code>
 					</div>
 				{/if}
 
 				{#if selectedItem.sourceUrl}
 					<div class="mb-4">
-						<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Source</h3>
+						<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{m.marketplace_source()}</h3>
 						<a
 							href={selectedItem.sourceUrl}
 							target="_blank"
@@ -762,7 +764,7 @@
 			<!-- Footer -->
 			<div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
 				<button onclick={() => (selectedItem = null)} class="btn btn-secondary">
-					Close
+					{m.action_close()}
 				</button>
 				<button
 					onclick={() => {
@@ -773,7 +775,7 @@
 					class="btn {selectedItem.isImported ? 'btn-ghost text-gray-400' : 'btn-primary'}"
 				>
 					<Download class="w-4 h-4 mr-2" />
-					{selectedItem.isImported ? 'Already Imported' : 'Import'}
+					{selectedItem.isImported ? m.marketplace_already_imported() : m.action_import()}
 				</button>
 			</div>
 		</div>
@@ -834,24 +836,24 @@
 			<div class="flex-1 overflow-auto p-6">
 				<!-- Command/URL Configuration -->
 				<div class="mb-4">
-					<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Configuration</h3>
+					<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{m.label_configuration()}</h3>
 					<div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
 						{#if selectedRegistryMcp.mcpType === 'stdio'}
 							<div class="space-y-2">
 								<div>
-									<span class="text-xs text-gray-500 dark:text-gray-400">Command:</span>
+									<span class="text-xs text-gray-500 dark:text-gray-400">{m.label_command()}:</span>
 									<code class="ml-2 text-sm text-gray-800 dark:text-gray-200 font-mono">{selectedRegistryMcp.command}</code>
 								</div>
 								{#if selectedRegistryMcp.args && selectedRegistryMcp.args.length > 0}
 									<div>
-										<span class="text-xs text-gray-500 dark:text-gray-400">Arguments:</span>
+										<span class="text-xs text-gray-500 dark:text-gray-400">{m.label_arguments()}:</span>
 										<code class="ml-2 text-sm text-gray-800 dark:text-gray-200 font-mono">{selectedRegistryMcp.args.join(' ')}</code>
 									</div>
 								{/if}
 							</div>
 						{:else}
 							<div>
-								<span class="text-xs text-gray-500 dark:text-gray-400">URL:</span>
+								<span class="text-xs text-gray-500 dark:text-gray-400">{m.label_url()}:</span>
 								<code class="ml-2 text-sm text-gray-800 dark:text-gray-200 font-mono break-all">{selectedRegistryMcp.url}</code>
 							</div>
 						{/if}
@@ -862,8 +864,8 @@
 				{#if selectedRegistryMcp.envPlaceholders && selectedRegistryMcp.envPlaceholders.length > 0}
 					<div class="mb-4">
 						<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-							Environment Variables
-							<span class="text-xs text-gray-400 font-normal ml-2">(You'll need to configure these after import)</span>
+							{m.label_env_variables()}
+							<span class="text-xs text-gray-400 font-normal ml-2">({m.marketplace_env_configure_after_import()})</span>
 						</h3>
 						<div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-3">
 							{#each selectedRegistryMcp.envPlaceholders as envVar}
@@ -873,7 +875,7 @@
 									</code>
 									{#if envVar.isRequired}
 										<span class="px-1.5 py-0.5 text-xs bg-red-100 text-red-600 dark:bg-red-900/50 dark:text-red-400 rounded">
-											Required
+											{m.marketplace_required()}
 										</span>
 									{/if}
 									{#if envVar.description}
@@ -888,7 +890,7 @@
 				<!-- Source URL -->
 				{#if selectedRegistryMcp.sourceUrl}
 					<div class="mb-4">
-						<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Source Repository</h3>
+						<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{m.marketplace_source_repository()}</h3>
 						<a
 							href={selectedRegistryMcp.sourceUrl}
 							target="_blank"
@@ -905,7 +907,7 @@
 			<!-- Footer -->
 			<div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
 				<button onclick={() => (selectedRegistryMcp = null)} class="btn btn-secondary">
-					Close
+					{m.action_close()}
 				</button>
 				<button
 					onclick={() => handleImportRegistryMcp(selectedRegistryMcp!)}
@@ -914,10 +916,10 @@
 				>
 					{#if isImportingMcp}
 						<Loader2 class="w-4 h-4 mr-2 animate-spin" />
-						Importing...
+						{m.marketplace_importing()}
 					{:else}
 						<Download class="w-4 h-4 mr-2" />
-						Import to Library
+						{m.action_add_to_library()}
 					{/if}
 				</button>
 			</div>

@@ -19,9 +19,9 @@ describe('McpForm Component', () => {
 		it('should render type selector with all three types', () => {
 			render(McpForm, { props: defaultProps });
 
-			expect(screen.getByText('Standard I/O')).toBeInTheDocument();
-			expect(screen.getByText('Server-Sent Events')).toBeInTheDocument();
-			expect(screen.getByText('HTTP/REST')).toBeInTheDocument();
+			expect(screen.getByText('stdio')).toBeInTheDocument();
+			expect(screen.getByText('SSE')).toBeInTheDocument();
+			expect(screen.getByText('HTTP')).toBeInTheDocument();
 		});
 
 		it('should show command and args fields for default stdio type', () => {
@@ -31,24 +31,24 @@ describe('McpForm Component', () => {
 			expect(screen.getByLabelText(/Arguments/)).toBeInTheDocument();
 		});
 
-		it('should show Create MCP button when no initial values', () => {
+		it('should show Create button when no initial values', () => {
 			render(McpForm, { props: defaultProps });
 
-			expect(screen.getByText('Create MCP')).toBeInTheDocument();
+			expect(screen.getByText('Create')).toBeInTheDocument();
 		});
 
-		it('should show Update MCP button when editing', () => {
+		it('should show Update button when editing', () => {
 			render(McpForm, {
 				props: { ...defaultProps, initialValues: { name: 'test-mcp' } }
 			});
 
-			expect(screen.getByText('Update MCP')).toBeInTheDocument();
+			expect(screen.getByText('Update')).toBeInTheDocument();
 		});
 
 		it('should show Quick Import section', () => {
 			render(McpForm, { props: defaultProps });
 
-			expect(screen.getByText('Quick Import')).toBeInTheDocument();
+			expect(screen.getAllByText(/Quick Import/).length).toBeGreaterThan(0);
 		});
 
 		it('should render cancel button', () => {
@@ -62,8 +62,7 @@ describe('McpForm Component', () => {
 		it('should show URL field when switching to SSE', async () => {
 			render(McpForm, { props: defaultProps });
 
-			// Click SSE type
-			await fireEvent.click(screen.getByText('Server-Sent Events'));
+			await fireEvent.click(screen.getByText('SSE'));
 
 			expect(screen.getByLabelText(/URL/)).toBeInTheDocument();
 			expect(screen.queryByLabelText(/Command/)).not.toBeInTheDocument();
@@ -72,7 +71,7 @@ describe('McpForm Component', () => {
 		it('should show URL field when switching to HTTP', async () => {
 			render(McpForm, { props: defaultProps });
 
-			await fireEvent.click(screen.getByText('HTTP/REST'));
+			await fireEvent.click(screen.getByText('HTTP'));
 
 			expect(screen.getByLabelText(/URL/)).toBeInTheDocument();
 			expect(screen.queryByLabelText(/Command/)).not.toBeInTheDocument();
@@ -81,7 +80,7 @@ describe('McpForm Component', () => {
 		it('should show Headers section for HTTP type', async () => {
 			render(McpForm, { props: defaultProps });
 
-			await fireEvent.click(screen.getByText('HTTP/REST'));
+			await fireEvent.click(screen.getByText('HTTP'));
 
 			expect(screen.getByText('Headers')).toBeInTheDocument();
 		});
@@ -90,8 +89,8 @@ describe('McpForm Component', () => {
 			render(McpForm, { props: defaultProps });
 
 			// Switch to SSE then back to stdio
-			await fireEvent.click(screen.getByText('Server-Sent Events'));
-			await fireEvent.click(screen.getByText('Standard I/O'));
+			await fireEvent.click(screen.getByText('SSE'));
+			await fireEvent.click(screen.getByText('stdio'));
 
 			expect(screen.getByLabelText(/Command/)).toBeInTheDocument();
 			expect(screen.getByLabelText(/Arguments/)).toBeInTheDocument();
@@ -102,7 +101,7 @@ describe('McpForm Component', () => {
 		it('should show error when name is empty', async () => {
 			render(McpForm, { props: defaultProps });
 
-			await fireEvent.click(screen.getByText('Create MCP'));
+			await fireEvent.click(screen.getByText('Create'));
 
 			expect(screen.getByText('Name is required')).toBeInTheDocument();
 		});
@@ -113,13 +112,12 @@ describe('McpForm Component', () => {
 			const nameInput = screen.getByLabelText(/Name/);
 			await fireEvent.input(nameInput, { target: { value: 'my mcp name' } });
 
-			// Also fill command to bypass that validation
 			const commandInput = screen.getByLabelText(/Command/);
 			await fireEvent.input(commandInput, { target: { value: 'npx' } });
 
-			await fireEvent.click(screen.getByText('Create MCP'));
+			await fireEvent.click(screen.getByText('Create'));
 
-			expect(screen.getByText(/Name can only contain/)).toBeInTheDocument();
+			expect(screen.getByText('Invalid name format')).toBeInTheDocument();
 		});
 
 		it('should show error when stdio command is empty', async () => {
@@ -128,7 +126,7 @@ describe('McpForm Component', () => {
 			const nameInput = screen.getByLabelText(/Name/);
 			await fireEvent.input(nameInput, { target: { value: 'test-mcp' } });
 
-			await fireEvent.click(screen.getByText('Create MCP'));
+			await fireEvent.click(screen.getByText('Create'));
 
 			expect(screen.getByText('Command is required')).toBeInTheDocument();
 		});
@@ -139,8 +137,8 @@ describe('McpForm Component', () => {
 			const nameInput = screen.getByLabelText(/Name/);
 			await fireEvent.input(nameInput, { target: { value: 'test-mcp' } });
 
-			await fireEvent.click(screen.getByText('Server-Sent Events'));
-			await fireEvent.click(screen.getByText('Create MCP'));
+			await fireEvent.click(screen.getByText('SSE'));
+			await fireEvent.click(screen.getByText('Create'));
 
 			expect(screen.getByText('URL is required')).toBeInTheDocument();
 		});
@@ -156,14 +154,14 @@ describe('McpForm Component', () => {
 			const form = document.querySelector('form')!;
 			await fireEvent.submit(form);
 
-			expect(screen.getByText('Invalid URL format')).toBeInTheDocument();
+			expect(screen.getByText('Please enter a valid URL')).toBeInTheDocument();
 		});
 
 		it('should not call onSubmit when validation fails', async () => {
 			const onSubmit = vi.fn();
 			render(McpForm, { props: { ...defaultProps, onSubmit } });
 
-			await fireEvent.click(screen.getByText('Create MCP'));
+			await fireEvent.click(screen.getByText('Create'));
 
 			expect(onSubmit).not.toHaveBeenCalled();
 		});
@@ -183,7 +181,7 @@ describe('McpForm Component', () => {
 			const argsInput = screen.getByLabelText(/Arguments/);
 			await fireEvent.input(argsInput, { target: { value: '-y @test/server' } });
 
-			await fireEvent.click(screen.getByText('Create MCP'));
+			await fireEvent.click(screen.getByText('Create'));
 
 			expect(onSubmit).toHaveBeenCalledWith(
 				expect.objectContaining({
@@ -202,12 +200,12 @@ describe('McpForm Component', () => {
 			const nameInput = screen.getByLabelText(/Name/);
 			await fireEvent.input(nameInput, { target: { value: 'test-sse' } });
 
-			await fireEvent.click(screen.getByText('Server-Sent Events'));
+			await fireEvent.click(screen.getByText('SSE'));
 
 			const urlInput = screen.getByLabelText(/URL/);
 			await fireEvent.input(urlInput, { target: { value: 'https://example.com/sse' } });
 
-			await fireEvent.click(screen.getByText('Create MCP'));
+			await fireEvent.click(screen.getByText('Create'));
 
 			expect(onSubmit).toHaveBeenCalledWith(
 				expect.objectContaining({

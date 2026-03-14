@@ -5,6 +5,7 @@
 	import { subagentLibrary, notifications } from '$lib/stores';
 	import type { SubAgent } from '$lib/types';
 	import { Plus } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let showAddSubAgent = $state(false);
 	let editingSubAgent = $state<SubAgent | null>(null);
@@ -14,9 +15,9 @@
 		try {
 			await subagentLibrary.create(values);
 			showAddSubAgent = false;
-			notifications.success('Sub-agent created successfully');
+			notifications.success(m.notify_created({ entity: m.entity_sub_agent() }));
 		} catch (err) {
-			notifications.error('Failed to create sub-agent');
+			notifications.error(m.notify_create_failed({ entity: m.entity_sub_agent() }));
 		}
 	}
 
@@ -25,9 +26,9 @@
 		try {
 			await subagentLibrary.update(editingSubAgent.id, values);
 			editingSubAgent = null;
-			notifications.success('Sub-agent updated successfully');
+			notifications.success(m.notify_updated({ entity: m.entity_sub_agent() }));
 		} catch (err) {
-			notifications.error('Failed to update sub-agent');
+			notifications.error(m.notify_update_failed({ entity: m.entity_sub_agent() }));
 		}
 	}
 
@@ -35,9 +36,9 @@
 		if (!deletingSubAgent) return;
 		try {
 			await subagentLibrary.delete(deletingSubAgent.id);
-			notifications.success('Sub-agent deleted');
+			notifications.success(m.notify_deleted({ entity: m.entity_sub_agent() }));
 		} catch (err) {
-			notifications.error('Failed to delete sub-agent');
+			notifications.error(m.notify_delete_failed({ entity: m.entity_sub_agent() }));
 		} finally {
 			deletingSubAgent = null;
 		}
@@ -45,15 +46,15 @@
 </script>
 
 <Header
-	title="Sub-Agents Library"
-	subtitle="Custom sub-agents - drag them to projects or global settings"
+	title={m.page_subagents_title()}
+	subtitle={m.page_subagents_subtitle()}
 />
 
 <div class="flex-1 overflow-auto p-6">
 	<div class="flex justify-end mb-6">
 		<button onclick={() => (showAddSubAgent = true)} class="btn btn-primary">
 			<Plus class="w-4 h-4 mr-2" />
-			Add Sub-Agent
+			{m.modal_add_title({ entity: m.entity_sub_agent() })}
 		</button>
 	</div>
 
@@ -68,7 +69,7 @@
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
 		<div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto">
 			<div class="p-6">
-				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">Add New Sub-Agent</h2>
+				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">{m.modal_add_title({ entity: m.entity_sub_agent() })}</h2>
 				<SubAgentForm onSubmit={handleCreateSubAgent} onCancel={() => (showAddSubAgent = false)} />
 			</div>
 		</div>
@@ -80,7 +81,7 @@
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
 		<div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto">
 			<div class="p-6">
-				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">Edit Sub-Agent</h2>
+				<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">{m.modal_edit_title({ entity: m.entity_sub_agent() })}</h2>
 				<SubAgentForm
 					initialValues={editingSubAgent}
 					onSubmit={handleUpdateSubAgent}
@@ -93,9 +94,9 @@
 
 <ConfirmDialog
 	open={!!deletingSubAgent}
-	title="Delete Sub-Agent"
-	message="Are you sure you want to delete '{deletingSubAgent?.name}'? This will remove it from all projects."
-	confirmText="Delete"
+	title={m.confirm_delete_title({ entity: m.entity_sub_agent() })}
+	message={m.confirm_delete_message({ name: deletingSubAgent?.name ?? '' })}
+	confirmText={m.action_delete()}
 	onConfirm={handleDeleteSubAgent}
 	onCancel={() => (deletingSubAgent = null)}
 />

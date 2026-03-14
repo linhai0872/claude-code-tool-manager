@@ -2,6 +2,11 @@
 	import type { ManagedSettingsInfo, ClaudeSettings } from '$lib/types';
 	import { MANAGED_SETTINGS_FIELDS } from '$lib/types';
 	import { Lock, CheckCircle, XCircle, FileWarning, Shield } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
+	import {
+		getManagedSettingsFieldDescription,
+		getManagedSettingsFieldLabel
+	} from '$lib/utils/managedSettingsI18n';
 
 	type Props = {
 		info: ManagedSettingsInfo;
@@ -11,24 +16,24 @@
 
 	// Standard (non-managed-only) fields to display when set
 	const STANDARD_FIELDS: { key: keyof ClaudeSettings; label: string }[] = [
-		{ key: 'model', label: 'Model' },
-		{ key: 'availableModels', label: 'Available Models' },
-		{ key: 'outputStyle', label: 'Output Style' },
-		{ key: 'language', label: 'Language' },
-		{ key: 'alwaysThinkingEnabled', label: 'Always Thinking Enabled' },
-		{ key: 'sandbox', label: 'Sandbox' },
-		{ key: 'enabledPlugins', label: 'Enabled Plugins' },
-		{ key: 'extraKnownMarketplaces', label: 'Extra Known Marketplaces' },
-		{ key: 'env', label: 'Environment Variables' },
-		{ key: 'showTurnDuration', label: 'Show Turn Duration' },
-		{ key: 'spinnerTipsEnabled', label: 'Spinner Tips Enabled' },
-		{ key: 'terminalProgressBarEnabled', label: 'Terminal Progress Bar' },
-		{ key: 'prefersReducedMotion', label: 'Prefers Reduced Motion' },
-		{ key: 'respectGitignore', label: 'Respect .gitignore' },
-		{ key: 'cleanupPeriodDays', label: 'Cleanup Period (days)' },
-		{ key: 'autoUpdatesChannel', label: 'Auto-Updates Channel' },
-		{ key: 'teammateMode', label: 'Teammate Mode' },
-		{ key: 'enableAllProjectMcpServers', label: 'Enable All Project MCP Servers' }
+		{ key: 'model', label: m.label_model() },
+		{ key: 'availableModels', label: m.managed_field_available_models() },
+		{ key: 'outputStyle', label: m.managed_field_output_style() },
+		{ key: 'language', label: m.label_language() },
+		{ key: 'alwaysThinkingEnabled', label: m.managed_field_always_thinking_enabled() },
+		{ key: 'sandbox', label: m.settings_sandbox_general_title() },
+		{ key: 'enabledPlugins', label: m.managed_field_enabled_plugins() },
+		{ key: 'extraKnownMarketplaces', label: m.managed_field_extra_known_marketplaces() },
+		{ key: 'env', label: m.label_env_variables() },
+		{ key: 'showTurnDuration', label: m.managed_field_show_turn_duration() },
+		{ key: 'spinnerTipsEnabled', label: m.managed_field_spinner_tips_enabled() },
+		{ key: 'terminalProgressBarEnabled', label: m.managed_field_terminal_progress_bar() },
+		{ key: 'prefersReducedMotion', label: m.managed_field_prefers_reduced_motion() },
+		{ key: 'respectGitignore', label: m.managed_field_respect_gitignore() },
+		{ key: 'cleanupPeriodDays', label: m.managed_field_cleanup_period_days() },
+		{ key: 'autoUpdatesChannel', label: m.managed_field_auto_updates_channel() },
+		{ key: 'teammateMode', label: m.managed_field_teammate_mode() },
+		{ key: 'enableAllProjectMcpServers', label: m.managed_field_enable_all_project_mcps() }
 	];
 
 	function hasValue(val: unknown): boolean {
@@ -39,7 +44,7 @@
 	}
 
 	function formatValue(val: unknown): string {
-		if (typeof val === 'boolean') return val ? 'Yes' : 'No';
+		if (typeof val === 'boolean') return val ? m.label_yes() : m.label_no();
 		if (typeof val === 'number') return String(val);
 		if (typeof val === 'string') return val;
 		if (typeof val === 'object') return JSON.stringify(val, null, 2);
@@ -60,7 +65,7 @@
 	<div class="flex items-center gap-3">
 		<Shield class="w-5 h-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
 		<div class="flex-1 min-w-0">
-			<h3 class="text-sm font-semibold text-gray-900 dark:text-white">Managed Settings File</h3>
+			<h3 class="text-sm font-semibold text-gray-900 dark:text-white">{m.managed_settings_file()}</h3>
 			<p class="text-xs text-gray-500 dark:text-gray-400 font-mono truncate mt-0.5">
 				{info.filePath}
 			</p>
@@ -70,14 +75,14 @@
 				class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800"
 			>
 				<CheckCircle class="w-3.5 h-3.5" />
-				Found
+				{m.managed_found()}
 			</span>
 		{:else}
 			<span
 				class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-600"
 			>
 				<XCircle class="w-3.5 h-3.5" />
-				Not Found
+				{m.managed_not_found()}
 			</span>
 		{/if}
 	</div>
@@ -90,14 +95,13 @@
 	>
 		<FileWarning class="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
 		<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-			No Managed Settings Found
+			{m.managed_no_settings_found()}
 		</h3>
 		<p class="text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-			Managed settings are deployed by IT administrators to enforce organization-wide
-			policies. They are read-only and cannot be modified by users.
+			{m.managed_deployed_desc()}
 		</p>
 		<p class="text-xs text-gray-400 dark:text-gray-500 mt-3">
-			Expected location: <code class="font-mono">{info.filePath}</code>
+			{m.managed_expected_location()}: <code class="font-mono">{info.filePath}</code>
 		</p>
 	</div>
 {:else if info.settings}
@@ -112,11 +116,11 @@
 			<div class="flex items-center gap-2 mb-4">
 				<Lock class="w-4 h-4 text-amber-500" />
 				<h3 class="text-base font-semibold text-gray-900 dark:text-white">
-					Managed-Only Policies
+					{m.managed_only_policies()}
 				</h3>
 			</div>
 			<p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-				These fields can only be set via the managed settings file. They enforce enterprise policies and cannot be overridden.
+				{m.managed_only_desc()}
 			</p>
 
 			<div class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -127,18 +131,18 @@
 						<div class="flex-1 min-w-0">
 							<div class="flex items-center gap-2">
 								<span class="text-sm font-medium text-gray-900 dark:text-white">
-									{field.label}
+									{getManagedSettingsFieldLabel(field.key, field.label)}
 								</span>
 								{#if !hasValue(val)}
 									<span
 										class="text-xs text-gray-400 dark:text-gray-500 italic"
 									>
-										Not set
+										{m.label_not_set()}
 									</span>
 								{/if}
 							</div>
 							<p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-								{field.description}
+								{getManagedSettingsFieldDescription(field.key, field.description)}
 							</p>
 							{#if hasValue(val)}
 								<div class="mt-2">
@@ -147,7 +151,7 @@
 											class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
 												{val ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400'}"
 										>
-											{val ? 'Yes' : 'No'}
+											{val ? m.label_yes() : m.label_no()}
 										</span>
 									{:else if field.type === 'stringArray' && Array.isArray(val)}
 										<div class="flex flex-wrap gap-1.5">
@@ -180,10 +184,10 @@
 				class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5"
 			>
 				<h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">
-					Managed Standard Settings
+					{m.managed_standard_settings()}
 				</h3>
 				<p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-					These regular settings are being enforced through the managed configuration file.
+					{m.managed_standard_desc()}
 				</p>
 
 				<div class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -201,7 +205,7 @@
 										class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
 											{val ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400'}"
 									>
-										{val ? 'Yes' : 'No'}
+										{val ? m.label_yes() : m.label_no()}
 									</span>
 								{:else if Array.isArray(val)}
 									<div class="flex flex-wrap gap-1.5">

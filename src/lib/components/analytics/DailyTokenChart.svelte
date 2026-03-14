@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { DailyModelTokens } from '$lib/types';
 	import { getModelColor, formatModelName, formatCompactNumber } from '$lib/types/usage';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		data: DailyModelTokens[];
@@ -81,7 +82,7 @@
 	class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4"
 >
 	<div class="flex items-center justify-between mb-4">
-		<h3 class="text-sm font-semibold text-gray-900 dark:text-white">Daily Token Usage</h3>
+		<h3 class="text-sm font-semibold text-gray-900 dark:text-white">{m.analytics_daily_token_usage()}</h3>
 		<!-- Legend -->
 		<div class="flex flex-wrap gap-3">
 			{#each models as m}
@@ -95,7 +96,7 @@
 
 	{#if data.length === 0}
 		<div class="flex items-center justify-center py-12 text-gray-400 dark:text-gray-500">
-			No token data available
+			{m.empty_no_token_data()}
 		</div>
 	{:else}
 		<div class="relative">

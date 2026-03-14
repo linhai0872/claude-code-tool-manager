@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import type { PermissionCategory } from '$lib/types';
 	import { ShieldAlert, ShieldQuestion, ShieldCheck, Layers } from 'lucide-svelte';
 
@@ -57,7 +58,7 @@
 			<div class="flex items-center gap-2">
 				<Layers class="w-5 h-5 text-primary-500" />
 				<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-					Merged Permissions View
+					{m.permission_merged_view_title()}
 				</h3>
 			</div>
 			<button
@@ -71,13 +72,12 @@
 		<!-- Content -->
 		<div class="flex-1 overflow-auto p-6">
 			<p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
-				Combined view of all permission rules across all scopes. Rules are evaluated in order:
-				deny first, then ask, then allow.
+				{m.permission_merged_view_desc()}
 			</p>
 
 			{#if rules.length === 0}
 				<div class="text-center py-12 text-gray-400 dark:text-gray-500">
-					<p>No permission rules configured</p>
+					<p>{m.permission_no_rules()}</p>
 				</div>
 			{:else}
 				<div class="space-y-1.5">
@@ -108,7 +108,7 @@
 		<div
 			class="px-6 py-3 border-t border-gray-200 dark:border-gray-700 flex justify-end"
 		>
-			<button onclick={onclose} class="btn btn-secondary">Close</button>
+			<button onclick={onclose} class="btn btn-secondary">{m.action_close()}</button>
 		</div>
 	</div>
 </div>

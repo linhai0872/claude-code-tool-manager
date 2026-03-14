@@ -2,6 +2,7 @@
 	import type { ClaudeSettings } from '$lib/types';
 	import { Save, Plus, X, BookOpen } from 'lucide-svelte';
 	import KnownEnvVarPicker from './KnownEnvVarPicker.svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		settings: ClaudeSettings;
@@ -71,18 +72,18 @@
 <div class="space-y-6">
 	<div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
 		<div class="flex items-center justify-between mb-1">
-			<h3 class="text-base font-semibold text-gray-900 dark:text-white">Environment Variables</h3>
+			<h3 class="text-base font-semibold text-gray-900 dark:text-white">{m.settings_env_title()}</h3>
 			<button
 				onclick={() => (showPicker = !showPicker)}
 				class="btn btn-ghost text-xs"
-				title="Browse known Claude Code env vars"
+				title={m.settings_env_browse_known_title()}
 			>
 				<BookOpen class="w-4 h-4 mr-1" />
-				{showPicker ? 'Hide' : 'Browse'} Known Vars
+				{showPicker ? m.settings_env_hide_known() : m.settings_env_browse_known()}
 			</button>
 		</div>
 		<p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-			Set environment variables that Claude Code will use at runtime
+			{m.settings_env_desc()}
 		</p>
 
 		{#if showPicker}
@@ -102,7 +103,7 @@
 							oninput={(e) => updateKey(i, (e.target as HTMLInputElement).value)}
 							class="input text-sm font-mono w-48"
 							class:border-red-400={!isValidKey(key)}
-							placeholder="KEY"
+							placeholder={m.placeholder_env_key()}
 						/>
 						<span class="text-gray-400">=</span>
 						<input
@@ -110,7 +111,7 @@
 							value={value}
 							oninput={(e) => updateValue(i, (e.target as HTMLInputElement).value)}
 							class="input text-sm font-mono flex-1"
-							placeholder="value"
+							placeholder={m.placeholder_env_value()}
 						/>
 						<button
 							onclick={() => removeEntry(i)}
@@ -123,7 +124,7 @@
 			</div>
 		{:else}
 			<p class="text-xs text-gray-500 dark:text-gray-400 italic mb-4">
-				No environment variables configured
+				{m.settings_env_empty()}
 			</p>
 		{/if}
 
@@ -132,7 +133,7 @@
 			<input
 				type="text"
 				bind:value={newKey}
-				placeholder="NEW_KEY"
+				placeholder={m.placeholder_env_new_key()}
 				class="input text-sm font-mono w-48"
 				class:border-red-400={newKey.trim() !== '' && !isValidKey(newKey.trim())}
 				onkeydown={(e) => e.key === 'Enter' && addEntry()}
@@ -141,7 +142,7 @@
 			<input
 				type="text"
 				bind:value={newValue}
-				placeholder="value"
+				placeholder={m.placeholder_env_value()}
 				class="input text-sm font-mono flex-1"
 				onkeydown={(e) => e.key === 'Enter' && addEntry()}
 			/>
@@ -155,7 +156,7 @@
 		</div>
 		{#if newKey.trim() !== '' && !isValidKey(newKey.trim())}
 			<p class="text-xs text-red-500 mt-1">
-				Key must start with a letter or underscore and contain only letters, digits, and underscores
+				{m.settings_env_key_validation()}
 			</p>
 		{/if}
 	</div>
@@ -163,7 +164,7 @@
 	<div class="flex justify-end">
 		<button onclick={handleSave} class="btn btn-primary">
 			<Save class="w-4 h-4 mr-2" />
-			Save Environment Variables
+			{m.settings_env_save_btn()}
 		</button>
 	</div>
 </div>

@@ -3,6 +3,7 @@
 	import { invoke } from '@tauri-apps/api/core';
 	import { ManagedSettingsViewer } from '$lib/components/admin-settings';
 	import { notifications } from '$lib/stores';
+	import * as m from '$lib/paraglide/messages.js';
 	import type { ManagedSettingsInfo } from '$lib/types';
 	import { RefreshCw } from 'lucide-svelte';
 
@@ -24,7 +25,7 @@
 
 	async function handleRefresh() {
 		await load();
-		notifications.success('Managed settings refreshed');
+		notifications.success(m.notify_refreshed({ entity: m.entity_settings() }));
 	}
 
 	onMount(() => {
@@ -36,7 +37,7 @@
 	<button
 		onclick={handleRefresh}
 		class="btn btn-ghost"
-		title="Refresh managed settings"
+		title={m.managed_refresh_settings()}
 		disabled={isLoading}
 	>
 		<RefreshCw class="w-4 h-4" />

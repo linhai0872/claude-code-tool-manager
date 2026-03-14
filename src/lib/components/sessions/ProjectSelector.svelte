@@ -3,6 +3,7 @@
 	import { projectTotalTokens } from '$lib/types/session';
 	import { formatCompactNumber } from '$lib/types/usage';
 	import { FolderOpen, ChevronRight } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		projects: ProjectSummary[];
@@ -34,7 +35,7 @@
 <div
 	class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 flex flex-col h-full"
 >
-	<h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Projects</h3>
+	<h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">{m.session_projects()}</h3>
 	<div class="space-y-1.5 flex-1 overflow-y-auto min-h-0">
 		{#each projects as project}
 			{@const isSelected = selectedFolder === project.folderName}
@@ -65,8 +66,8 @@
 						{shortPath(project.inferredPath)}
 					</p>
 					<div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-						<span>{project.sessionCount} sessions</span>
-						<span>{formatCompactNumber(projectTotalTokens(project))} tokens</span>
+						<span>{m.analytics_sessions_count({ count: project.sessionCount })}</span>
+						<span>{formatCompactNumber(projectTotalTokens(project))} {m.label_tokens()}</span>
 						{#if project.latestSession}
 							<span>{formatDate(project.latestSession)}</span>
 						{/if}

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { ClaudeSettings } from '$lib/types';
 	import { Save, X } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		settings: ClaudeSettings;
@@ -55,9 +56,9 @@
 </script>
 
 <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
-	<h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">Attribution</h3>
+	<h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">{m.settings_attribution_title()}</h3>
 	<p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-		Customize text appended to git commits and PR descriptions. Set to empty to hide attribution.
+		{m.settings_attribution_desc()}
 	</p>
 
 	<div class="space-y-4">
@@ -68,14 +69,14 @@
 					for="commit-attribution"
 					class="text-sm font-medium text-gray-700 dark:text-gray-300"
 				>
-					Commit Attribution
+					{m.settings_attribution_commit_label()}
 				</label>
 				<div class="flex gap-1">
 					{#if commitHasValue}
 						<button
 							onclick={unsetCommit}
 							class="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-							title="Unset (use default)"
+							title={m.settings_attribution_unset_hint()}
 						>
 							<X class="w-3.5 h-3.5" />
 						</button>
@@ -84,7 +85,7 @@
 							onclick={clearCommit}
 							class="text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400"
 						>
-							Set to empty (hide)
+							{m.settings_attribution_set_empty()}
 						</button>
 					{/if}
 				</div>
@@ -93,18 +94,18 @@
 				<textarea
 					id="commit-attribution"
 					bind:value={commitText}
-					placeholder="e.g. Co-Authored-By: Claude <noreply@anthropic.com>"
+					placeholder={m.settings_attribution_commit_placeholder()}
 					rows={2}
 					class="input text-sm w-full resize-y"
 				></textarea>
 				{#if commitText === ''}
 					<p class="text-xs text-amber-600 dark:text-amber-400 mt-1">
-						Empty string — commit attribution will be hidden
+						{m.settings_attribution_commit_hidden()}
 					</p>
 				{/if}
 			{:else}
 				<p class="text-xs text-gray-500 dark:text-gray-400 italic">
-					Not set — using default: "{DEFAULT_COMMIT}"
+					{m.settings_attribution_not_set({ defaultValue: DEFAULT_COMMIT })}
 				</p>
 			{/if}
 		</div>
@@ -116,14 +117,14 @@
 					for="pr-attribution"
 					class="text-sm font-medium text-gray-700 dark:text-gray-300"
 				>
-					PR Description Attribution
+					{m.settings_attribution_pr_label()}
 				</label>
 				<div class="flex gap-1">
 					{#if prHasValue}
 						<button
 							onclick={unsetPr}
 							class="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-							title="Unset (use default)"
+							title={m.settings_attribution_unset_hint()}
 						>
 							<X class="w-3.5 h-3.5" />
 						</button>
@@ -132,7 +133,7 @@
 							onclick={clearPr}
 							class="text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400"
 						>
-							Set to empty (hide)
+							{m.settings_attribution_set_empty()}
 						</button>
 					{/if}
 				</div>
@@ -141,18 +142,18 @@
 				<textarea
 					id="pr-attribution"
 					bind:value={prText}
-					placeholder="e.g. Generated with Claude Code"
+					placeholder={m.settings_attribution_pr_placeholder()}
 					rows={2}
 					class="input text-sm w-full resize-y"
 				></textarea>
 				{#if prText === ''}
 					<p class="text-xs text-amber-600 dark:text-amber-400 mt-1">
-						Empty string — PR attribution will be hidden
+						{m.settings_attribution_pr_hidden()}
 					</p>
 				{/if}
 			{:else}
 				<p class="text-xs text-gray-500 dark:text-gray-400 italic">
-					Not set — using default: "{DEFAULT_PR}"
+					{m.settings_attribution_not_set({ defaultValue: DEFAULT_PR })}
 				</p>
 			{/if}
 		</div>
@@ -160,18 +161,18 @@
 		<!-- Preview -->
 		{#if commitHasValue || prHasValue}
 			<div class="border-t border-gray-200 dark:border-gray-700 pt-4">
-				<h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Preview</h4>
+				<h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{m.settings_attribution_preview()}</h4>
 				<div class="space-y-2">
 					{#if commitHasValue}
 						<div class="bg-gray-50 dark:bg-gray-900/50 rounded p-3">
-							<p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Commit message footer:</p>
-							<pre class="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{commitText || '(hidden — empty string)'}</pre>
+							<p class="text-xs text-gray-500 dark:text-gray-400 mb-1">{m.settings_attribution_commit_footer()}</p>
+							<pre class="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{commitText || m.settings_attribution_hidden_text()}</pre>
 						</div>
 					{/if}
 					{#if prHasValue}
 						<div class="bg-gray-50 dark:bg-gray-900/50 rounded p-3">
-							<p class="text-xs text-gray-500 dark:text-gray-400 mb-1">PR description footer:</p>
-							<pre class="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{prText || '(hidden — empty string)'}</pre>
+							<p class="text-xs text-gray-500 dark:text-gray-400 mb-1">{m.settings_attribution_pr_footer()}</p>
+							<pre class="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{prText || m.settings_attribution_hidden_text()}</pre>
 						</div>
 					{/if}
 				</div>
@@ -182,7 +183,7 @@
 	<div class="mt-5 flex justify-end">
 		<button onclick={handleSave} class="btn btn-primary">
 			<Save class="w-4 h-4 mr-2" />
-			Save Attribution
+			{m.settings_attribution_save_btn()}
 		</button>
 	</div>
 </div>

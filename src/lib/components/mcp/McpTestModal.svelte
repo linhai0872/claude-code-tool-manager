@@ -2,6 +2,7 @@
 	import { invoke } from '@tauri-apps/api/core';
 	import { onMount } from 'svelte';
 	import type { Mcp, McpTestResult } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 	import { CheckCircle, XCircle, X, RefreshCw, ChevronDown, ChevronRight, Wrench, Database, MessageSquare, Clock, Play } from 'lucide-svelte';
 	import McpExecutionModal from './McpExecutionModal.svelte';
 
@@ -73,7 +74,7 @@
 		<div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
 			<div>
 				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-					Test MCP: {mcp.name}
+					{m.mcp_test_title({ name: mcp.name })}
 				</h2>
 				<p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
 					{mcp.type === 'stdio' ? mcp.command : mcp.url}
@@ -92,8 +93,8 @@
 			{#if isLoading}
 				<div class="flex flex-col items-center justify-center py-12">
 					<div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600 mb-4"></div>
-					<p class="text-gray-600 dark:text-gray-400">Testing connection...</p>
-					<p class="text-sm text-gray-400 dark:text-gray-500 mt-1">This may take a few seconds</p>
+					<p class="text-gray-600 dark:text-gray-400">{m.mcp_testing_connection()}</p>
+					<p class="text-sm text-gray-400 dark:text-gray-500 mt-1">{m.mcp_may_take_seconds()}</p>
 				</div>
 			{:else if result}
 				{#if result.success}
@@ -104,10 +105,10 @@
 							<CheckCircle class="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0" />
 							<div class="flex-1">
 								<p class="font-medium text-green-800 dark:text-green-200">
-									Connected successfully
+									{m.mcp_connected_successfully()}
 								</p>
 								<p class="text-sm text-green-600 dark:text-green-400">
-									{result.serverInfo?.name || 'Unknown server'}
+									{result.serverInfo?.name || m.mcp_unknown_server()}
 									{#if result.serverInfo?.version}
 										v{result.serverInfo.version}
 									{/if}
@@ -121,28 +122,28 @@
 
 						<!-- Capabilities -->
 						<div>
-							<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Capabilities</h3>
+							<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{m.mcp_capabilities()}</h3>
 							<div class="flex flex-wrap gap-2">
 								<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
 									{result.tools.length > 0
 										? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300'
 										: 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'}">
 									<Wrench class="w-3.5 h-3.5" />
-									Tools: {result.tools.length}
+									{m.mcp_cap_tools()}: {result.tools.length}
 								</div>
 								<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
 									{result.resourcesSupported
 										? 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300'
 										: 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'}">
 									<Database class="w-3.5 h-3.5" />
-									Resources: {result.resourcesSupported ? 'Yes' : 'No'}
+									{m.mcp_cap_resources()}: {result.resourcesSupported ? m.label_yes() : m.label_no()}
 								</div>
 								<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
 									{result.promptsSupported
 										? 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300'
 										: 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'}">
 									<MessageSquare class="w-3.5 h-3.5" />
-									Prompts: {result.promptsSupported ? 'Yes' : 'No'}
+									{m.mcp_cap_prompts()}: {result.promptsSupported ? m.label_yes() : m.label_no()}
 								</div>
 							</div>
 						</div>
@@ -151,7 +152,7 @@
 						{#if result.tools.length > 0}
 							<div>
 								<h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-									Available Tools ({result.tools.length})
+									{m.mcp_available_tools({ count: result.tools.length })}
 								</h3>
 								<div class="space-y-2 max-h-[300px] overflow-auto">
 									{#each result.tools as tool (tool.name)}
@@ -180,7 +181,7 @@
 											{#if expandedTools.has(tool.name) && tool.inputSchema}
 												<div class="px-3 pb-3 pt-0">
 													<div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-														<p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Input Schema</p>
+														<p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{m.mcp_input_schema()}</p>
 														<pre class="text-xs text-gray-700 dark:text-gray-300 overflow-auto max-h-[200px]">{JSON.stringify(tool.inputSchema, null, 2)}</pre>
 													</div>
 												</div>
@@ -192,7 +193,7 @@
 						{:else}
 							<div class="text-center py-6 text-gray-500 dark:text-gray-400">
 								<Wrench class="w-8 h-8 mx-auto mb-2 opacity-50" />
-								<p class="text-sm">This MCP doesn't expose any tools</p>
+								<p class="text-sm">{m.mcp_no_tools()}</p>
 							</div>
 						{/if}
 					</div>
@@ -203,7 +204,7 @@
 							<XCircle class="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
 							<div class="flex-1 min-w-0">
 								<p class="font-medium text-red-800 dark:text-red-200">
-									Connection failed
+									{m.mcp_connection_failed()}
 								</p>
 								<p class="text-sm text-red-600 dark:text-red-400 mt-1 break-words">
 									{result.error}
@@ -212,16 +213,16 @@
 						</div>
 
 						<div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-							<h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Troubleshooting Tips</h4>
+							<h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{m.mcp_troubleshooting_tips()}</h4>
 							<ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1.5">
 								{#if mcp.type === 'stdio'}
-									<li>Make sure the command is installed and available in your PATH</li>
-									<li>Check that all required arguments are correctly configured</li>
-									<li>Verify any required environment variables are set</li>
+									<li>{m.mcp_tip_command_path()}</li>
+									<li>{m.mcp_tip_check_args()}</li>
+									<li>{m.mcp_tip_check_env()}</li>
 								{:else}
-									<li>Make sure the URL is accessible from your machine</li>
-									<li>Check that the server is running and responding</li>
-									<li>Verify any required headers (like API keys) are configured</li>
+									<li>{m.mcp_tip_url_accessible()}</li>
+									<li>{m.mcp_tip_server_running()}</li>
+									<li>{m.mcp_tip_check_headers()}</li>
 								{/if}
 							</ul>
 						</div>
@@ -238,7 +239,7 @@
 				class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
 			>
 				<RefreshCw class="w-4 h-4 {isLoading ? 'animate-spin' : ''}" />
-				{isLoading ? 'Testing...' : 'Re-run Test'}
+				{isLoading ? m.mcp_testing() : m.mcp_rerun_test()}
 			</button>
 			<div class="flex items-center gap-2">
 				{#if result?.success && result.tools.length > 0}
@@ -247,14 +248,14 @@
 						class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
 					>
 						<Play class="w-4 h-4" />
-						Execute Tools
+						{m.mcp_execute_tools()}
 					</button>
 				{/if}
 				<button
 					onclick={onClose}
 					class="btn btn-secondary"
 				>
-					Close
+					{m.action_close()}
 				</button>
 			</div>
 		</div>

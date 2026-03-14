@@ -3,6 +3,7 @@
 	import { ModelConfigEditor, AttributionEditor } from '$lib/components/claude-settings';
 	import { claudeSettingsLibrary } from '$lib/stores';
 	import type { ClaudeSettingsScope } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 
 	function getSettingCount(scope: ClaudeSettingsScope): number {
 		if (!claudeSettingsLibrary.settings) return 0;
@@ -30,11 +31,11 @@
 		<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 			<ModelConfigEditor
 				{settings}
-				onsave={(s) => save(s, 'Model settings saved', 'Failed to save model settings')}
+				onsave={(s) => save(s, m.settings_model_saved(), m.settings_model_save_failed())}
 			/>
 			<AttributionEditor
 				{settings}
-				onsave={(s) => save(s, 'Attribution settings saved', 'Failed to save attribution settings')}
+				onsave={(s) => save(s, m.settings_attribution_saved(), m.settings_attribution_save_failed())}
 			/>
 		</div>
 	{/snippet}

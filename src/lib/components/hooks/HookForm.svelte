@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { CreateHookRequest, Hook, HookEventType, HookType } from '$lib/types';
 	import { HOOK_EVENT_TYPES } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
+	import { getHookEventDescription, getHookEventLabel, getHookEventMatcherHint } from '$lib/utils/hookEventI18n';
 	import { Clipboard, Check, AlertCircle, FileUp, Terminal, MessageSquare, Zap } from 'lucide-svelte';
 
 	type Props = {
@@ -29,8 +31,7 @@
 	let importStatus = $state<'idle' | 'success' | 'error'>('idle');
 	let importMessage = $state('');
 
-	// Get current event type metadata
-	const currentEventMeta = $derived(HOOK_EVENT_TYPES.find((e) => e.value === eventType));
+	const currentMatcherHint = $derived(getHookEventMatcherHint(eventType));
 
 	// Auto-generate hook name from event type and matcher
 	function generateName(): string {
@@ -53,7 +54,7 @@
 		timeout = template.timeout?.toString() ?? '';
 
 		importStatus = 'success';
-		importMessage = `Applied template "${template.name}"`;
+		importMessage = m.hook_applied_template({ name: template.name });
 		setTimeout(() => {
 			importStatus = 'idle';
 			importMessage = '';
@@ -98,7 +99,7 @@
 		if (parseJsonHook(text)) {
 			e.preventDefault();
 			importStatus = 'success';
-			importMessage = 'Imported from JSON';
+			importMessage = m.hook_imported_from_json();
 			setTimeout(() => {
 				importStatus = 'idle';
 				importMessage = '';
@@ -111,10 +112,10 @@
 			const text = await navigator.clipboard.readText();
 			if (parseJsonHook(text)) {
 				importStatus = 'success';
-				importMessage = 'Imported from JSON';
+				importMessage = m.hook_imported_from_json();
 			} else {
 				importStatus = 'error';
-				importMessage = 'Could not parse as hook JSON';
+				importMessage = m.hook_parse_error_json();
 			}
 			setTimeout(() => {
 				importStatus = 'idle';
@@ -122,7 +123,7 @@
 			}, 3000);
 		} catch {
 			importStatus = 'error';
-			importMessage = 'Could not access clipboard';
+			importMessage = m.hook_clipboard_error();
 			setTimeout(() => {
 				importStatus = 'idle';
 				importMessage = '';
@@ -142,10 +143,10 @@
 				const text = await file.text();
 				if (parseJsonHook(text)) {
 					importStatus = 'success';
-					importMessage = 'Imported from file';
+					importMessage = m.hook_imported_from_file();
 				} else {
 					importStatus = 'error';
-					importMessage = 'Could not parse file as hook JSON';
+					importMessage = m.hook_parse_error_file();
 				}
 				setTimeout(() => {
 					importStatus = 'idle';
@@ -153,7 +154,7 @@
 				}, 3000);
 			} catch {
 				importStatus = 'error';
-				importMessage = 'Could not read file';
+				importMessage = m.hook_file_read_error();
 				setTimeout(() => {
 					importStatus = 'idle';
 					importMessage = '';
@@ -167,15 +168,15 @@
 		errors = {};
 
 		if (hookType === 'command' && !command.trim()) {
-			errors.command = 'Command is required for command hooks';
+			errors.command = m.validation_command_required();
 		}
 
 		if (hookType === 'prompt' && !prompt.trim()) {
-			errors.prompt = 'Prompt is required for prompt hooks';
+			errors.prompt = m.validation_prompt_required();
 		}
 
 		if (timeout && (isNaN(Number(timeout)) || Number(timeout) < 0)) {
-			errors.timeout = 'Timeout must be a positive number';
+			errors.timeout = m.validation_timeout_positive();
 		}
 
 		return Object.keys(errors).length === 0;
@@ -234,10 +235,10 @@
 						</p>
 					{:else}
 						<p class="text-sm font-medium text-gray-700 dark:text-gray-300">
-							Import from JSON or Template
+							{m.hook_import_json_or_template()}
 						</p>
 						<p class="text-xs text-gray-500 dark:text-gray-400">
-							Paste settings.json or select a template
+							{m.hook_paste_settings_or_template()}
 						</p>
 					{/if}
 				</div>
@@ -253,7 +254,7 @@
 							(e.target as HTMLSelectElement).value = '';
 						}}
 					>
-						<option value="">Templates...</option>
+						<option value="">{m.hook_templates_placeholder()}</option>
 						{#each templates as template}
 							<option value={template.id}>{template.name}</option>
 						{/each}
@@ -261,11 +262,11 @@
 				{/if}
 				<button type="button" onclick={handleFileImport} class="btn btn-secondary text-sm">
 					<FileUp class="w-4 h-4 mr-1.5" />
-					File
+					{m.hook_import_file()}
 				</button>
 				<button type="button" onclick={handlePasteFromClipboard} class="btn btn-secondary text-sm">
 					<Clipboard class="w-4 h-4 mr-1.5" />
-					Paste
+					{m.hook_import_paste()}
 				</button>
 			</div>
 		</div>
@@ -274,21 +275,21 @@
 	<!-- Description -->
 	<div>
 		<label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-			Description
+			{m.label_description()}
 		</label>
 		<input
 			type="text"
 			id="description"
 			bind:value={description}
 			class="input mt-1"
-			placeholder="What this hook does"
+			placeholder={m.placeholder_hook_description()}
 		/>
 	</div>
 
 	<!-- Event Type -->
 	<div>
 		<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-			Event Type <span class="text-red-500">*</span>
+			{m.label_event_type()} <span class="text-red-500">*</span>
 		</label>
 		<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
 			{#each HOOK_EVENT_TYPES as event}
@@ -301,9 +302,9 @@
 				>
 					<div class="flex items-center gap-2">
 						<Zap class="w-4 h-4 {eventType === event.value ? 'text-orange-500' : 'text-gray-400'}" />
-						<span class="font-medium text-sm text-gray-900 dark:text-white">{event.label}</span>
+						<span class="font-medium text-sm text-gray-900 dark:text-white">{getHookEventLabel(event.value)}</span>
 					</div>
-					<span class="text-xs text-gray-500 dark:text-gray-400 mt-1">{event.description}</span>
+					<span class="text-xs text-gray-500 dark:text-gray-400 mt-1">{getHookEventDescription(event.value)}</span>
 				</button>
 			{/each}
 		</div>
@@ -312,20 +313,20 @@
 	<!-- Matcher -->
 	<div>
 		<label for="matcher" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-			Matcher Pattern
+			{m.label_matcher_pattern()}
 		</label>
 		<input
 			type="text"
 			id="matcher"
 			bind:value={matcher}
 			class="input mt-1 font-mono"
-			placeholder={currentEventMeta?.matcherHint ?? 'Optional pattern to match'}
+			placeholder={currentMatcherHint ?? m.placeholder_matcher_default()}
 		/>
 		<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-			{#if currentEventMeta?.matcherHint}
-				{currentEventMeta.matcherHint}. Use <code class="px-1 bg-gray-100 dark:bg-gray-700 rounded">|</code> for alternatives.
+			{#if currentMatcherHint}
+				{currentMatcherHint}. {m.hook_matcher_alternatives()}
 			{:else}
-				Optional regex pattern to filter when this hook runs
+				{m.hook_matcher_description()}
 			{/if}
 		</p>
 	</div>
@@ -333,7 +334,7 @@
 	<!-- Hook Type Toggle -->
 	<div>
 		<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-			Hook Type <span class="text-red-500">*</span>
+			{m.label_hook_type()} <span class="text-red-500">*</span>
 		</label>
 		<div class="flex gap-3">
 			<button
@@ -347,8 +348,8 @@
 					<Terminal class="w-5 h-5 text-gray-600 dark:text-gray-400" />
 				</div>
 				<div class="text-left">
-					<div class="font-medium text-gray-900 dark:text-white">Command</div>
-					<div class="text-xs text-gray-500 dark:text-gray-400">Run a shell command</div>
+					<div class="font-medium text-gray-900 dark:text-white">{m.hook_type_command()}</div>
+					<div class="text-xs text-gray-500 dark:text-gray-400">{m.hook_type_command_desc()}</div>
 				</div>
 			</button>
 
@@ -363,8 +364,8 @@
 					<MessageSquare class="w-5 h-5 text-violet-600 dark:text-violet-400" />
 				</div>
 				<div class="text-left">
-					<div class="font-medium text-gray-900 dark:text-white">Prompt</div>
-					<div class="text-xs text-gray-500 dark:text-gray-400">Inject text into conversation</div>
+					<div class="font-medium text-gray-900 dark:text-white">{m.hook_type_prompt()}</div>
+					<div class="text-xs text-gray-500 dark:text-gray-400">{m.hook_type_prompt_desc()}</div>
 				</div>
 			</button>
 		</div>
@@ -374,7 +375,7 @@
 	{#if hookType === 'command'}
 		<div>
 			<label for="command" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-				Command <span class="text-red-500">*</span>
+				{m.hook_type_command()} <span class="text-red-500">*</span>
 			</label>
 			<textarea
 				id="command"
@@ -388,9 +389,7 @@
 				<p class="mt-1 text-sm text-red-500">{errors.command}</p>
 			{:else}
 				<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-					Available env vars: <code class="px-1 bg-gray-100 dark:bg-gray-700 rounded">$CLAUDE_TOOL_NAME</code>,
-					<code class="px-1 bg-gray-100 dark:bg-gray-700 rounded">$CLAUDE_TOOL_INPUT</code>,
-					<code class="px-1 bg-gray-100 dark:bg-gray-700 rounded">$CLAUDE_FILE_PATHS</code>
+					{m.hook_available_env_vars()}
 				</p>
 			{/if}
 		</div>
@@ -398,7 +397,7 @@
 		<!-- Timeout -->
 		<div>
 			<label for="timeout" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-				Timeout (seconds)
+				{m.label_timeout_seconds()}
 			</label>
 			<input
 				type="number"
@@ -413,7 +412,7 @@
 				<p class="mt-1 text-sm text-red-500">{errors.timeout}</p>
 			{:else}
 				<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-					Maximum time the command can run before being terminated
+					{m.hook_timeout_description()}
 				</p>
 			{/if}
 		</div>
@@ -423,7 +422,7 @@
 	{#if hookType === 'prompt'}
 		<div>
 			<label for="prompt" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-				Prompt Text <span class="text-red-500">*</span>
+				{m.label_prompt_text()} <span class="text-red-500">*</span>
 			</label>
 			<textarea
 				id="prompt"
@@ -431,13 +430,13 @@
 				rows={6}
 				class="input mt-1 font-mono text-sm resize-y"
 				class:border-red-500={errors.prompt}
-				placeholder="Additional context or instructions to inject..."
+				placeholder={m.placeholder_prompt_text()}
 			></textarea>
 			{#if errors.prompt}
 				<p class="mt-1 text-sm text-red-500">{errors.prompt}</p>
 			{:else}
 				<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-					Text that will be injected into the conversation when this hook runs
+					{m.hook_prompt_description()}
 				</p>
 			{/if}
 		</div>
@@ -446,25 +445,25 @@
 	<!-- Tags -->
 	<div>
 		<label for="tags" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-			Tags
+			{m.label_tags()}
 		</label>
 		<input
 			type="text"
 			id="tags"
 			bind:value={tagsInput}
 			class="input mt-1"
-			placeholder="formatting, security, logging"
+			placeholder={m.placeholder_hook_tags()}
 		/>
-		<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Comma-separated tags for organization</p>
+		<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{m.hook_tags_description()}</p>
 	</div>
 
 	<!-- Actions -->
 	<div class="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
 		<button type="button" onclick={onCancel} class="btn btn-secondary">
-			Cancel
+			{m.action_cancel()}
 		</button>
 		<button type="submit" class="btn btn-primary" disabled={isSubmitting}>
-			{initialValues.name ? 'Update Hook' : 'Create Hook'}
+			{initialValues.name ? m.hook_update() : m.hook_create()}
 		</button>
 	</div>
 </form>

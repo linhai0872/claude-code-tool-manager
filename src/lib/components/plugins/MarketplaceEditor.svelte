@@ -2,6 +2,7 @@
 	import type { ClaudeSettings, MarketplaceDefinition } from '$lib/types';
 	import { Save, Plus, Pencil, Trash2 } from 'lucide-svelte';
 	import MarketplaceSourceForm from './MarketplaceSourceForm.svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		settings: ClaudeSettings;
@@ -74,9 +75,9 @@
 </script>
 
 <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
-	<h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">Extra Marketplaces</h3>
+	<h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">{m.settings_marketplace_title()}</h3>
 	<p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-		Add custom marketplace sources for discovering and installing plugins
+		{m.settings_marketplace_desc()}
 	</p>
 
 	{#if marketplaces.length > 0}
@@ -120,7 +121,7 @@
 		</div>
 	{:else if !addingNew}
 		<p class="text-xs text-gray-500 dark:text-gray-400 italic mb-4">
-			No extra marketplaces configured
+			{m.settings_marketplace_empty()}
 		</p>
 	{/if}
 
@@ -137,14 +138,14 @@
 			class="btn btn-ghost text-sm mb-4"
 		>
 			<Plus class="w-4 h-4 mr-1" />
-			Add Marketplace
+			{m.settings_marketplace_add_btn()}
 		</button>
 	{/if}
 
 	<div class="flex justify-end">
 		<button onclick={handleSave} class="btn btn-primary">
 			<Save class="w-4 h-4 mr-2" />
-			Save Marketplaces
+			{m.settings_marketplace_save_btn()}
 		</button>
 	</div>
 </div>

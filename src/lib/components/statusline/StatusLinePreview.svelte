@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { StatusLineSegment, SegmentColor, StatusLineTheme } from '$lib/types';
 	import { SEGMENT_COLORS, POWERLINE_DEFAULT_BG } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		segments: StatusLineSegment[];
@@ -128,7 +129,7 @@
 
 <div class="bg-gray-900 rounded-lg px-4 py-2.5 font-mono text-sm overflow-x-auto">
 	{#if enabledSegments.length === 0}
-		<span class="text-gray-500 italic">No segments — add some above</span>
+		<span class="text-gray-500 italic">{m.empty_statusline_hint()}</span>
 	{:else if isPowerline}
 		<!-- Powerline Mode Preview -->
 		<div class="flex items-stretch" style="height: 28px">

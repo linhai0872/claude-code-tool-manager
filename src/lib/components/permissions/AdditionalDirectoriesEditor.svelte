@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
 	import { Plus, X, FolderOpen } from 'lucide-svelte';
 
 	type Props = {
@@ -41,7 +42,7 @@
 	<div class="flex items-center gap-2 mb-2">
 		<FolderOpen class="w-4 h-4 text-gray-500 dark:text-gray-400" />
 		<label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-			Additional Directories
+			{m.permission_additional_directories()}
 		</label>
 		{#if !isAdding}
 			<button
@@ -49,7 +50,7 @@
 				class="flex items-center gap-1 px-2 py-0.5 text-xs rounded text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30"
 			>
 				<Plus class="w-3 h-3" />
-				Add
+				{m.action_add()}
 			</button>
 		{/if}
 	</div>
@@ -72,7 +73,7 @@
 		</div>
 	{:else if !isAdding}
 		<p class="text-xs text-gray-400 dark:text-gray-500 mb-2">
-			No additional directories configured
+			{m.permission_no_additional_directories()}
 		</p>
 	{/if}
 
@@ -82,10 +83,10 @@
 				type="text"
 				bind:value={newDir}
 				onkeydown={handleKeydown}
-				placeholder="/path/to/directory"
+				placeholder={m.placeholder_directory_path()}
 				class="input text-sm flex-1 font-mono"
 			/>
-			<button onclick={addDirectory} class="btn btn-primary btn-sm">Add</button>
+			<button onclick={addDirectory} class="btn btn-primary btn-sm">{m.action_add()}</button>
 			<button
 				onclick={() => {
 					isAdding = false;
@@ -93,7 +94,7 @@
 				}}
 				class="btn btn-secondary btn-sm"
 			>
-				Cancel
+				{m.action_cancel()}
 			</button>
 		</div>
 	{/if}

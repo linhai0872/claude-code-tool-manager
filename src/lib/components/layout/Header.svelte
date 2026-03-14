@@ -2,6 +2,7 @@
 	import { RefreshCw, Moon, Sun } from 'lucide-svelte';
 	import { mcpLibrary, projectsStore } from '$lib/stores';
 	import type { Snippet } from 'svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		title: string;
@@ -42,7 +43,7 @@
 		<button
 			onclick={handleRefresh}
 			class="btn btn-ghost"
-			title="Refresh data"
+			title={m.header_refresh()}
 		>
 			<RefreshCw class="w-4 h-4" />
 		</button>
@@ -50,7 +51,7 @@
 		<button
 			onclick={toggleTheme}
 			class="btn btn-ghost"
-			title="Toggle theme"
+			title={m.header_toggle_theme()}
 		>
 			{#if isDark}
 				<Sun class="w-4 h-4" />

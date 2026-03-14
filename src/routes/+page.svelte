@@ -3,6 +3,7 @@
 	import { mcpLibrary, projectsStore, subagentLibrary, skillLibrary, hookLibrary, commandLibrary, profileLibrary, statuslineLibrary } from '$lib/stores';
 	import { FolderOpen, Plug, Bot, Sparkles, Zap, ArrowRight, Terminal, Layers, PanelBottom, Library, Settings, Store } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
+	import * as m from '$lib/paraglide/messages.js';
 
 	// Derived counts
 	const projectCount = $derived(projectsStore.projects.length);
@@ -21,62 +22,62 @@
 
 	const stats = $derived([
 		{
-			label: 'Projects',
+			label: m.dashboard_stat_projects(),
 			value: projectCount,
 			icon: FolderOpen,
 			color: 'bg-blue-500',
 			href: '/projects'
 		},
 		{
-			label: 'MCPs',
+			label: m.dashboard_stat_mcps(),
 			value: mcpCount,
-			subtitle: `${globalMcpCount} global`,
+			subtitle: m.dashboard_count_global({ count: String(globalMcpCount) }),
 			icon: Plug,
 			color: 'bg-purple-500',
 			href: '/library'
 		},
 		{
-			label: 'Subagents',
+			label: m.dashboard_stat_subagents(),
 			value: subagentCount,
 			icon: Bot,
 			color: 'bg-green-500',
 			href: '/subagents'
 		},
 		{
-			label: 'Commands',
+			label: m.dashboard_stat_commands(),
 			value: commandCount,
-			subtitle: `${globalCommandCount} global`,
+			subtitle: m.dashboard_count_global({ count: String(globalCommandCount) }),
 			icon: Terminal,
 			color: 'bg-amber-500',
 			href: '/commands'
 		},
 		{
-			label: 'Skills',
+			label: m.dashboard_stat_skills(),
 			value: skillCount,
 			icon: Sparkles,
 			color: 'bg-purple-400',
 			href: '/skills'
 		},
 		{
-			label: 'Hooks',
+			label: m.dashboard_stat_hooks(),
 			value: hookCount,
-			subtitle: `${globalHookCount} global`,
+			subtitle: m.dashboard_count_global({ count: String(globalHookCount) }),
 			icon: Zap,
 			color: 'bg-rose-500',
 			href: '/hooks'
 		},
 		{
-			label: 'Profiles',
+			label: m.dashboard_stat_profiles(),
 			value: profileCount,
-			subtitle: activeProfileName ? `Active: ${activeProfileName}` : 'None active',
+			subtitle: activeProfileName ? m.dashboard_active_name({ name: activeProfileName }) : m.dashboard_none_active(),
 			icon: Layers,
 			color: 'bg-indigo-500',
 			href: '/profiles'
 		},
 		{
-			label: 'Status Line',
+			label: m.dashboard_stat_statusline(),
 			value: statuslineCount,
-			subtitle: activeStatusLineName ? `Active: ${activeStatusLineName}` : 'None active',
+			subtitle: activeStatusLineName ? m.dashboard_active_name({ name: activeStatusLineName }) : m.dashboard_none_active(),
 			icon: PanelBottom,
 			color: 'bg-teal-500',
 			href: '/statusline'
@@ -84,52 +85,52 @@
 	]);
 
 	// Quick links with icons
-	const quickLinks = [
-		{ label: 'Add MCP', href: '/library', description: 'Add a new MCP server to your library', icon: Library },
-		{ label: 'Manage Projects', href: '/projects', description: 'Configure MCPs for your projects', icon: FolderOpen },
-		{ label: 'Browse Marketplace', href: '/marketplace', description: 'Discover community MCPs and tools', icon: Store },
-		{ label: 'Settings', href: '/settings', description: 'Configure application settings', icon: Settings }
-	];
+	const quickLinks = $derived([
+		{ label: m.dashboard_quick_add_mcp(), href: '/library', description: m.dashboard_quick_add_mcp_desc(), icon: Library },
+		{ label: m.dashboard_quick_manage_projects(), href: '/projects', description: m.dashboard_quick_manage_projects_desc(), icon: FolderOpen },
+		{ label: m.dashboard_quick_browse_marketplace(), href: '/marketplace', description: m.dashboard_quick_browse_marketplace_desc(), icon: Store },
+		{ label: m.dashboard_quick_settings(), href: '/settings', description: m.dashboard_quick_settings_desc(), icon: Settings }
+	]);
 
 	// Global config mini-cards
 	const globalConfig = $derived([
 		{
-			label: 'Global MCPs',
+			label: m.dashboard_global_mcps(),
 			value: globalMcpCount,
-			subtitle: 'MCP servers',
+			subtitle: m.dashboard_global_mcps_desc(),
 			icon: Plug,
 			color: 'text-purple-500'
 		},
 		{
-			label: 'Global Subagents',
+			label: m.dashboard_global_subagents(),
 			value: subagentLibrary.globalSubAgents.length,
-			subtitle: 'Custom agents',
+			subtitle: m.dashboard_global_subagents_desc(),
 			icon: Bot,
 			color: 'text-green-500'
 		},
 		{
-			label: 'Global Commands',
+			label: m.dashboard_global_commands(),
 			value: globalCommandCount,
-			subtitle: 'Slash commands',
+			subtitle: m.dashboard_global_commands_desc(),
 			icon: Terminal,
 			color: 'text-amber-500'
 		},
 		{
-			label: 'Global Hooks',
+			label: m.dashboard_global_hooks(),
 			value: globalHookCount,
-			subtitle: 'Event hooks',
+			subtitle: m.dashboard_global_hooks_desc(),
 			icon: Zap,
 			color: 'text-rose-500'
 		}
 	]);
 </script>
 
-<Header title="Dashboard" subtitle="Overview of your Claude Code configuration" />
+<Header title={m.page_dashboard_title()} subtitle={m.page_dashboard_subtitle()} />
 
 <div class="flex-1 overflow-auto p-6 space-y-6">
 	<!-- Stats Grid -->
 	<section>
-		<h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Overview</h2>
+		<h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">{m.dashboard_overview()}</h2>
 		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
 			{#each stats as stat}
 				<button
@@ -149,7 +150,7 @@
 						</div>
 					</div>
 					<div class="mt-2 flex items-center text-xs text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
-						<span>View all</span>
+						<span>{m.dashboard_view_all()}</span>
 						<ArrowRight class="w-3 h-3 ml-1 group-hover:translate-x-0.5 transition-transform" />
 					</div>
 				</button>
@@ -159,7 +160,7 @@
 
 	<!-- Quick Links -->
 	<section>
-		<h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Quick Actions</h2>
+		<h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">{m.dashboard_quick_actions()}</h2>
 		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
 			{#each quickLinks as link}
 				<a
@@ -182,7 +183,7 @@
 
 	<!-- Global Configuration -->
 	<section>
-		<h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Global Configuration</h2>
+		<h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">{m.dashboard_global_config()}</h2>
 		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
 			{#each globalConfig as item}
 				<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">

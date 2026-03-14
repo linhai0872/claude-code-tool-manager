@@ -4,6 +4,7 @@
 	import { Globe, RefreshCw, Plus, Minus, Plug, Server, Sparkles, Bot, Bug, FolderOpen, Loader2, Terminal } from 'lucide-svelte';
 	import { installDebugInterceptor, uninstallDebugInterceptor } from '$lib/utils/debugLogger';
 	import { onMount } from 'svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	// Load debug state on mount
 	onMount(() => {
@@ -15,14 +16,14 @@
 			if (debugStore.isEnabled) {
 				await debugStore.disable();
 				uninstallDebugInterceptor();
-				notifications.success('Debug mode disabled');
+				notifications.success(m.notify_debug_disabled());
 			} else {
 				await debugStore.enable();
 				installDebugInterceptor();
-				notifications.success('Debug mode enabled');
+				notifications.success(m.notify_debug_enabled());
 			}
 		} catch (e) {
-			notifications.error('Failed to toggle debug mode');
+			notifications.error(m.notify_debug_toggle_failed());
 		}
 	}
 
@@ -30,7 +31,7 @@
 		try {
 			await debugStore.openLogsFolder();
 		} catch {
-			notifications.error('Failed to open logs folder');
+			notifications.error(m.notify_open_failed({ entity: m.entity_folder() }));
 		}
 	}
 
@@ -86,9 +87,9 @@
 	async function handleSync() {
 		try {
 			await projectsStore.syncGlobalConfig();
-			notifications.success('Global config synced');
+			notifications.success(m.notify_synced({ entity: m.entity_config() }));
 		} catch {
-			notifications.error('Failed to sync config');
+			notifications.error(m.notify_sync_failed({ entity: m.entity_config() }));
 		}
 	}
 
@@ -97,9 +98,9 @@
 		try {
 			await projectsStore.addGlobalMcp(mcp.id);
 			await projectsStore.syncGlobalConfig();
-			notifications.success(`Added ${mcp.name} to global settings`);
+			notifications.success(m.notify_added({ entity: m.entity_mcp() }));
 		} catch {
-			notifications.error('Failed to add MCP');
+			notifications.error(m.notify_add_failed({ entity: m.entity_mcp() }));
 		}
 	}
 
@@ -108,9 +109,9 @@
 			const mcp = mcpLibrary.getMcpById(mcpId);
 			await projectsStore.removeGlobalMcp(mcpId);
 			await projectsStore.syncGlobalConfig();
-			notifications.success(`Removed ${mcp?.name || 'MCP'} from global settings`);
+			notifications.success(m.notify_removed({ entity: m.entity_mcp() }));
 		} catch {
-			notifications.error('Failed to remove MCP');
+			notifications.error(m.notify_remove_failed({ entity: m.entity_mcp() }));
 		}
 	}
 
@@ -119,7 +120,7 @@
 			await projectsStore.toggleGlobalMcp(assignmentId, enabled);
 			await projectsStore.syncGlobalConfig();
 		} catch {
-			notifications.error('Failed to toggle MCP');
+			notifications.error(m.notify_toggle_failed({ entity: m.entity_mcp() }));
 		}
 	}
 
@@ -128,9 +129,9 @@
 		try {
 			await commandLibrary.addGlobalCommand(command.id);
 			await projectsStore.syncGlobalConfig();
-			notifications.success(`Added ${command.name} to global settings`);
+			notifications.success(m.notify_added({ entity: m.entity_command() }));
 		} catch {
-			notifications.error('Failed to add command');
+			notifications.error(m.notify_add_failed({ entity: m.entity_command() }));
 		}
 	}
 
@@ -139,9 +140,9 @@
 			const command = commandLibrary.getCommandById(commandId);
 			await commandLibrary.removeGlobalCommand(commandId);
 			await projectsStore.syncGlobalConfig();
-			notifications.success(`Removed ${command?.name || 'Command'} from global settings`);
+			notifications.success(m.notify_removed({ entity: m.entity_command() }));
 		} catch {
-			notifications.error('Failed to remove command');
+			notifications.error(m.notify_remove_failed({ entity: m.entity_command() }));
 		}
 	}
 
@@ -150,7 +151,7 @@
 			await commandLibrary.toggleGlobalCommand(assignmentId, enabled);
 			await projectsStore.syncGlobalConfig();
 		} catch {
-			notifications.error('Failed to toggle command');
+			notifications.error(m.notify_toggle_failed({ entity: m.entity_command() }));
 		}
 	}
 
@@ -159,9 +160,9 @@
 		try {
 			await skillLibrary.addGlobalSkill(skill.id);
 			await projectsStore.syncGlobalConfig();
-			notifications.success(`Added ${skill.name} to global settings`);
+			notifications.success(m.notify_added({ entity: m.entity_skill() }));
 		} catch {
-			notifications.error('Failed to add skill');
+			notifications.error(m.notify_add_failed({ entity: m.entity_skill() }));
 		}
 	}
 
@@ -170,9 +171,9 @@
 			const skill = skillLibrary.getSkillById(skillId);
 			await skillLibrary.removeGlobalSkill(skillId);
 			await projectsStore.syncGlobalConfig();
-			notifications.success(`Removed ${skill?.name || 'Skill'} from global settings`);
+			notifications.success(m.notify_removed({ entity: m.entity_skill() }));
 		} catch {
-			notifications.error('Failed to remove skill');
+			notifications.error(m.notify_remove_failed({ entity: m.entity_skill() }));
 		}
 	}
 
@@ -181,7 +182,7 @@
 			await skillLibrary.toggleGlobalSkill(assignmentId, enabled);
 			await projectsStore.syncGlobalConfig();
 		} catch {
-			notifications.error('Failed to toggle skill');
+			notifications.error(m.notify_toggle_failed({ entity: m.entity_skill() }));
 		}
 	}
 
@@ -190,9 +191,9 @@
 		try {
 			await subagentLibrary.addGlobalSubAgent(agent.id);
 			await projectsStore.syncGlobalConfig();
-			notifications.success(`Added ${agent.name} to global settings`);
+			notifications.success(m.notify_added({ entity: m.entity_sub_agent() }));
 		} catch {
-			notifications.error('Failed to add agent');
+			notifications.error(m.notify_add_failed({ entity: m.entity_sub_agent() }));
 		}
 	}
 
@@ -201,9 +202,9 @@
 			const agent = subagentLibrary.getSubAgentById(agentId);
 			await subagentLibrary.removeGlobalSubAgent(agentId);
 			await projectsStore.syncGlobalConfig();
-			notifications.success(`Removed ${agent?.name || 'Agent'} from global settings`);
+			notifications.success(m.notify_removed({ entity: m.entity_sub_agent() }));
 		} catch {
-			notifications.error('Failed to remove agent');
+			notifications.error(m.notify_remove_failed({ entity: m.entity_sub_agent() }));
 		}
 	}
 
@@ -212,25 +213,25 @@
 			await subagentLibrary.toggleGlobalSubAgent(assignmentId, enabled);
 			await projectsStore.syncGlobalConfig();
 		} catch {
-			notifications.error('Failed to toggle agent');
+			notifications.error(m.notify_toggle_failed({ entity: m.entity_sub_agent() }));
 		}
 	}
 
 	function getAddButtonLabel() {
 		switch (activeTab) {
-			case 'mcps': return 'Add MCP';
-			case 'commands': return 'Add Command';
-			case 'skills': return 'Add Skill';
-			case 'agents': return 'Add Agent';
+			case 'mcps': return m.action_add_mcp();
+			case 'commands': return m.action_add_command();
+			case 'skills': return m.action_add_skill();
+			case 'agents': return m.action_add_agent();
 		}
 	}
 
 	function getAddModalTitle() {
 		switch (activeTab) {
-			case 'mcps': return 'Add Global MCP';
-			case 'commands': return 'Add Global Command';
-			case 'skills': return 'Add Global Skill';
-			case 'agents': return 'Add Global Agent';
+			case 'mcps': return m.modal_add_global_title({ entity: m.entity_mcp() });
+			case 'commands': return m.modal_add_global_title({ entity: m.entity_command() });
+			case 'skills': return m.modal_add_global_title({ entity: m.entity_skill() });
+			case 'agents': return m.modal_add_global_title({ entity: m.entity_sub_agent() });
 		}
 	}
 </script>
@@ -243,9 +244,9 @@
 				<Globe class="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
 			</div>
 			<div>
-				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">Global Settings</h2>
+				<h2 class="text-lg font-semibold text-gray-900 dark:text-white">{m.global_settings_title()}</h2>
 				<p class="text-sm text-gray-500 dark:text-gray-400">
-					Available in all projects
+					{m.global_settings_desc()}
 				</p>
 			</div>
 		</div>
@@ -256,7 +257,7 @@
 			</button>
 			<button onclick={handleSync} class="btn btn-secondary">
 				<RefreshCw class="w-4 h-4 mr-2" />
-				Sync
+				{m.action_sync()}
 			</button>
 		</div>
 	</div>
@@ -268,28 +269,28 @@
 			class="flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors {activeTab === 'mcps' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}"
 		>
 			<Plug class="w-4 h-4" />
-			MCPs ({projectsStore.globalMcps.length})
+			{m.nav_mcps()} ({projectsStore.globalMcps.length})
 		</button>
 		<button
 			onclick={() => activeTab = 'commands'}
 			class="flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors {activeTab === 'commands' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}"
 		>
 			<Terminal class="w-4 h-4" />
-			Commands ({commandLibrary.globalCommands.length})
+			{m.nav_commands()} ({commandLibrary.globalCommands.length})
 		</button>
 		<button
 			onclick={() => activeTab = 'skills'}
 			class="flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors {activeTab === 'skills' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}"
 		>
 			<Sparkles class="w-4 h-4" />
-			Skills ({skillLibrary.globalSkills.length})
+			{m.nav_skills()} ({skillLibrary.globalSkills.length})
 		</button>
 		<button
 			onclick={() => activeTab = 'agents'}
 			class="flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors {activeTab === 'agents' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}"
 		>
 			<Bot class="w-4 h-4" />
-			Agents ({subagentLibrary.globalSubAgents.length})
+			{m.nav_agents()} ({subagentLibrary.globalSubAgents.length})
 		</button>
 	</div>
 
@@ -318,7 +319,7 @@
 									class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {assignment.isEnabled ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'}"
 									role="switch"
 									aria-checked={assignment.isEnabled}
-									title={assignment.isEnabled ? 'Disable' : 'Enable'}
+									title={assignment.isEnabled ? m.action_disable() : m.action_enable()}
 								>
 									<span
 										class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {assignment.isEnabled ? 'translate-x-4' : 'translate-x-0'}"
@@ -327,7 +328,7 @@
 								<button
 									onclick={() => handleRemoveMcp(assignment.mcpId)}
 									class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-									title="Remove"
+									title={m.action_remove()}
 								>
 									<Minus class="w-4 h-4" />
 								</button>
@@ -338,13 +339,13 @@
 			{:else}
 				<div class="text-center py-8">
 					<Plug class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-					<h3 class="text-lg font-medium text-gray-900 dark:text-white">No global MCPs</h3>
+					<h3 class="text-lg font-medium text-gray-900 dark:text-white">{m.global_no_mcps()}</h3>
 					<p class="text-gray-500 dark:text-gray-400 mt-1 mb-4">
-						Add MCPs to make them available in all projects
+						{m.global_no_mcps_hint()}
 					</p>
 					<button onclick={() => (showAddModal = true)} class="btn btn-primary">
 						<Plus class="w-4 h-4 mr-2" />
-						Add MCP
+						{m.action_add_mcp()}
 					</button>
 				</div>
 			{/if}
@@ -373,7 +374,7 @@
 									class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {assignment.isEnabled ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'}"
 									role="switch"
 									aria-checked={assignment.isEnabled}
-									title={assignment.isEnabled ? 'Disable' : 'Enable'}
+									title={assignment.isEnabled ? m.action_disable() : m.action_enable()}
 								>
 									<span
 										class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {assignment.isEnabled ? 'translate-x-4' : 'translate-x-0'}"
@@ -382,7 +383,7 @@
 								<button
 									onclick={() => handleRemoveCommand(assignment.commandId)}
 									class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-									title="Remove"
+									title={m.action_remove()}
 								>
 									<Minus class="w-4 h-4" />
 								</button>
@@ -393,13 +394,13 @@
 			{:else}
 				<div class="text-center py-8">
 					<Terminal class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-					<h3 class="text-lg font-medium text-gray-900 dark:text-white">No global commands</h3>
+					<h3 class="text-lg font-medium text-gray-900 dark:text-white">{m.global_no_commands()}</h3>
 					<p class="text-gray-500 dark:text-gray-400 mt-1 mb-4">
-						Add commands to make them available in all projects
+						{m.global_no_commands_hint()}
 					</p>
 					<button onclick={() => (showAddModal = true)} class="btn btn-primary">
 						<Plus class="w-4 h-4 mr-2" />
-						Add Command
+						{m.action_add_command()}
 					</button>
 				</div>
 			{/if}
@@ -428,7 +429,7 @@
 									class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {assignment.isEnabled ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'}"
 									role="switch"
 									aria-checked={assignment.isEnabled}
-									title={assignment.isEnabled ? 'Disable' : 'Enable'}
+									title={assignment.isEnabled ? m.action_disable() : m.action_enable()}
 								>
 									<span
 										class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {assignment.isEnabled ? 'translate-x-4' : 'translate-x-0'}"
@@ -437,7 +438,7 @@
 								<button
 									onclick={() => handleRemoveSkill(assignment.skillId)}
 									class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-									title="Remove"
+									title={m.action_remove()}
 								>
 									<Minus class="w-4 h-4" />
 								</button>
@@ -448,13 +449,13 @@
 			{:else}
 				<div class="text-center py-8">
 					<Sparkles class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-					<h3 class="text-lg font-medium text-gray-900 dark:text-white">No global skills</h3>
+					<h3 class="text-lg font-medium text-gray-900 dark:text-white">{m.global_no_skills()}</h3>
 					<p class="text-gray-500 dark:text-gray-400 mt-1 mb-4">
-						Add skills to make them available in all projects
+						{m.global_no_skills_hint()}
 					</p>
 					<button onclick={() => (showAddModal = true)} class="btn btn-primary">
 						<Plus class="w-4 h-4 mr-2" />
-						Add Skill
+						{m.action_add_skill()}
 					</button>
 				</div>
 			{/if}
@@ -483,7 +484,7 @@
 									class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {assignment.isEnabled ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'}"
 									role="switch"
 									aria-checked={assignment.isEnabled}
-									title={assignment.isEnabled ? 'Disable' : 'Enable'}
+									title={assignment.isEnabled ? m.action_disable() : m.action_enable()}
 								>
 									<span
 										class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {assignment.isEnabled ? 'translate-x-4' : 'translate-x-0'}"
@@ -492,7 +493,7 @@
 								<button
 									onclick={() => handleRemoveAgent(assignment.subagentId)}
 									class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-									title="Remove"
+									title={m.action_remove()}
 								>
 									<Minus class="w-4 h-4" />
 								</button>
@@ -503,13 +504,13 @@
 			{:else}
 				<div class="text-center py-8">
 					<Bot class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-					<h3 class="text-lg font-medium text-gray-900 dark:text-white">No global agents</h3>
+					<h3 class="text-lg font-medium text-gray-900 dark:text-white">{m.global_no_agents()}</h3>
 					<p class="text-gray-500 dark:text-gray-400 mt-1 mb-4">
-						Add agents to make them available in all projects
+						{m.global_no_agents_hint()}
 					</p>
 					<button onclick={() => (showAddModal = true)} class="btn btn-primary">
 						<Plus class="w-4 h-4 mr-2" />
-						Add Agent
+						{m.action_add_agent()}
 					</button>
 				</div>
 			{/if}
@@ -524,9 +525,9 @@
 					<Bug class="w-5 h-5 text-orange-600 dark:text-orange-400" />
 				</div>
 				<div>
-					<h2 class="text-lg font-semibold text-gray-900 dark:text-white">Debug Mode</h2>
+					<h2 class="text-lg font-semibold text-gray-900 dark:text-white">{m.global_debug_mode_title()}</h2>
 					<p class="text-sm text-gray-500 dark:text-gray-400">
-						Enable logging to help troubleshoot issues
+						{m.global_debug_mode_desc()}
 					</p>
 				</div>
 			</div>
@@ -536,7 +537,7 @@
 				class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:opacity-50 {debugStore.isEnabled ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'}"
 				role="switch"
 				aria-checked={debugStore.isEnabled}
-				title={debugStore.isEnabled ? 'Disable debug mode' : 'Enable debug mode'}
+				title={debugStore.isEnabled ? m.global_disable_debug_mode() : m.global_enable_debug_mode()}
 			>
 				{#if debugStore.isLoading}
 					<span class="absolute inset-0 flex items-center justify-center">
@@ -554,9 +555,9 @@
 			<div class="mt-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
 				<div class="flex items-center justify-between gap-4">
 					<div class="min-w-0 flex-1">
-						<p class="text-sm font-medium text-gray-700 dark:text-gray-300">Log file location:</p>
+						<p class="text-sm font-medium text-gray-700 dark:text-gray-300">{m.global_log_file_location()}</p>
 						<code class="text-xs text-gray-500 dark:text-gray-400 break-all">
-							{debugStore.logFilePath || 'No active log file'}
+							{debugStore.logFilePath || m.global_no_active_log_file()}
 						</code>
 					</div>
 					<button
@@ -564,12 +565,12 @@
 						class="btn btn-secondary flex-shrink-0"
 					>
 						<FolderOpen class="w-4 h-4 mr-2" />
-						Open Folder
+						{m.action_open_folder()}
 					</button>
 				</div>
 				{#if debugStore.isEnabled}
 					<p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
-						Debug mode is active. Logs are being written to the file above. Share this file when reporting issues.
+						{m.global_debug_mode_active_hint()}
 					</p>
 				{/if}
 			</div>
@@ -622,7 +623,7 @@
 						</div>
 					{:else}
 						<div class="text-center py-8 text-gray-500 dark:text-gray-400">
-							All MCPs are already in global settings
+							{m.global_all_mcps_added()}
 						</div>
 					{/if}
 				{:else if activeTab === 'commands'}
@@ -651,7 +652,7 @@
 						</div>
 					{:else}
 						<div class="text-center py-8 text-gray-500 dark:text-gray-400">
-							All commands are already in global settings
+							{m.global_all_commands_added()}
 						</div>
 					{/if}
 				{:else if activeTab === 'skills'}
@@ -680,7 +681,7 @@
 						</div>
 					{:else}
 						<div class="text-center py-8 text-gray-500 dark:text-gray-400">
-							All skills are already in global settings
+							{m.global_all_skills_added()}
 						</div>
 					{/if}
 				{:else if activeTab === 'agents'}
@@ -709,7 +710,7 @@
 						</div>
 					{:else}
 						<div class="text-center py-8 text-gray-500 dark:text-gray-400">
-							All agents are already in global settings
+							{m.global_all_agents_added()}
 						</div>
 					{/if}
 				{/if}

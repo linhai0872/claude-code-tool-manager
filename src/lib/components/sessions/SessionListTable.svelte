@@ -3,6 +3,7 @@
 	import { totalTokens } from '$lib/types/session';
 	import { formatCompactNumber, formatDuration, formatModelName, estimateSessionCost, formatCost } from '$lib/types/usage';
 	import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		sessions: SessionSummary[];
@@ -45,13 +46,13 @@
 		);
 	}
 
-	const columns: { field: SessionSortField; label: string }[] = [
-		{ field: 'date', label: 'Date' },
-		{ field: 'duration', label: 'Duration' },
-		{ field: 'messages', label: 'Messages' },
-		{ field: 'tokens', label: 'Tokens' },
-		{ field: 'cost', label: 'Est. Cost' }
-	];
+	const columns = $derived<{ field: SessionSortField; label: string }[]>([
+		{ field: 'date', label: m.label_date() },
+		{ field: 'duration', label: m.label_duration() },
+		{ field: 'messages', label: m.analytics_messages() },
+		{ field: 'tokens', label: m.label_tokens() },
+		{ field: 'cost', label: m.label_est_cost() }
+	]);
 </script>
 
 <div
@@ -59,13 +60,13 @@
 >
 	<div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
 		<h3 class="text-sm font-semibold text-gray-900 dark:text-white">
-			Sessions ({sessions.length})
+			{m.analytics_sessions()} ({sessions.length})
 		</h3>
 	</div>
 
 	{#if sessions.length === 0}
 		<div class="flex items-center justify-center py-12 text-gray-400 dark:text-gray-500 text-sm">
-			No sessions found
+			{m.empty_no_sessions_found()}
 		</div>
 	{:else}
 		<div class="overflow-x-auto max-h-96 overflow-y-auto">
@@ -89,13 +90,13 @@
 							</th>
 						{/each}
 						<th class="text-left px-4 py-2 font-medium text-gray-500 dark:text-gray-400"
-							>Model</th
+							>{m.label_model()}</th
 						>
 						<th class="text-left px-4 py-2 font-medium text-gray-500 dark:text-gray-400"
-							>Branch</th
+							>{m.label_branch()}</th
 						>
 						<th class="text-left px-4 py-2 font-medium text-gray-500 dark:text-gray-400"
-							>First Prompt</th
+							>{m.session_first_prompt()}</th
 						>
 					</tr>
 				</thead>

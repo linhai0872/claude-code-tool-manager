@@ -3,6 +3,7 @@
 	import { SessionCleanupEditor } from '$lib/components/session-cleanup';
 	import { claudeSettingsLibrary } from '$lib/stores';
 	import type { ClaudeSettingsScope } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 
 	function getSettingCount(scope: ClaudeSettingsScope): number {
 		if (!claudeSettingsLibrary.settings) return 0;
@@ -26,7 +27,7 @@
 	{#snippet children({ settings, save })}
 		<SessionCleanupEditor
 			{settings}
-			onsave={(s) => save(s, 'Session & cleanup settings saved', 'Failed to save session & cleanup settings')}
+			onsave={(s) => save(s, m.settings_session_saved(), m.settings_session_save_failed())}
 		/>
 	{/snippet}
 </ScopedSettingsWrapper>

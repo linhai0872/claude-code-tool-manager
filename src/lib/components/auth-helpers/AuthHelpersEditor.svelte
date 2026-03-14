@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { ClaudeSettings } from '$lib/types';
 	import { Save } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = {
 		settings: ClaudeSettings;
@@ -9,32 +10,32 @@
 
 	let { settings, onsave }: Props = $props();
 
-	const fields = [
+	const fields = $derived([
 		{
 			key: 'apiKeyHelper' as const,
-			label: 'API Key Helper',
-			description: 'Script that provides the Anthropic API key',
+			label: m.settings_auth_api_key_label(),
+			description: m.settings_auth_api_key_desc(),
 			placeholder: '/path/to/api-key-helper.sh'
 		},
 		{
 			key: 'otelHeadersHelper' as const,
-			label: 'OpenTelemetry Headers Helper',
-			description: 'Script that provides OpenTelemetry headers',
+			label: m.settings_auth_otel_label(),
+			description: m.settings_auth_otel_desc(),
 			placeholder: '/path/to/otel-headers-helper.sh'
 		},
 		{
 			key: 'awsAuthRefresh' as const,
-			label: 'AWS Auth Refresh',
-			description: 'Script to refresh AWS authentication credentials',
+			label: m.settings_auth_aws_refresh_label(),
+			description: m.settings_auth_aws_refresh_desc(),
 			placeholder: '/path/to/aws-auth-refresh.sh'
 		},
 		{
 			key: 'awsCredentialExport' as const,
-			label: 'AWS Credential Export',
-			description: 'Script to export AWS credentials to environment',
+			label: m.settings_auth_aws_export_label(),
+			description: m.settings_auth_aws_export_desc(),
 			placeholder: '/path/to/aws-credential-export.sh'
 		}
-	];
+	]);
 
 	let values = $state<Record<string, string>>({
 		apiKeyHelper: settings.apiKeyHelper ?? '',
@@ -65,9 +66,9 @@
 
 <div class="space-y-6">
 	<div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
-		<h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">Auth & API Key Helpers</h3>
+		<h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">{m.settings_auth_title()}</h3>
 		<p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-			Configure scripts that provide authentication credentials and API keys
+			{m.settings_auth_desc()}
 		</p>
 
 		<div class="space-y-4">
@@ -94,7 +95,7 @@
 	<div class="flex justify-end">
 		<button onclick={handleSave} class="btn btn-primary">
 			<Save class="w-4 h-4 mr-2" />
-			Save Auth Helper Settings
+			{m.settings_auth_save_btn()}
 		</button>
 	</div>
 </div>

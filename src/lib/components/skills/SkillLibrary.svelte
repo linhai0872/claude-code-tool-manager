@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Skill } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 	import { skillLibrary } from '$lib/stores';
 	import SkillCard from './SkillCard.svelte';
 	import { SearchBar } from '$lib/components/shared';
@@ -29,12 +30,12 @@
 		<div class="flex-1 max-w-sm">
 			<SearchBar
 				bind:value={skillLibrary.searchQuery}
-				placeholder="Search skills..."
+				placeholder={m.placeholder_search_skills()}
 			/>
 		</div>
 
 		<div class="text-sm text-gray-500 dark:text-gray-400">
-			{skillLibrary.skills.length} skill{skillLibrary.skills.length !== 1 ? 's' : ''}
+			{m.skill_count({ count: skillLibrary.skills.length })}
 		</div>
 	</div>
 
@@ -47,14 +48,14 @@
 		<div class="text-center py-12">
 			<Sparkles class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
 			{#if skillLibrary.searchQuery}
-				<h3 class="text-lg font-medium text-gray-900 dark:text-white">No matching skills</h3>
+				<h3 class="text-lg font-medium text-gray-900 dark:text-white">{m.empty_no_matching_skills()}</h3>
 				<p class="text-gray-500 dark:text-gray-400 mt-1">
-					Try adjusting your search
+					{m.empty_adjust_search()}
 				</p>
 			{:else}
-				<h3 class="text-lg font-medium text-gray-900 dark:text-white">No skills in library</h3>
+				<h3 class="text-lg font-medium text-gray-900 dark:text-white">{m.empty_no_skills()}</h3>
 				<p class="text-gray-500 dark:text-gray-400 mt-1">
-					Add your first agent skill to get started
+					{m.empty_add_first_skill()}
 				</p>
 			{/if}
 		</div>

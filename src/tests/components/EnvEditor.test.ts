@@ -16,7 +16,7 @@ describe('EnvEditor Component', () => {
 	it('should render add button when not readonly', () => {
 		render(EnvEditor, { props: { values: {} } });
 
-		expect(screen.getByText('Add variable')).toBeInTheDocument();
+		expect(screen.getByText('Add Variable')).toBeInTheDocument();
 	});
 
 	it('should not render add button when readonly', () => {
@@ -28,7 +28,7 @@ describe('EnvEditor Component', () => {
 	it('should add entry when add button clicked', async () => {
 		render(EnvEditor, { props: { values: {} } });
 
-		const addButton = screen.getByText('Add variable');
+		const addButton = screen.getByText('Add Variable');
 		await fireEvent.click(addButton);
 
 		// Should now have 2 inputs (key + value for new entry)
@@ -46,7 +46,7 @@ describe('EnvEditor Component', () => {
 		});
 
 		// Click add to get inputs
-		const addButton = screen.getByText('Add variable');
+		const addButton = screen.getByText('Add Variable');
 		fireEvent.click(addButton);
 
 		expect(screen.getByPlaceholderText('Header name')).toBeInTheDocument();

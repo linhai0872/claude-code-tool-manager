@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { KNOWN_ENV_VARS, ENV_VAR_CATEGORIES } from '$lib/types';
 	import { Plus, Search } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
+	import { getEnvVarCategoryLabel, getEnvVarDescriptionLabel } from '$lib/utils/envVarI18n';
 
 	type Props = {
 		existingKeys: string[];
@@ -17,7 +19,7 @@
 			if (selectedCategory && v.category !== selectedCategory) return false;
 			if (searchQuery) {
 				const q = searchQuery.toLowerCase();
-				return v.key.toLowerCase().includes(q) || v.description.toLowerCase().includes(q);
+				return v.key.toLowerCase().includes(q) || getEnvVarDescriptionLabel(v.key, v.description).toLowerCase().includes(q);
 			}
 			return true;
 		});
@@ -25,7 +27,7 @@
 </script>
 
 <div class="bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-	<h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Known Environment Variables</h4>
+	<h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{m.settings_env_known_title()}</h4>
 
 	<div class="flex flex-wrap gap-2 mb-3">
 		<div class="relative flex-1 min-w-[200px]">
@@ -33,7 +35,7 @@
 			<input
 				type="text"
 				bind:value={searchQuery}
-				placeholder="Search variables..."
+				placeholder={m.settings_env_search_placeholder()}
 				class="input text-sm pl-8 w-full"
 			/>
 		</div>
@@ -41,9 +43,9 @@
 			bind:value={selectedCategory}
 			class="input text-sm"
 		>
-			<option value="">All categories</option>
+			<option value="">{m.settings_env_all_categories()}</option>
 			{#each ENV_VAR_CATEGORIES as category}
-				<option value={category}>{category}</option>
+				<option value={category}>{getEnvVarCategoryLabel(category)}</option>
 			{/each}
 		</select>
 	</div>
@@ -56,24 +58,26 @@
 					<div class="flex items-center gap-2">
 						<code class="text-xs font-medium text-gray-900 dark:text-gray-100">{envVar.key}</code>
 						<span class="text-[10px] px-1.5 py-0.5 rounded bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400">
-							{envVar.category}
+							{getEnvVarCategoryLabel(envVar.category)}
 						</span>
 					</div>
-					<p class="text-xs text-gray-500 dark:text-gray-400 truncate">{envVar.description}</p>
+					<p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+						{getEnvVarDescriptionLabel(envVar.key, envVar.description)}
+					</p>
 				</div>
 				<button
 					onclick={() => onselect(envVar.key)}
 					disabled={isExisting}
 					class="btn btn-ghost text-xs ml-2 shrink-0"
 					class:opacity-50={isExisting}
-					title={isExisting ? 'Already added' : `Add ${envVar.key}`}
+					title={isExisting ? m.settings_env_already_added() : m.settings_env_add_var({ key: envVar.key })}
 				>
 					<Plus class="w-3.5 h-3.5" />
 				</button>
 			</div>
 		{/each}
 		{#if filteredVars().length === 0}
-			<p class="text-xs text-gray-400 dark:text-gray-500 italic text-center py-4">No matching variables found</p>
+			<p class="text-xs text-gray-400 dark:text-gray-500 italic text-center py-4">{m.settings_env_no_matching()}</p>
 		{/if}
 	</div>
 </div>
