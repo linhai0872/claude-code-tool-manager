@@ -35,54 +35,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
-      - name: Import Apple Developer Certificate
-        if: startsWith(matrix.platform, 'macos-')
-        env:
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          KEYCHAIN_PASSWORD: ${{ github.run_id }}
-        run: |
-          # Create variables
-          CERTIFICATE_PATH=$RUNNER_TEMP/certificate.p12
-          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
-
-          # Decode certificate
-          echo -n "$APPLE_CERTIFICATE" | base64 --decode -o $CERTIFICATE_PATH
-
-          # Create temporary keychain
-          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-
-          # Import certificate to keychain
-          security import $CERTIFICATE_PATH -P "$APPLE_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
-          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-          security list-keychain -d user -s $KEYCHAIN_PATH
-
-      - name: Write Apple API key to file
-        if: startsWith(matrix.platform, 'macos-')
-        env:
-          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
-          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
-        run: |
-          mkdir -p $RUNNER_TEMP/apple-keys
-          API_KEY_PATH=$RUNNER_TEMP/apple-keys/AuthKey_${APPLE_API_KEY_ID}.p8
-
-          # Debug: show format info (first 10 chars of a .p8 are always "-----BEGIN", not sensitive)
-          echo "Key starts with: $(echo -n "$APPLE_API_KEY" | head -c 10)"
-          echo "Key length: $(echo -n "$APPLE_API_KEY" | wc -c)"
-
-          # If it starts with "-----", it's raw PEM - write directly
-          # Otherwise assume it's base64-encoded and decode it
-          if echo "$APPLE_API_KEY" | grep -q "^-----"; then
-            printf '%s\n' "$APPLE_API_KEY" > "$API_KEY_PATH"
-          else
-            echo -n "$APPLE_API_KEY" | base64 --decode > "$API_KEY_PATH"
-          fi
-
-          echo "Written key starts with: $(head -c 10 "$API_KEY_PATH")"
-          echo "APPLE_API_KEY_PATH=$API_KEY_PATH" >> $GITHUB_ENV
-
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
@@ -106,43 +58,24 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-          # Apple code signing (macOS only)
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          # Apple notarization (macOS only) - APPLE_API_KEY_PATH is set by the "Write Apple API key to file" step
-          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY_ID }}
-          APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
-          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'Claude Code Tool Manager ${{ github.ref_name }}'
           releaseBody: |
-            ## Download
+            ## 下载
 
-            | Platform | Download |
-            |----------|----------|
-            | Windows | `.msi` or `.exe` |
+            | 平台 | 下载 |
+            |------|------|
+            | Windows | `.msi` 或 `.exe` |
             | macOS (Apple Silicon) | `.dmg` (aarch64) |
             | macOS (Intel) | `.dmg` (x64) |
-            | Linux | `.deb` or `.AppImage` |
+            | Linux | `.deb` 或 `.AppImage` |
 
-            ## Install via Homebrew (macOS)
+            > **macOS 用户**：首次打开未签名应用时，右键点击应用 → 选择「打开」，或运行 `xattr -cr /Applications/Claude\ Code\ Tool\ Manager.app`。
 
-            ```bash
-            brew tap tylergraydev/cctm
-            brew install --cask claude-code-tool-manager
-            ```
+            ## 更新内容
 
-            ## What's Changed
-
-            See the [commit history](https://github.com/${{ github.repository }}/commits/${{ github.ref_name }}) for details.
+            查看 [提交历史](https://github.com/${{ github.repository }}/commits/${{ github.ref_name }})。
           releaseDraft: true
           prerelease: false
           args: --target ${{ matrix.target }}
-
-      - name: Cleanup keychain and API key
-        if: startsWith(matrix.platform, 'macos-') && always()
-        run: |
-          security delete-keychain $RUNNER_TEMP/app-signing.keychain-db || true
-          rm -rf $RUNNER_TEMP/apple-keys || true
