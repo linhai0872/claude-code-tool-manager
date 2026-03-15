@@ -5,10 +5,10 @@
 	import * as m from '$lib/paraglide/messages.js';
 
 	onMount(() => {
-		// Check for updates on mount (with a small delay to not block startup)
-		setTimeout(() => {
-			updater.checkForUpdates();
-		}, 3000);
+		// Auto-check is disabled for this fork (no update endpoints configured).
+		// To re-enable, add endpoints to plugins.updater in tauri.conf.json and
+		// uncomment the line below.
+		// setTimeout(() => updater.checkForUpdates(), 3000);
 	});
 
 	function handleDownload() {

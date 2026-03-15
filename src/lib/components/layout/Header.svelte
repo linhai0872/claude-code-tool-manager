@@ -3,6 +3,7 @@
 	import { mcpLibrary, projectsStore } from '$lib/stores';
 	import type { Snippet } from 'svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import { onMount } from 'svelte';
 
 	type Props = {
 		title: string;
@@ -11,7 +12,17 @@
 	};
 
 	let { title, subtitle, children }: Props = $props();
-	let isDark = $state(true);
+	let isDark = $state(false);
+
+	onMount(() => {
+		const stored = localStorage.getItem('theme');
+		if (stored === 'dark' || stored === 'light') {
+			isDark = stored === 'dark';
+		} else {
+			isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+		}
+		document.documentElement.classList.toggle('dark', isDark);
+	});
 
 	async function handleRefresh() {
 		await Promise.all([
@@ -24,6 +35,7 @@
 	function toggleTheme() {
 		isDark = !isDark;
 		document.documentElement.classList.toggle('dark', isDark);
+		localStorage.setItem('theme', isDark ? 'dark' : 'light');
 	}
 </script>
 

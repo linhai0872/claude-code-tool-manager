@@ -8,7 +8,6 @@ class UpdaterState {
 	update = $state<Update | null>(null);
 	error = $state<string | null>(null);
 	downloadProgress = $state<number>(0);
-
 	async checkForUpdates() {
 		if (this.status === 'checking' || this.status === 'downloading') {
 			return;
