@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { AlertTriangle } from 'lucide-svelte';
+	import { i18n } from '$lib/i18n';
 
 	type Props = {
 		open: boolean;
@@ -16,8 +17,8 @@
 		open,
 		title,
 		message,
-		confirmText = 'Confirm',
-		cancelText = 'Cancel',
+		confirmText = i18n.t('common.confirm'),
+		cancelText = i18n.t('common.cancel'),
 		variant = 'danger',
 		onConfirm,
 		onCancel
