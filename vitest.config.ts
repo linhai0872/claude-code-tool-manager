@@ -1,9 +1,17 @@
 import { defineConfig } from 'vitest/config';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
+import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import { resolve } from 'path';
 
 	export default defineConfig({
-		plugins: [svelte({ hot: !process.env.VITEST })],
+		plugins: [
+			svelte({ hot: !process.env.VITEST }),
+			paraglideVitePlugin({
+				project: './project.inlang',
+				outdir: './src/lib/paraglide',
+				strategy: ['localStorage', 'preferredLanguage', 'baseLocale']
+			})
+		],
 		test: {
 			include: ['src/**/*.{test,spec}.{js,ts}'],
 			globals: true,

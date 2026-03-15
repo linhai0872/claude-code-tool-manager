@@ -54,15 +54,6 @@ export type SessionType =
 	| 'learning'
 	| 'unknown';
 
-export const OUTCOME_LABELS: Record<string, string> = {
-	fully_achieved: 'Fully Achieved',
-	mostly_achieved: 'Mostly Achieved',
-	partially_achieved: 'Partially Achieved',
-	not_achieved: 'Not Achieved',
-	abandoned: 'Abandoned',
-	unknown: 'Unknown'
-};
-
 export const OUTCOME_COLORS: Record<string, string> = {
 	fully_achieved: '#10b981',
 	mostly_achieved: '#3b82f6',
@@ -70,14 +61,6 @@ export const OUTCOME_COLORS: Record<string, string> = {
 	not_achieved: '#ef4444',
 	abandoned: '#6b7280',
 	unknown: '#9ca3af'
-};
-
-export const HELPFULNESS_LABELS: Record<string, string> = {
-	essential: 'Essential',
-	very_helpful: 'Very Helpful',
-	helpful: 'Helpful',
-	slightly_helpful: 'Slightly Helpful',
-	not_helpful: 'Not Helpful'
 };
 
 export const HELPFULNESS_COLORS: Record<string, string> = {
@@ -88,22 +71,3 @@ export const HELPFULNESS_COLORS: Record<string, string> = {
 	not_helpful: '#ef4444'
 };
 
-export const SESSION_TYPE_LABELS: Record<string, string> = {
-	single_task: 'Single Task',
-	multi_task: 'Multi Task',
-	exploration: 'Exploration',
-	debugging: 'Debugging',
-	learning: 'Learning',
-	unknown: 'Unknown'
-};
-
-export const FRICTION_LABELS: Record<string, string> = {
-	tool_failures: 'Tool Failures',
-	context_loss: 'Context Loss',
-	misunderstanding: 'Misunderstanding',
-	slow_response: 'Slow Response',
-	permission_issues: 'Permission Issues',
-	unclear_instructions: 'Unclear Instructions',
-	repeated_attempts: 'Repeated Attempts',
-	scope_creep: 'Scope Creep'
-};
