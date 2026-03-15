@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { KNOWN_ENV_VARS, ENV_VAR_CATEGORIES } from '$lib/types';
+	import { CustomSelect } from '$lib/components/shared';
 	import { Plus, Search } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { getEnvVarCategoryLabel, getEnvVarDescriptionLabel } from '$lib/utils/envVarI18n';
@@ -39,15 +40,14 @@
 				class="input text-sm pl-8 w-full"
 			/>
 		</div>
-		<select
+		<CustomSelect
+			class="min-w-36"
 			bind:value={selectedCategory}
-			class="input text-sm"
-		>
-			<option value="">{m.settings_env_all_categories()}</option>
-			{#each ENV_VAR_CATEGORIES as category}
-				<option value={category}>{getEnvVarCategoryLabel(category)}</option>
-			{/each}
-		</select>
+			options={[
+				{ value: '', label: m.settings_env_all_categories() },
+				...ENV_VAR_CATEGORIES.map((c) => ({ value: c, label: getEnvVarCategoryLabel(c) }))
+			]}
+		/>
 	</div>
 
 	<div class="max-h-60 overflow-y-auto space-y-1">

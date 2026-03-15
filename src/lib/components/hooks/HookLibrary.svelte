@@ -5,7 +5,7 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { getHookEventLabel } from '$lib/utils/hookEventI18n';
 	import HookCard from './HookCard.svelte';
-	import { SearchBar } from '$lib/components/shared';
+	import { SearchBar, CustomSelect } from '$lib/components/shared';
 	import { Zap, List, FolderTree, Globe, FolderOpen, Inbox } from 'lucide-svelte';
 
 	type Props = {
@@ -198,17 +198,15 @@
 			<SearchBar bind:value={hookLibrary.searchQuery} placeholder={m.placeholder_search_hooks_library()} />
 		</div>
 
-		<select
-			class="input py-1.5 w-40"
+		<CustomSelect
+			class="min-w-44"
 			value={hookLibrary.eventFilter}
-			onchange={(e) =>
-				hookLibrary.setEventFilter((e.target as HTMLSelectElement).value as HookEventType | '')}
-		>
-			<option value="">{m.hook_all_events()}</option>
-			{#each HOOK_EVENT_TYPES as event}
-				<option value={event.value}>{getHookEventLabel(event.value)}</option>
-			{/each}
-		</select>
+			onchange={(val) => hookLibrary.setEventFilter(val as HookEventType | '')}
+			options={[
+				{ value: '', label: m.hook_all_events() },
+				...HOOK_EVENT_TYPES.map((e) => ({ value: e.value, label: getHookEventLabel(e.value) }))
+			]}
+		/>
 
 		<!-- View Mode Toggle -->
 		<div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">

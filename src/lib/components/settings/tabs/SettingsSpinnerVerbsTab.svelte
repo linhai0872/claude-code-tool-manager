@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { SpinnerVerbList, SpinnerVerbForm } from '$lib/components/spinnerverbs';
-	import { ConfirmDialog } from '$lib/components/shared';
+	import { ConfirmDialog, CustomSelect } from '$lib/components/shared';
 	import { spinnerVerbLibrary, notifications } from '$lib/stores';
 	import type { SpinnerVerb } from '$lib/types';
 	import { Plus, RefreshCw } from 'lucide-svelte';
@@ -49,9 +49,8 @@
 		}
 	}
 
-	async function handleModeChange(e: Event) {
-		const target = e.target as HTMLSelectElement;
-		const mode = target.value as 'append' | 'replace';
+	async function handleModeChange(val: string) {
+		const mode = val as 'append' | 'replace';
 		try {
 			await spinnerVerbLibrary.setMode(mode);
 			notifications.success(m.notify_mode_set({ mode }));
@@ -82,15 +81,16 @@
 		>
 			{m.spinner_mode_label()}
 		</label>
-		<select
+		<CustomSelect
 			id="spinner-mode"
+			class="min-w-52"
 			value={spinnerVerbLibrary.mode}
 			onchange={handleModeChange}
-			class="px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-		>
-			<option value="append">{m.spinner_mode_append()}</option>
-			<option value="replace">{m.spinner_mode_replace()}</option>
-		</select>
+			options={[
+				{ value: 'append', label: m.spinner_mode_append() },
+				{ value: 'replace', label: m.spinner_mode_replace() }
+			]}
+		/>
 	</div>
 
 	<div class="flex items-center gap-3">

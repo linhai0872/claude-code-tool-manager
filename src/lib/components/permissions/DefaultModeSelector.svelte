@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { PERMISSION_DEFAULT_MODES } from '$lib/types';
+	import { CustomSelect } from '$lib/components/shared';
 
 	type Props = {
 		value: string | undefined;
@@ -23,9 +24,8 @@
 		bypassPermissions: () => m.permission_mode_bypass_desc()
 	};
 
-	function handleChange(e: Event) {
-		const target = e.target as HTMLSelectElement;
-		onchange(target.value || null);
+	function handleChange(val: string) {
+		onchange(val || null);
 	}
 </script>
 
@@ -33,11 +33,12 @@
 	<label class="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
 		{m.permission_default_mode()}
 	</label>
-	<select value={value ?? ''} onchange={handleChange} class="input text-sm flex-1 max-w-xs">
-		{#each PERMISSION_DEFAULT_MODES as mode}
-			<option value={mode.value}>{modeLabels[mode.value]?.() ?? mode.label}</option>
-		{/each}
-	</select>
+	<CustomSelect
+		value={value ?? ''}
+		onchange={handleChange}
+		class="flex-1 min-w-36 max-w-xs"
+		options={PERMISSION_DEFAULT_MODES.map((mode) => ({ value: mode.value, label: modeLabels[mode.value]?.() ?? mode.label }))}
+	/>
 	{#if value}
 		<span class="text-xs text-gray-500 dark:text-gray-400">
 			{modeDescriptions[value]?.() ?? ''}

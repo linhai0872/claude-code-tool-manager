@@ -19,10 +19,10 @@
 		Search,
 		Server,
 		Package,
-		Loader2,
-		ArrowUpDown
+		Loader2
 	} from 'lucide-svelte';
 	import type { Repo, RepoItem, CreateRepoRequest, ItemType, RegistryMcpEntry } from '$lib/types';
+	import { CustomSelect } from '$lib/components/shared';
 	import * as m from '$lib/paraglide/messages.js';
 
 	// State
@@ -321,16 +321,14 @@
 					/>
 				</div>
 				<!-- Sort Dropdown -->
-				<div class="relative">
-					<select
-						bind:value={mcpSortBy}
-						class="input pr-8 appearance-none cursor-pointer"
-					>
-						<option value="updated">{m.marketplace_sort_recently_updated()}</option>
-						<option value="name">{m.marketplace_sort_name_az()}</option>
-					</select>
-					<ArrowUpDown class="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-				</div>
+				<CustomSelect
+					class="min-w-36"
+					bind:value={mcpSortBy}
+					options={[
+						{ value: 'updated', label: m.marketplace_sort_recently_updated() },
+						{ value: 'name', label: m.marketplace_sort_name_az() }
+					]}
+				/>
 				<button
 					onclick={handleMcpSearch}
 					disabled={repoLibrary.isSearchingRegistry}
@@ -636,21 +634,29 @@
 					<label for="marketplace-new-repo-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
 						{m.marketplace_repository_type()}
 					</label>
-					<select id="marketplace-new-repo-type" bind:value={newRepoType} class="input w-full">
-						<option value="readme_based">{m.marketplace_repo_type_readme_desc()}</option>
-						<option value="file_based">{m.marketplace_repo_type_files_desc()}</option>
-					</select>
+					<CustomSelect
+						id="marketplace-new-repo-type"
+						bind:value={newRepoType}
+						options={[
+							{ value: 'readme_based', label: m.marketplace_repo_type_readme_desc() },
+							{ value: 'file_based', label: m.marketplace_repo_type_files_desc() }
+						]}
+					/>
 				</div>
 
 				<div>
 					<label for="marketplace-new-content-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
 						{m.marketplace_content_type()}
 					</label>
-					<select id="marketplace-new-content-type" bind:value={newRepoContentType} class="input w-full">
-						<option value="mixed">{m.marketplace_content_type_mixed()}</option>
-						<option value="skill">{m.marketplace_content_type_skills()}</option>
-						<option value="subagent">{m.marketplace_content_type_agents()}</option>
-					</select>
+					<CustomSelect
+						id="marketplace-new-content-type"
+						bind:value={newRepoContentType}
+						options={[
+							{ value: 'mixed', label: m.marketplace_content_type_mixed() },
+							{ value: 'skill', label: m.marketplace_content_type_skills() },
+							{ value: 'subagent', label: m.marketplace_content_type_agents() }
+						]}
+					/>
 				</div>
 			</div>
 

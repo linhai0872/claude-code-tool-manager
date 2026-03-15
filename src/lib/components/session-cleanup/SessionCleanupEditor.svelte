@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { ClaudeSettings } from '$lib/types';
 	import { AUTO_UPDATES_CHANNELS, TEAMMATE_MODES } from '$lib/types';
+	import { CustomSelect } from '$lib/components/shared';
 	import { Save } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { getAutoUpdatesChannelLabel, getTeammateModeLabel } from '$lib/utils/claudeSettingsOptionsI18n';
@@ -73,11 +74,11 @@
 				<p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
 					{m.settings_session_updates_desc()}
 				</p>
-				<select id="updates-channel" bind:value={autoUpdatesChannel} class="input w-full">
-					{#each AUTO_UPDATES_CHANNELS as channel}
-						<option value={channel.value}>{getAutoUpdatesChannelLabel(channel.value)}</option>
-					{/each}
-				</select>
+				<CustomSelect
+					id="updates-channel"
+					bind:value={autoUpdatesChannel}
+					options={AUTO_UPDATES_CHANNELS.map((c) => ({ value: c.value, label: getAutoUpdatesChannelLabel(c.value) }))}
+				/>
 			</div>
 
 			<div>
@@ -87,11 +88,11 @@
 				<p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
 					{m.settings_session_teammate_desc()}
 				</p>
-				<select id="teammate-mode" bind:value={teammateMode} class="input w-full">
-					{#each TEAMMATE_MODES as mode}
-						<option value={mode.value}>{getTeammateModeLabel(mode.value)}</option>
-					{/each}
-				</select>
+				<CustomSelect
+					id="teammate-mode"
+					bind:value={teammateMode}
+					options={TEAMMATE_MODES.map((mo) => ({ value: mo.value, label: getTeammateModeLabel(mo.value) }))}
+				/>
 			</div>
 
 			<div>

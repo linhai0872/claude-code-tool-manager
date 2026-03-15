@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { StatusLineSegment, SegmentColor } from '$lib/types';
 	import { SEGMENT_TYPES, SEGMENT_COLORS } from '$lib/types';
+	import { CustomSelect } from '$lib/components/shared';
 	import * as m from '$lib/paraglide/messages.js';
 	import {
 		getStatuslineColorLabel,
@@ -74,16 +75,12 @@
 			<label for={`segment-format-${segment.id}`} class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
 				{m.segment_format()}
 			</label>
-			<select
+			<CustomSelect
 				id={`segment-format-${segment.id}`}
 				value={segment.format || meta.formats[0].value}
-				onchange={(e) => update('format', (e.target as HTMLSelectElement).value)}
-				class="w-full px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white"
-			>
-				{#each meta.formats as fmt}
-					<option value={fmt.value}>{getStatuslineSegmentFormatLabel(meta.type, fmt.value, fmt.label)}</option>
-				{/each}
-			</select>
+				onchange={(val) => update('format', val)}
+				options={meta.formats.map((fmt) => ({ value: fmt.value, label: getStatuslineSegmentFormatLabel(meta.type, fmt.value, fmt.label) }))}
+			/>
 		</div>
 	{/if}
 

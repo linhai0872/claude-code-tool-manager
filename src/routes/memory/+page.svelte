@@ -7,7 +7,7 @@
 		MemoryPreview,
 		MemoryFileStatus
 	} from '$lib/components/memory';
-	import { ConfirmDialog } from '$lib/components/shared';
+	import { ConfirmDialog, CustomSelect } from '$lib/components/shared';
 	import { memoryLibrary, projectsStore, notifications } from '$lib/stores';
 	import type { MemoryScope } from '$lib/types';
 	import { RefreshCw, FolderOpen, Eye, EyeOff, Plus, Trash2, Save, Undo2, FileText } from 'lucide-svelte';
@@ -21,10 +21,8 @@
 		await memoryLibrary.load();
 	});
 
-	function handleProjectChange(e: Event) {
-		const target = e.target as HTMLSelectElement;
-		const value = target.value;
-		memoryLibrary.setProjectPath(value || null);
+	function handleProjectChange(val: string) {
+		memoryLibrary.setProjectPath(val || null);
 		memoryLibrary.load();
 	}
 
@@ -109,16 +107,15 @@
 		<!-- Project selector -->
 		<div class="flex items-center gap-2">
 			<FolderOpen class="w-4 h-4 text-gray-500 dark:text-gray-400" />
-			<select
+			<CustomSelect
+				class="min-w-40"
 				value={memoryLibrary.projectPath ?? ''}
 				onchange={handleProjectChange}
-				class="input text-sm"
-			>
-				<option value="">{m.project_none_selected()}</option>
-				{#each projectsStore.projects as project}
-					<option value={project.path}>{project.name}</option>
-				{/each}
-			</select>
+				options={[
+					{ value: '', label: m.project_none_selected() },
+					...projectsStore.projects.map((p) => ({ value: p.path, label: p.name }))
+				]}
+			/>
 		</div>
 
 		<!-- Scope selector -->

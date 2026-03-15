@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { ClaudeSettings } from '$lib/types';
+	import { CustomSelect } from '$lib/components/shared';
 	import { Save, Plus, X, Trash2 } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages.js';
 
@@ -93,15 +94,16 @@
 						<code class="text-sm font-medium text-gray-900 dark:text-gray-100 flex-1 truncate">
 							{plugin.name}
 						</code>
-						<select
+						<CustomSelect
 							value={plugin.mode}
-							onchange={(e) => setMode(i, (e.target as HTMLSelectElement).value as 'enabled' | 'disabled' | 'tools')}
-							class="input text-xs w-36"
-						>
-							<option value="enabled">{m.label_enabled()}</option>
-							<option value="disabled">{m.label_disabled()}</option>
-							<option value="tools">{m.settings_plugins_specific_tools()}</option>
-						</select>
+							onchange={(val) => setMode(i, val as 'enabled' | 'disabled' | 'tools')}
+							class="min-w-32"
+							options={[
+								{ value: 'enabled', label: m.label_enabled() },
+								{ value: 'disabled', label: m.label_disabled() },
+								{ value: 'tools', label: m.settings_plugins_specific_tools() }
+							]}
+						/>
 						<button
 							onclick={() => removePlugin(i)}
 							class="btn btn-ghost text-red-500 hover:text-red-700"

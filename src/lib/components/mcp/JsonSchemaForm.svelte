@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
+	import { CustomSelect } from '$lib/components/shared';
 	import { ChevronDown, ChevronRight, Plus, Trash2 } from 'lucide-svelte';
 
 	type JsonSchema = {
@@ -236,17 +237,17 @@
 				{#if propSchema.description}
 					<p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{propSchema.description}</p>
 				{/if}
-				<select
-					value={currentValue ?? ''}
-					onchange={(e) => updateValue(currentPath, (e.target as HTMLSelectElement).value)}
-					class="mt-1 w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+				<CustomSelect
+					value={String(currentValue ?? '')}
+					onchange={(val) => updateValue(currentPath, val)}
 					{disabled}
-				>
-					<option value="">{m.placeholder_select()}</option>
-					{#each propSchema.enum as option}
-						<option value={String(option)}>{String(option)}</option>
-					{/each}
-				</select>
+					class="mt-1"
+					placeholder={m.placeholder_select()}
+					options={[
+						{ value: '', label: m.placeholder_select() },
+						...propSchema.enum.map((option) => ({ value: String(option), label: String(option) }))
+					]}
+				/>
 			</label>
 		{:else if propSchema.type === 'boolean'}
 			<!-- Boolean/checkbox field -->

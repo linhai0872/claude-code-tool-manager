@@ -4,6 +4,7 @@
 	import { claudeSettingsLibrary, projectsStore, notifications } from '$lib/stores';
 	import * as m from '$lib/paraglide/messages.js';
 	import type { ClaudeSettings, ClaudeSettingsScope } from '$lib/types';
+	import { CustomSelect } from '$lib/components/shared';
 	import { RefreshCw, FolderOpen, User, FileText } from 'lucide-svelte';
 	import {
 		getClaudeSettingsScopeDescription,
@@ -22,10 +23,8 @@
 		await claudeSettingsLibrary.load();
 	});
 
-	function handleProjectChange(e: Event) {
-		const target = e.target as HTMLSelectElement;
-		const value = target.value;
-		claudeSettingsLibrary.setProjectPath(value || null);
+	function handleProjectChange(val: string) {
+		claudeSettingsLibrary.setProjectPath(val || null);
 		claudeSettingsLibrary.load();
 	}
 
@@ -53,16 +52,15 @@
 <div class="flex flex-wrap items-center gap-4 mb-6">
 	<div class="flex items-center gap-2">
 		<FolderOpen class="w-4 h-4 text-gray-500 dark:text-gray-400" />
-		<select
+		<CustomSelect
+			class="min-w-40"
 			value={claudeSettingsLibrary.projectPath ?? ''}
 			onchange={handleProjectChange}
-			class="input text-sm"
-		>
-			<option value="">{m.project_none_selected()}</option>
-			{#each projectsStore.projects as project}
-				<option value={project.path}>{project.name}</option>
-			{/each}
-		</select>
+			options={[
+				{ value: '', label: m.project_none_selected() },
+				...projectsStore.projects.map((p) => ({ value: p.path, label: p.name }))
+			]}
+		/>
 	</div>
 
 	<div class="flex-1 min-w-[300px]">

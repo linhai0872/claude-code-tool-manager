@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { ScopedSettingsWrapper } from '$lib/components/settings';
 	import { UITogglesEditor } from '$lib/components/ui-toggles';
+	import { CustomSelect } from '$lib/components/shared';
 	import { claudeSettingsLibrary } from '$lib/stores';
 	import type { ClaudeSettingsScope } from '$lib/types';
 	import * as m from '$lib/paraglide/messages.js';
@@ -13,9 +14,8 @@
 
 	let currentLocale = $state(getLocale());
 
-	function handleLocaleChange(e: Event) {
-		const target = e.target as HTMLSelectElement;
-		const locale = target.value as 'en' | 'zh-CN';
+	function handleLocaleChange(val: string) {
+		const locale = val as 'en' | 'zh-CN';
 		currentLocale = locale;
 		setLocale(locale);
 	}
@@ -46,15 +46,12 @@
 			<h3 class="text-sm font-medium text-gray-900 dark:text-white">{m.label_language()}</h3>
 			<p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{m.label_language_desc()}</p>
 		</div>
-		<select
+		<CustomSelect
+			class="min-w-28"
 			value={currentLocale}
 			onchange={handleLocaleChange}
-			class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-		>
-			{#each locales as locale}
-				<option value={locale}>{localeNames[locale] ?? locale}</option>
-			{/each}
-		</select>
+			options={locales.map((l) => ({ value: l, label: localeNames[l] ?? l }))}
+		/>
 	</div>
 </div>
 

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { CreateSkillRequest, Skill } from '$lib/types';
+	import { CustomSelect } from '$lib/components/shared';
 	import * as m from '$lib/paraglide/messages.js';
 	import { parseSkillMarkdown } from '$lib/utils/markdownParser';
 	import { Clipboard, Check, AlertCircle, FileUp, TriangleAlert } from 'lucide-svelte';
@@ -324,16 +325,17 @@
 		<label for="model" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
 			{m.label_model_override()}
 		</label>
-		<select
+		<CustomSelect
 			id="model"
 			bind:value={model}
-			class="input mt-1"
-		>
-			<option value="">{m.command_model_default()}</option>
-			<option value="opus">{m.command_model_opus()}</option>
-			<option value="sonnet">{m.command_model_sonnet()}</option>
-			<option value="haiku">{m.command_model_haiku()}</option>
-		</select>
+			class="mt-1"
+			options={[
+				{ value: '', label: m.command_model_default() },
+				{ value: 'opus', label: m.command_model_opus() },
+				{ value: 'sonnet', label: m.command_model_sonnet() },
+				{ value: 'haiku', label: m.command_model_haiku() }
+			]}
+		/>
 		<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
 			{m.skill_model_hint()}
 		</p>

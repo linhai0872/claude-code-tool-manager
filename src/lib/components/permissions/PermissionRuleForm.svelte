@@ -2,6 +2,7 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import type { PermissionCategory } from '$lib/types';
 	import { PERMISSION_TOOL_NAMES } from '$lib/types';
+	import { CustomSelect } from '$lib/components/shared';
 	import { X, Code, Wand2 } from 'lucide-svelte';
 	import { getPermissionToolHint, getPermissionToolLabel } from '$lib/utils/permissionToolI18n';
 
@@ -114,11 +115,11 @@
 					<label for="permission-tool" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
 						{m.permission_tool_label()}
 					</label>
-					<select id="permission-tool" bind:value={selectedTool} class="input w-full">
-						{#each PERMISSION_TOOL_NAMES as tool}
-							<option value={tool.value}>{getPermissionToolLabel(tool.value, tool.label)}</option>
-						{/each}
-					</select>
+					<CustomSelect
+						id="permission-tool"
+						bind:value={selectedTool}
+						options={PERMISSION_TOOL_NAMES.map((t) => ({ value: t.value, label: getPermissionToolLabel(t.value, t.label) }))}
+					/>
 					<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{currentToolHint}</p>
 				</div>
 

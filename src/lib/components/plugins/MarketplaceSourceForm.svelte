@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { MarketplaceDefinition, MarketplaceSource, MarketplaceSourceType } from '$lib/types';
 	import { MARKETPLACE_SOURCE_TYPES } from '$lib/types';
+	import { CustomSelect } from '$lib/components/shared';
 	import { Save, X } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { getMarketplaceSourceTypeLabel } from '$lib/utils/claudeSettingsOptionsI18n';
@@ -113,11 +114,12 @@
 
 	<div>
 		<label for="marketplace-source-type" class="text-xs font-medium text-gray-600 dark:text-gray-400">{m.settings_marketplace_source_type()}</label>
-		<select id="marketplace-source-type" bind:value={sourceType} class="input text-sm w-full mt-1">
-			{#each MARKETPLACE_SOURCE_TYPES as type}
-				<option value={type.value}>{getMarketplaceSourceTypeLabel(type.value)}</option>
-			{/each}
-		</select>
+		<CustomSelect
+			id="marketplace-source-type"
+			bind:value={sourceType}
+			class="mt-1"
+			options={MARKETPLACE_SOURCE_TYPES.map((t) => ({ value: t.value, label: getMarketplaceSourceTypeLabel(t.value) }))}
+		/>
 	</div>
 
 	{#if sourceType === 'github'}

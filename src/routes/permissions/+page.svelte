@@ -10,7 +10,7 @@
 		DefaultModeSelector,
 		AdditionalDirectoriesEditor
 	} from '$lib/components/permissions';
-	import { SearchBar } from '$lib/components/shared';
+	import { SearchBar, CustomSelect } from '$lib/components/shared';
 	import { permissionLibrary, projectsStore, notifications } from '$lib/stores';
 	import type { PermissionCategory, PermissionTemplate } from '$lib/types';
 	import { Sparkles, Layers, RefreshCw, FolderOpen } from 'lucide-svelte';
@@ -88,10 +88,8 @@
 		}
 	}
 
-	function handleProjectChange(e: Event) {
-		const target = e.target as HTMLSelectElement;
-		const value = target.value;
-		permissionLibrary.setProjectPath(value || null);
+	function handleProjectChange(val: string) {
+		permissionLibrary.setProjectPath(val || null);
 		permissionLibrary.load();
 	}
 
@@ -112,16 +110,15 @@
 		<!-- Project selector -->
 		<div class="flex items-center gap-2">
 			<FolderOpen class="w-4 h-4 text-gray-500 dark:text-gray-400" />
-			<select
+			<CustomSelect
+				class="min-w-40"
 				value={permissionLibrary.projectPath ?? ''}
 				onchange={handleProjectChange}
-				class="input text-sm"
-			>
-				<option value="">{m.project_none_selected()}</option>
-				{#each projectsStore.projects as project}
-					<option value={project.path}>{project.name}</option>
-				{/each}
-			</select>
+				options={[
+					{ value: '', label: m.project_none_selected() },
+					...projectsStore.projects.map((p) => ({ value: p.path, label: p.name }))
+				]}
+			/>
 		</div>
 
 		<!-- Scope selector -->

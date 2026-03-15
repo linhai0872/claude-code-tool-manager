@@ -6,6 +6,7 @@
 		COMMON_LANGUAGES
 	} from '$lib/types';
 	import type { ClaudeSettings } from '$lib/types';
+	import { CustomSelect } from '$lib/components/shared';
 	import { Save } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import {
@@ -57,15 +58,6 @@
 		}
 	}
 
-	function handleThinkingChange(e: Event) {
-		const target = e.target as HTMLSelectElement;
-		const val = target.value;
-		if (val === '') {
-			alwaysThinkingEnabled = undefined;
-		} else {
-			alwaysThinkingEnabled = val === 'true';
-		}
-	}
 </script>
 
 <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5">
@@ -80,18 +72,17 @@
 			>
 				{m.settings_model_default_label()}
 			</label>
-			<select
+			<CustomSelect
 				id="model-select"
 				bind:value={model}
-				class="input text-sm w-full"
-			>
-				<option value="">{m.label_not_set_default()}</option>
-				{#each CLAUDE_MODELS as model_opt}
-					<option value={model_opt.value}>
-						{getClaudeModelLabel(model_opt.value, model_opt.label)} — {getClaudeModelDescription(model_opt.value, model_opt.description)}
-					</option>
-				{/each}
-			</select>
+				options={[
+					{ value: '', label: m.label_not_set_default() },
+					...CLAUDE_MODELS.map((mo) => ({
+						value: mo.value,
+						label: `${getClaudeModelLabel(mo.value, mo.label)} — ${getClaudeModelDescription(mo.value, mo.description)}`
+					}))
+				]}
+			/>
 		</div>
 
 		<!-- Available Models -->
@@ -126,15 +117,11 @@
 			>
 				{m.settings_model_output_style_label()}
 			</label>
-			<select
+			<CustomSelect
 				id="output-style-select"
 				bind:value={outputStyle}
-				class="input text-sm w-full"
-			>
-				{#each OUTPUT_STYLES as style}
-					<option value={style.value}>{getOutputStyleLabel(style.value)}</option>
-				{/each}
-			</select>
+				options={OUTPUT_STYLES.map((s) => ({ value: s.value, label: getOutputStyleLabel(s.value) }))}
+			/>
 		</div>
 
 		<!-- Language -->
@@ -145,15 +132,12 @@
 			>
 				{m.settings_model_language_label()}
 			</label>
-			<select
+			<CustomSelect
 				id="language-select"
 				bind:value={language}
-				class="input text-sm w-full"
-			>
-				{#each COMMON_LANGUAGES as lang}
-					<option value={lang.value}>{getCommonLanguageLabel(lang.value)}</option>
-				{/each}
-			</select>
+				searchable
+				options={COMMON_LANGUAGES.map((l) => ({ value: l.value, label: getCommonLanguageLabel(l.value) }))}
+			/>
 		</div>
 
 		<!-- Extended Thinking -->
@@ -164,16 +148,18 @@
 			>
 				{m.settings_model_thinking_label()}
 			</label>
-			<select
+			<CustomSelect
 				id="thinking-select"
 				value={alwaysThinkingEnabled === undefined ? '' : String(alwaysThinkingEnabled)}
-				onchange={handleThinkingChange}
-				class="input text-sm w-full"
-			>
-				<option value="">{m.label_not_set_default()}</option>
-				<option value="true">{m.settings_model_thinking_always()}</option>
-				<option value="false">{m.label_disabled()}</option>
-			</select>
+				onchange={(val) => {
+					alwaysThinkingEnabled = val === '' ? undefined : val === 'true';
+				}}
+				options={[
+					{ value: '', label: m.label_not_set_default() },
+					{ value: 'true', label: m.settings_model_thinking_always() },
+					{ value: 'false', label: m.label_disabled() }
+				]}
+			/>
 		</div>
 	</div>
 

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { CreateHookRequest, Hook, HookEventType, HookType } from '$lib/types';
 	import { HOOK_EVENT_TYPES } from '$lib/types';
+	import { CustomSelect } from '$lib/components/shared';
 	import * as m from '$lib/paraglide/messages.js';
 	import { getHookEventDescription, getHookEventLabel, getHookEventMatcherHint } from '$lib/utils/hookEventI18n';
 	import { Clipboard, Check, AlertCircle, FileUp, Terminal, MessageSquare, Zap } from 'lucide-svelte';
@@ -24,6 +25,7 @@
 	let timeout = $state(initialValues.timeout?.toString() ?? '');
 	let tagsInput = $state(initialValues.tags?.join(', ') ?? '');
 
+	let templateSelection = $state('');
 	let isSubmitting = $state(false);
 	let errors = $state<Record<string, string>>({});
 
@@ -245,20 +247,20 @@
 			</div>
 			<div class="flex items-center gap-2">
 				{#if templates.length > 0}
-					<select
-						class="input text-sm py-1.5"
-						onchange={(e) => {
-							const id = Number((e.target as HTMLSelectElement).value);
-							const template = templates.find((t) => t.id === id);
+					<CustomSelect
+						class="min-w-36"
+						bind:value={templateSelection}
+						placeholder={m.hook_templates_placeholder()}
+						onchange={(val) => {
+							const template = templates.find((t) => String(t.id) === val);
 							if (template) applyTemplate(template);
-							(e.target as HTMLSelectElement).value = '';
+							templateSelection = '';
 						}}
-					>
-						<option value="">{m.hook_templates_placeholder()}</option>
-						{#each templates as template}
-							<option value={template.id}>{template.name}</option>
-						{/each}
-					</select>
+						options={[
+							{ value: '', label: m.hook_templates_placeholder() },
+							...templates.map((t) => ({ value: String(t.id), label: t.name }))
+						]}
+					/>
 				{/if}
 				<button type="button" onclick={handleFileImport} class="btn btn-secondary text-sm">
 					<FileUp class="w-4 h-4 mr-1.5" />

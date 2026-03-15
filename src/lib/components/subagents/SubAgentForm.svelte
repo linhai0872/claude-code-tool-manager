@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { CreateSubAgentRequest, SubAgent } from '$lib/types';
+	import { CustomSelect } from '$lib/components/shared';
 	import { parseSubAgentMarkdown, type ParsedSubAgent } from '$lib/utils/markdownParser';
 	import * as m from '$lib/paraglide/messages.js';
 	import { Clipboard, Check, AlertCircle, FileUp } from 'lucide-svelte';
@@ -300,15 +301,12 @@
 		<label for="model" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
 			{m.label_model()}
 		</label>
-		<select
+		<CustomSelect
 			id="model"
 			bind:value={model}
-			class="input mt-1"
-		>
-			{#each modelOptions as option}
-				<option value={option.value}>{option.label}</option>
-			{/each}
-		</select>
+			class="mt-1"
+			options={modelOptions}
+		/>
 		<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
 			{m.subagent_model_hint()}
 		</p>
@@ -319,15 +317,12 @@
 		<label for="permissionMode" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
 			{m.label_permission_mode()}
 		</label>
-		<select
+		<CustomSelect
 			id="permissionMode"
 			bind:value={permissionMode}
-			class="input mt-1"
-		>
-			{#each permissionModeOptions as option}
-				<option value={option.value}>{option.label}</option>
-			{/each}
-		</select>
+			class="mt-1"
+			options={permissionModeOptions}
+		/>
 		<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
 			{m.subagent_permission_hint()}
 		</p>
