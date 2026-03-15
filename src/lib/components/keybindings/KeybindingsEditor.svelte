@@ -7,6 +7,7 @@
 	} from '$lib/types';
 	import type { KeybindingContext, MergedBinding } from '$lib/types';
 	import { getKeybindingContextDescription, getKeybindingContextLabel } from '$lib/utils/keybindingI18n';
+	import { getKeybindingActionLabel, getKeybindingActionDescription } from '$lib/utils/keybindingActionI18n';
 	import KeyCaptureDialog from './KeyCaptureDialog.svelte';
 	import {
 		ChevronDown,
@@ -204,14 +205,14 @@
 								<div class="flex-1 min-w-0">
 									<div class="flex items-center gap-2">
 										<span class="font-medium text-gray-900 dark:text-white truncate">
-											{binding.label}
+											{getKeybindingActionLabel(binding.action, binding.label)}
 										</span>
 										{#if hasModification}
 											<span class="w-1.5 h-1.5 rounded-full bg-primary-500 flex-shrink-0" title={m.keybindings_modified()}></span>
 										{/if}
 									</div>
 									<div class="text-xs text-gray-400 dark:text-gray-500 truncate">
-										{binding.description}
+										{getKeybindingActionDescription(binding.action, binding.description)}
 									</div>
 								</div>
 

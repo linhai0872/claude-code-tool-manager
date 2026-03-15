@@ -78,6 +78,72 @@ export function getKeybindingActionLabel(action: string, fallback: string): stri
 			return m.keybinding_action_execute();
 		case 'task:background':
 			return m.keybinding_action_background_task();
+		case 'theme:toggleSyntaxHighlighting':
+			return m.keybinding_action_toggle_syntax_highlighting();
+		case 'help:dismiss':
+			return m.keybinding_action_dismiss_help();
+		case 'attachments:next':
+			return m.keybinding_action_next_attachment();
+		case 'attachments:previous':
+			return m.keybinding_action_previous_attachment();
+		case 'attachments:remove':
+			return m.keybinding_action_remove_attachment();
+		case 'attachments:exit':
+			return m.keybinding_action_exit_attachments();
+		case 'footer:next':
+			return m.keybinding_action_next_footer_item();
+		case 'footer:previous':
+			return m.keybinding_action_previous_footer_item();
+		case 'footer:openSelected':
+			return m.keybinding_action_open_selected();
+		case 'footer:clearSelection':
+			return m.keybinding_action_clear_selection();
+		case 'messageSelector:up':
+			return m.keybinding_action_move_up();
+		case 'messageSelector:down':
+			return m.keybinding_action_move_down();
+		case 'messageSelector:top':
+			return m.keybinding_action_move_to_top();
+		case 'messageSelector:bottom':
+			return m.keybinding_action_move_to_bottom();
+		case 'messageSelector:select':
+			return m.keybinding_action_select_message();
+		case 'diff:dismiss':
+			return m.keybinding_action_dismiss_diff();
+		case 'diff:previousSource':
+			return m.keybinding_action_previous_source();
+		case 'diff:nextSource':
+			return m.keybinding_action_next_source();
+		case 'diff:back':
+			return m.keybinding_action_back();
+		case 'diff:viewDetails':
+			return m.keybinding_action_view_details();
+		case 'diff:previousFile':
+			return m.keybinding_action_previous_file();
+		case 'diff:nextFile':
+			return m.keybinding_action_next_file();
+		case 'modelPicker:decreaseEffort':
+			return m.keybinding_action_decrease_effort();
+		case 'modelPicker:increaseEffort':
+			return m.keybinding_action_increase_effort();
+		case 'select:next':
+			return m.keybinding_action_next_select_option();
+		case 'select:previous':
+			return m.keybinding_action_previous_select_option();
+		case 'select:accept':
+			return m.keybinding_action_accept_selection();
+		case 'select:cancel':
+			return m.keybinding_action_cancel_selection();
+		case 'plugin:toggle':
+			return m.keybinding_action_toggle_plugin();
+		case 'plugin:install':
+			return m.keybinding_action_install_plugin();
+		case 'permission:toggleDebug':
+			return m.keybinding_action_toggle_debug();
+		case 'settings:search':
+			return m.keybinding_action_search_settings();
+		case 'settings:retry':
+			return m.keybinding_action_retry_settings();
 		default:
 			return fallback;
 	}
@@ -161,6 +227,72 @@ export function getKeybindingActionDescription(action: string, fallback: string)
 			return m.keybinding_action_execute_desc();
 		case 'task:background':
 			return m.keybinding_action_background_task_desc();
+		case 'theme:toggleSyntaxHighlighting':
+			return m.keybinding_action_toggle_syntax_highlighting_desc();
+		case 'help:dismiss':
+			return m.keybinding_action_dismiss_help_desc();
+		case 'attachments:next':
+			return m.keybinding_action_next_attachment_desc();
+		case 'attachments:previous':
+			return m.keybinding_action_previous_attachment_desc();
+		case 'attachments:remove':
+			return m.keybinding_action_remove_attachment_desc();
+		case 'attachments:exit':
+			return m.keybinding_action_exit_attachments_desc();
+		case 'footer:next':
+			return m.keybinding_action_next_footer_item_desc();
+		case 'footer:previous':
+			return m.keybinding_action_previous_footer_item_desc();
+		case 'footer:openSelected':
+			return m.keybinding_action_open_selected_desc();
+		case 'footer:clearSelection':
+			return m.keybinding_action_clear_selection_desc();
+		case 'messageSelector:up':
+			return m.keybinding_action_move_up_desc();
+		case 'messageSelector:down':
+			return m.keybinding_action_move_down_desc();
+		case 'messageSelector:top':
+			return m.keybinding_action_move_to_top_desc();
+		case 'messageSelector:bottom':
+			return m.keybinding_action_move_to_bottom_desc();
+		case 'messageSelector:select':
+			return m.keybinding_action_select_message_desc();
+		case 'diff:dismiss':
+			return m.keybinding_action_dismiss_diff_desc();
+		case 'diff:previousSource':
+			return m.keybinding_action_previous_source_desc();
+		case 'diff:nextSource':
+			return m.keybinding_action_next_source_desc();
+		case 'diff:back':
+			return m.keybinding_action_back_desc();
+		case 'diff:viewDetails':
+			return m.keybinding_action_view_details_desc();
+		case 'diff:previousFile':
+			return m.keybinding_action_previous_file_desc();
+		case 'diff:nextFile':
+			return m.keybinding_action_next_file_desc();
+		case 'modelPicker:decreaseEffort':
+			return m.keybinding_action_decrease_effort_desc();
+		case 'modelPicker:increaseEffort':
+			return m.keybinding_action_increase_effort_desc();
+		case 'select:next':
+			return m.keybinding_action_next_select_option_desc();
+		case 'select:previous':
+			return m.keybinding_action_previous_select_option_desc();
+		case 'select:accept':
+			return m.keybinding_action_accept_selection_desc();
+		case 'select:cancel':
+			return m.keybinding_action_cancel_selection_desc();
+		case 'plugin:toggle':
+			return m.keybinding_action_toggle_plugin_desc();
+		case 'plugin:install':
+			return m.keybinding_action_install_plugin_desc();
+		case 'permission:toggleDebug':
+			return m.keybinding_action_toggle_debug_desc();
+		case 'settings:search':
+			return m.keybinding_action_search_settings_desc();
+		case 'settings:retry':
+			return m.keybinding_action_retry_settings_desc();
 		default:
 			return fallback;
 	}
