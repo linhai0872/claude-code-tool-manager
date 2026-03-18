@@ -1,14 +1,17 @@
 <script lang="ts">
 	import { updater } from '$lib/stores/updater.svelte';
 	import { onMount } from 'svelte';
+	import { platform } from '@tauri-apps/plugin-os';
+	import { open } from '@tauri-apps/plugin-shell';
 	import { Download, RefreshCw, X, CheckCircle, AlertCircle } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages.js';
 
-	onMount(() => {
-		// Auto-check is disabled for this fork (no update endpoints configured).
-		// To re-enable, add endpoints to plugins.updater in tauri.conf.json and
-		// uncomment the line below.
-		// setTimeout(() => updater.checkForUpdates(), 3000);
+	let isMacOS = $state(false);
+
+	onMount(async () => {
+		const os = await platform();
+		isMacOS = os === 'macos';
+		setTimeout(() => updater.checkForUpdates(), 3000);
 	});
 
 	function handleDownload() {
@@ -22,41 +25,86 @@
 	function handleDismiss() {
 		updater.dismiss();
 	}
+
+	function openReleasesPage() {
+		open('https://github.com/linhai0872/claude-code-tool-manager/releases/latest');
+	}
 </script>
 
 {#if updater.status === 'available' && updater.update}
-	<div class="fixed bottom-4 right-4 z-50 max-w-sm bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4">
-		<div class="flex items-start gap-3">
-			<div class="flex-shrink-0">
-				<Download class="w-5 h-5 text-primary-500" />
-			</div>
-			<div class="flex-1 min-w-0">
-				<h3 class="text-sm font-medium text-gray-900 dark:text-white">
-					{m.update_available()}
-				</h3>
-				<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-					{m.update_version_ready({ version: updater.update.version })}
-				</p>
-				<div class="mt-3 flex gap-2">
-					<button
-						onclick={handleDownload}
-						class="px-3 py-1.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md transition-colors"
-					>
-						{m.action_download()}
-					</button>
-					<button
-						onclick={handleDismiss}
-						class="px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-					>
-						{m.action_later()}
-					</button>
+	{#if isMacOS}
+		<!-- macOS: no in-app download; guide user to brew upgrade -->
+		<div class="fixed bottom-4 right-4 z-50 max-w-sm bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4">
+			<div class="flex items-start gap-3">
+				<div class="flex-shrink-0">
+					<Download class="w-5 h-5 text-primary-500" />
 				</div>
+				<div class="flex-1 min-w-0">
+					<h3 class="text-sm font-medium text-gray-900 dark:text-white">
+						{m.update_macos_title()}
+					</h3>
+					<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+						{m.update_macos_body({ version: updater.update.version })}
+					</p>
+					<pre class="mt-2 text-xs bg-gray-100 dark:bg-gray-900 rounded px-2 py-1.5 font-mono overflow-x-auto">brew upgrade --cask claude-code-tool-manager</pre>
+					<p class="mt-2 text-xs text-gray-400 dark:text-gray-500">
+						{m.update_macos_or_download()}
+						<button
+							onclick={openReleasesPage}
+							class="underline hover:text-primary-500 transition-colors"
+						>
+							{m.update_macos_releases_page()}
+						</button>
+					</p>
+					<div class="mt-3">
+						<button
+							onclick={handleDismiss}
+							class="px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+						>
+							{m.action_later()}
+						</button>
+					</div>
+				</div>
+				<button onclick={handleDismiss} class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+					<X class="w-4 h-4" />
+				</button>
 			</div>
-			<button onclick={handleDismiss} class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-				<X class="w-4 h-4" />
-			</button>
 		</div>
-	</div>
+	{:else}
+		<!-- Windows / Linux: standard Tauri in-app updater -->
+		<div class="fixed bottom-4 right-4 z-50 max-w-sm bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4">
+			<div class="flex items-start gap-3">
+				<div class="flex-shrink-0">
+					<Download class="w-5 h-5 text-primary-500" />
+				</div>
+				<div class="flex-1 min-w-0">
+					<h3 class="text-sm font-medium text-gray-900 dark:text-white">
+						{m.update_available()}
+					</h3>
+					<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+						{m.update_version_ready({ version: updater.update.version })}
+					</p>
+					<div class="mt-3 flex gap-2">
+						<button
+							onclick={handleDownload}
+							class="px-3 py-1.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md transition-colors"
+						>
+							{m.action_download()}
+						</button>
+						<button
+							onclick={handleDismiss}
+							class="px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+						>
+							{m.action_later()}
+						</button>
+					</div>
+				</div>
+				<button onclick={handleDismiss} class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+					<X class="w-4 h-4" />
+				</button>
+			</div>
+		</div>
+	{/if}
 {/if}
 
 {#if updater.status === 'downloading'}

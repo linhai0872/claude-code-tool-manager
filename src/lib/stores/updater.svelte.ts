@@ -9,6 +9,7 @@ class UpdaterState {
 	error = $state<string | null>(null);
 	downloadProgress = $state<number>(0);
 	async checkForUpdates() {
+		if (import.meta.env.MODE === 'development') return;
 		if (this.status === 'checking' || this.status === 'downloading') {
 			return;
 		}

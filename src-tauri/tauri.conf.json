@@ -29,7 +29,7 @@
   "bundle": {
     "active": true,
     "targets": "all",
-    "createUpdaterArtifacts": false,
+    "createUpdaterArtifacts": true,
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -43,8 +43,10 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbWVlbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IERDOTkyM0Y4NDA3RDdCREUKUldUZWUzMUErQ09aM0RtenVWdnNmRTl1TTNvcmlzU0luM2xZUWpBRkFUbGZuVXV1Z0JHc0tQV3AK",
-      "endpoints": []
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEVFODc4NjVEODU3Q0IzREEKUldUYXMzeUZYWWFIN2pOK0lWMk5qQmhOMlRvdXNNalZWalhQYXZxYjdIYWJCalQ0UmI3ZFkwbWcK",
+      "endpoints": [
+        "https://github.com/linhai0872/claude-code-tool-manager/releases/latest/download/latest.json"
+      ]
     }
   }
 }
