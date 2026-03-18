@@ -1,3 +1,5 @@
+export type SkillType = 'skill' | 'command';
+
 export interface Skill {
 	id: number;
 	name: string;

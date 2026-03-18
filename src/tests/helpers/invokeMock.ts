@@ -31,9 +31,9 @@ export function mockInvokeResponses(responses: Record<string, unknown>): void {
  * The handler receives (command, args) and can return different values.
  */
 export function mockInvokeHandler(
-	handler: (cmd: string, args?: Record<string, unknown>) => unknown
+	handler: (cmd: string, args?: unknown) => unknown
 ): void {
-	vi.mocked(invoke).mockImplementation(async (cmd: string, args?: Record<string, unknown>) => {
+	vi.mocked(invoke).mockImplementation(async (cmd: string, args?: unknown) => {
 		return handler(cmd, args);
 	});
 }
