@@ -1,121 +1,229 @@
 **English** | [中文](./README.md)
 
 <div align="center">
-  <img src="./imgs/Claude_AI_symbol.svg.png" width="120" />
-  <h1>Claude Code Tool Manager</h1>
-  <p>Claude Code doesn't have a configuration GUI. This is it.</p>
 
-  [Install](#installation) · [Features](#features) · [Quick Start](#quick-start) · [Contributing](./CONTRIBUTING.md) · [Changelog](./CHANGELOG.md)
-</div>
+# Claude Code Tool Manager
 
-<p align="center">
-  <a href="https://opensource.org/licenses/MIT">
-    <img src="https://img.shields.io/github/license/linhai0872/claude-code-tool-manager?style=flat-square" alt="License" />
-  </a>
-</p>
+**A Visual Configuration Console for Claude Code and Multi-Editor Workflows**
 
-<!-- GIF recorded from upstream English UI; consider replacing with Chinese UI version -->
-<div align="center">
-  <img src="./imgs/project-assign.gif" width="100%" />
+*Out of sight, out of mind.*
+
+Free your MCP, Skill, Hook, Subagent, and Command configs from scattered JSON files.  
+Manage, test, and sync — all in one place.
+
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg)]()
+[![Built with Tauri](https://img.shields.io/badge/Built%20with-Tauri%202-FFC131.svg)](https://tauri.app/)
+
+[Features](#features) · [Install](#installation) · [Quick Start](#quick-start) · [Changelog](./CHANGELOG.md) · [Contributing](./CONTRIBUTING.md)
+
+<!-- Hero image from upstream -->
+![Claude Code Tool Manager](./imgs/project-assign.gif)
+
 </div>
 
 ---
 
-## Why This Tool Exists
+## You Might Need This
 
-Claude Code configuration is scattered across your filesystem — `~/.claude.json` for MCP servers, `~/.claude/commands/` for commands, `~/.claude/settings.json` for hooks — and managing it means hand-editing JSON and Markdown files. If you also use Cursor, Copilot CLI, Gemini CLI, or other AI coding assistants, each has its own config format and path.
+Claude Code configuration lives across `~/.claude.json`, `commands/`, `settings.json`, and several other files. Every change requires hand-editing JSON or Markdown — and you won't know if it works until you restart Claude. If you also use Cursor, Gemini CLI, or other editors, each has its own config format and path. The overhead scales with the number of tools.
 
-Claude Code Tool Manager does one thing well: **provide a GUI to manage all your configurations in one place, then sync them to every editor you use.** It works as a middleware layer — reading and writing each editor's standard config files without modifying tool behavior, introducing new config formats, or creating vendor lock-in.
+This app brings all those configs into one interface. **See it, manage it.**
 
-If you've used tools like cc-switch for config toggling, think of this as the full replacement: beyond switching, it covers MCP testing, usage analytics, session review, status line customization, and more.
+- **Visual Management** — No more digging through JSON. MCP, Skill, Hook, Subagent, Command — all visible at a glance
+- **Pre-flight Validation** — Test MCP connections and execute tools before assigning to projects. No more "configure and pray"
+- **One Change, Multi-Editor Sync** — MCP syncs to 6 editors; Skill/Command/Subagent sync to Claude Code and OpenCode
+- **Scene Switching** — Profiles bundle your entire config. One click to switch between work/personal/project setups
+- **Local Analytics** — Usage and session data stay on your machine. Understand your habits and costs
 
-> This is a fork of [tylergraydev/claude-code-tool-manager](https://github.com/tylergraydev/claude-code-tool-manager) with **Simplified Chinese UI** added — powered by Paraglide JS, covering 1750+ translation keys, switchable at runtime in Settings without restart.
+> [!TIP]
+> Fork of [tylergraydev/claude-code-tool-manager](https://github.com/tylergraydev/claude-code-tool-manager), adding full Simplified Chinese UI (1800+ translations) and several UI improvements. See [Differences from Upstream](#differences-from-upstream).
+
+---
+
+## How We Compare
+
+**vs. Hand-editing JSON** — Configs scattered, error-prone, no feedback until runtime. GUI makes everything visible with instant test feedback.
+
+**vs. [cc-switch](https://github.com/farion1231/cc-switch)** — Both are config management GUIs. cc-switch focuses on provider switching and multi-CLI support. This project covers full MCP/Skill/Command/Subagent/Hook management, plus MCP testing, usage analytics, session browsing, and StatusLine customization.
+
+**vs. [McPick](https://github.com/spences10/mcpick) / MCP Bundler** — Focused on MCP toggling. This project goes further: test connections, execute tools, import from Registry, and manage Skill, Hook, and other components in one place.
+
+**About the CLI** — Claude Code's CLI is powerful and can handle almost any config operation. The GUI's value is letting you see the full picture — which MCPs are active, which Skills are enabled, when Hooks fire — instead of jumping between JSON files.
+
+---
+
+## Quick Start
+
+```bash
+# macOS (Homebrew)
+brew tap linhai0872/tap
+brew install --cask claude-code-tool-manager
+
+# Or download from GitHub Releases
+# https://github.com/linhai0872/claude-code-tool-manager/releases
+```
+
+On launch, the app detects installed editors and imports existing MCP configurations.
+
+### Supported Editors
+
+| Editor | Config Location |
+|--------|-----------------|
+| [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | `~/.claude.json` |
+| [Cursor](https://cursor.com) | `~/.cursor/mcp.json` |
+| [Gemini CLI](https://github.com/google-gemini/gemini-cli) | `~/.gemini/settings.json` |
+| [Codex CLI](https://github.com/openai/codex) | `~/.codex/config.toml` |
+| [Copilot CLI](https://githubnext.com/projects/copilot-cli) | `~/.copilot/mcp-config.json` |
+| [OpenCode](https://opencode.ai) | `~/.config/opencode/opencode.json` |
+
+Enable the editors you use in Settings, and MCP configurations will sync to all of them automatically.
 
 ---
 
 ## Features
 
-### MCP Server Management and Testing
+### MCP Server Management & Testing
 
-Create, edit, and remove MCP server configurations. Supports stdio, SSE, and HTTP transports. Test servers directly in the app — launch a server, list its tools, execute calls, and verify everything works before assigning it to a project.
+![MCP Testing](./imgs/mcp-testing-12s.gif)
 
-Browse and import from the official [MCP Registry](https://registry.modelcontextprotocol.io/).
+- **Three Transports** — stdio / SSE / HTTP, covering local and remote MCP servers
+- **Test & Execute** — Connect, list tools, and execute calls before assigning to projects
+- **Registry Import** — Browse, search, and one-click import from [MCP Registry](https://registry.modelcontextprotocol.io/)
+- **Multiple Import Methods** — Paste JSON config or CLI command (`claude mcp add ...`) for auto-parsing
+- **MCP Gateway** — Lazy-load mode exposing only 3 meta-tools, connecting MCPs on demand to reduce context window usage
 
-<!-- GIF recorded from upstream English UI -->
-<div align="center">
-  <img src="./imgs/mcp-testing-12s.gif" width="100%" />
-</div>
+### Skills & Commands
 
-### Commands and Skills
+<!--
+[Placeholder] Skills & Commands screenshot
+Capture: Open the app → navigate to the Skills page → expand a Skill's edit panel to show Markdown content, allowedTools, and model selection
+Size: 1280px wide, PNG
+Path: imgs/skills.png
+Uncomment when ready:
+![Skills & Commands](./imgs/skills.png)
+-->
 
-Manage slash commands (Markdown files in `.claude/commands/`) and Skills (directories with `SKILL.md` that Claude invokes automatically based on context). Edit content and trigger conditions through the GUI instead of creating files manually.
+- **Skill** — On-demand capabilities; Claude decides whether to invoke based on conversation context
+- **Command** — Manually triggered via `/command-name`, with argument hints
+- **Visual Editing** — Markdown content, allowedTools restrictions, model selection (Opus/Sonnet/Haiku/Other)
+- **Import Support** — Paste Markdown or import from file
 
-### Sub-Agents and Hooks
+### Subagents & Hooks
 
-Define custom Sub-Agents with name, model, instructions, and tool sets. Configure Hooks to run scripts on specific events (conversation start, pre/post tool use, task completion, etc.). Includes a sound notification wizard for audio alerts when Claude finishes a task.
+<!--
+[Placeholder] Hooks configuration screenshot
+Capture: Open the app → navigate to the Hooks page → expand a Hook's edit panel showing event type, regex matcher, and script input
+Size: 1280px wide, PNG
+Path: imgs/hooks.png
+Uncomment when ready:
+![Hooks](./imgs/hooks.png)
+-->
+
+- **Subagent** — Independent child agents with dedicated model, system instructions, tool set, and permission mode
+- **Hook** — Execute scripts or inject prompts on specific events
+  - 10 event types: SessionStart, PreToolUse, PostToolUse, Stop, and more
+  - Regex matching for tool names (e.g., `Write|Edit`)
+  - Built-in task completion sound presets
 
 ### Profiles
 
-Save your current set of enabled MCPs, Skills, Sub-Agents, commands, and Hooks as a named Profile. Switch between "Work" and "Personal" setups with one click, or assign different tool sets per project.
+Profiles bundle your currently enabled MCPs, Skills, Subagents, Commands, and Hooks into one configuration set. Create different Profiles for different scenarios (daily coding, work projects, learning) and switch between them with one click.
 
-### AI-Controllable
+### Editor Sync
 
-Ships with a built-in MCP server that starts alongside the app, exposing 31 tools via Streamable HTTP. Claude Code or any MCP client can query and modify your tool configurations programmatically — tell Claude "add this MCP to my project" and it works.
+One change, multi-editor effect. The app syncs configurations to each editor's config files:
 
-### Status Line and Spinner Customization
+| Component | Claude Code | Cursor | Gemini CLI | Codex CLI | Copilot CLI | OpenCode |
+|-----------|:-----------:|:------:|:----------:|:---------:|:-----------:|:--------:|
+| MCP Server | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Skill | ✓ | | | | | ✓ |
+| Command | ✓ | | | | | ✓ |
+| Subagent | ✓ | | | | | ✓ |
+| Hook | ✓ | | | | | |
+| Spinner Verb | ✓ | | | | | |
 
-Design Claude Code terminal status lines with a visual builder. Choose from 25+ segment types (model, cost, context window, git branch, etc.), apply Powerline themes, or browse community presets. Customize Spinner verbs with drag-and-drop reordering and per-verb toggles.
+> [!NOTE]
+> ✓ indicates this project actively syncs to that editor's config file. Some editors (like Cursor) support reading additional config types, which is the editor's own capability and not part of this project's sync scope.
 
-### Usage Analytics and Session Explorer
+### Built-in MCP Server
 
-- **Analytics** — Daily activity trends, model usage breakdown, token consumption, peak hours heatmap, cost estimates
-- **Session Explorer** — Browse past sessions per project with conversation timelines, tool call tags, per-message token usage
-- **Insights** — Session quality scores, friction analysis, helpfulness ratings
+The app runs its own MCP Server on startup, exposing **31 tools** over Streamable HTTP. Claude Code can query and modify configurations mid-conversation — e.g., "add this MCP to my project" or "list all enabled Skills." Any MCP-compatible client can connect.
 
-<!--
-  Screenshot placeholder: Analytics page
-  How to capture: Open app → navigate to Analytics page with chart data visible → full window screenshot
-  Suggested size: 1280px wide
-  Format: PNG
-  Save to: imgs/analytics-screenshot.png
--->
+<details>
+<summary>Built-in Tool List</summary>
 
-### Multi-Editor Sync
+**MCP Management**: list_mcps, get_mcp, create_mcp, update_mcp, delete_mcp, assign_mcp_to_project, remove_mcp_from_project, list_global_mcps, enable_global_mcp, disable_global_mcp
 
-Enable target editors in Settings, and MCP configurations sync to each editor's config file automatically. Global configs write to the editor's global path; project configs write to project-level paths. Configure once, use everywhere.
+**Skill Management**: list_skills, get_skill, create_skill, delete_skill, enable_global_skill, disable_global_skill
 
-| Editor | Config Path | Format |
-|--------|-------------|--------|
-| [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | `~/.claude.json` | JSON |
-| [OpenCode](https://opencode.ai) | `~/.config/opencode/opencode.json` | JSON |
-| [Codex CLI](https://github.com/openai/codex) | `~/.codex/config.toml` | TOML |
-| [GitHub Copilot CLI](https://githubnext.com/projects/copilot-cli) | `~/.copilot/mcp-config.json` | JSON |
-| [Cursor](https://cursor.com) | `~/.cursor/mcp.json` | JSON |
-| [Gemini CLI](https://github.com/google-gemini/gemini-cli) | `~/.gemini/settings.json` | JSON |
+**Subagent Management**: list_subagents, get_subagent, create_subagent, delete_subagent, enable_global_subagent, disable_global_subagent
 
-### Simplified Chinese UI
+**Hook Management**: list_hooks, get_hook, create_hook, delete_hook, enable_global_hook, disable_global_hook
 
-This fork adds full Simplified Chinese support. 1750+ translation keys cover every piece of text in the interface. Switch languages in Settings — takes effect immediately, no restart required.
+**Project Management**: list_projects, get_project
+
+</details>
+
+### StatusLine & Spinner Customization
 
 <!--
-  Screenshot placeholder: Chinese UI overview
-  How to capture:
-  1. Open app, go to Settings → Interface, switch to Chinese
-  2. Navigate to MCP server management page
-  3. Resize window to ~1280×800
-  4. Take full window screenshot (Cmd+Shift+4 on macOS)
-  Suggested size: 1280px wide
-  Format: PNG
-  Save to: imgs/hero-zh.png
+[Placeholder] StatusLine builder screenshot
+Capture: Open the app → navigate to the StatusLine page → drag in several segments (model, cost, git_branch, etc.) → switch to Powerline theme → screenshot the full builder including the preview bar
+Size: 1280px wide, PNG
+Path: imgs/statusline.png
+Uncomment when ready:
+![StatusLine Builder](./imgs/statusline.png)
 -->
+
+**StatusLine** is the info bar at the bottom of the Claude Code terminal. Drag-and-drop builder with 25+ segment types:
+
+- Model/Session: model, version, session_id, agent_name, vim_mode
+- Usage/Cost: cost, context, tokens_in, tokens_out, duration, lines_changed
+- Git/Workspace: git_branch, git_status, cwd, project_dir
+- Themes: Default / Powerline / Powerline Round
+
+**Spinner Verb** — The action words shown during task execution (*Thinking...*, *Analyzing...*). Customize content, order, and enable/disable.
+
+### Usage Analytics & Session Explorer
+
+<!--
+[Placeholder] Usage analytics screenshot
+Capture: Open the app → navigate to the Analytics page (requires existing usage history) → screenshot the full page including activity heatmap and model distribution chart
+Size: 1280px wide, PNG
+Path: imgs/analytics.png
+Uncomment when ready:
+![Usage Analytics](./imgs/analytics.png)
+-->
+
+Parse local Claude Code session data. All analysis runs locally — no cloud required:
+
+- **Usage Analytics** — Daily activity trends, model breakdown, token consumption, peak hours heatmap, cost estimates
+- **Session Explorer** — View conversation history per project, tool call stats, per-message token usage
+- **Insights** — Session quality assessment, goal completion analysis, friction point identification, efficiency bottleneck diagnosis
+
+### More Features
+
+- **Memory File Management** — Manage Claude Code memory files with user/project/local scopes
+- **Permission Rules** — Visual config for tool permissions (allow/deny/ask), with preset templates
+- **Marketplace** — Extend Skill/Command plugin sources via GitHub, npm, URL, and more
 
 ---
 
 ## Installation
 
+### macOS (Homebrew Recommended)
+
+```bash
+brew tap linhai0872/tap
+brew install --cask claude-code-tool-manager
+```
+
+Update: `brew upgrade --cask claude-code-tool-manager`
+
 ### Direct Download
 
-Download the latest release from [GitHub Releases](https://github.com/linhai0872/claude-code-tool-manager/releases):
+Grab the latest from [GitHub Releases](https://github.com/linhai0872/claude-code-tool-manager/releases):
 
 | Platform | File |
 |----------|------|
@@ -125,19 +233,18 @@ Download the latest release from [GitHub Releases](https://github.com/linhai0872
 | Linux | `.AppImage` or `.deb` |
 
 > [!IMPORTANT]
-> **macOS users:** This app is not signed with an Apple Developer certificate. macOS will block it on first launch.
+> **macOS users:** The app isn't Apple-signed. DMG installs get blocked on first launch.
+> Right-click → "Open" → confirm, or run:
 >
-> Fix: Right-click the app → select "Open" → confirm "Open" in the dialog.
->
-> Or run in Terminal:
 > ```bash
 > xattr -cr /Applications/Claude\ Code\ Tool\ Manager.app
 > ```
+>
+> Homebrew installs are not affected.
 
-<details>
-<summary><strong>Build from Source</strong></summary>
+**Build from Source**
 
-Requires [Node.js](https://nodejs.org/) 18+, [Rust](https://www.rust-lang.org/tools/install) 1.70+, and [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/).
+Requires [Node.js](https://nodejs.org/) 18+, [Rust](https://www.rust-lang.org/tools/install) 1.70+, [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/).
 
 ```bash
 git clone https://github.com/linhai0872/claude-code-tool-manager.git
@@ -146,21 +253,17 @@ npm install
 npm run tauri build
 ```
 
-Output: `src-tauri/target/release/bundle/`
-
-</details>
+Output in `src-tauri/target/release/bundle/`.
 
 ---
 
-## Quick Start
+## Quick Start Guide
 
-**1. Scan existing configurations**
+1. **Scan existing configs** — On launch, the app detects installed editors and imports existing MCP configurations
+2. **Add or import** — Create manually, or paste JSON / CLI commands for auto-parsing
+3. **Assign to projects** — Toggle tools on/off, pick target editors, configs sync automatically
 
-On launch, the app detects installed editors and scans their existing MCP configurations.
-
-**2. Add or import**
-
-Create a new MCP server manually, or paste JSON / CLI commands for quick import:
+Supported import formats:
 
 ```json
 {
@@ -177,39 +280,47 @@ Create a new MCP server manually, or paste JSON / CLI commands for quick import:
 claude mcp add filesystem -s user -- npx -y @modelcontextprotocol/server-filesystem ~/Documents
 ```
 
-**3. Assign to projects**
-
-Toggle tools on/off per project, select target editors, and configurations sync automatically.
-
 ---
 
 ## Configuration Locations
 
-| Scope | MCPs | Commands | Skills | Sub-Agents | Hooks |
-|-------|------|----------|--------|------------|-------|
+| Scope | MCP Server | Command | Skill | Subagent | Hook |
+|-------|------------|---------|-------|----------|------|
 | Global | `~/.claude.json` | `~/.claude/commands/` | `~/.claude/skills/` | `~/.claude/agents/` | `~/.claude/settings.json` |
 | Project | `.claude/.mcp.json` | `.claude/commands/` | `.claude/skills/` | `.claude/agents/` | `.claude/settings.json` |
 
 ---
 
-## Tech Stack
+## Development
 
-Svelte 5 + SvelteKit · Tauri 2 + Rust · SQLite · Tailwind CSS v4 · Paraglide JS
+| Command | Purpose |
+|---------|---------|
+| `npm install` | Install dependencies |
+| `npm run tauri dev` | Start dev server |
+| `npm run check` | TypeScript type checking |
+| `npm run test:run` | Unit tests |
+| `npm run tauri build` | Production build |
+
+**Tech Stack**: Svelte 5 + SvelteKit · Tauri 2 + Rust · SQLite · Tailwind CSS v4 · Paraglide JS
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+
+---
+
+## Differences from Upstream
+
+Fork of [tylergraydev/claude-code-tool-manager](https://github.com/tylergraydev/claude-code-tool-manager). All upstream features retained, with the following additions:
+
+| Change | Details |
+|--------|---------|
+| **Simplified Chinese UI** | Paraglide JS, 1800+ translations covering the full interface, runtime switching without restart |
+| **Custom Select Component** | All native `<select>` elements replaced with CustomSelect — keyboard nav, search filtering, dark mode |
+| **Theme Persistence** | Dark mode preference stored in localStorage, no longer hardcoded |
+| **Independent Release Pipeline** | Removed upstream Apple signing dependency; added Homebrew Cask distribution and Tauri signed updates (Windows/Linux) |
 
 ## Acknowledgments
 
-Thanks to [@tylergraydev](https://github.com/tylergraydev) for creating and maintaining the upstream project [claude-code-tool-manager](https://github.com/tylergraydev/claude-code-tool-manager).
-
-## Development
-
-```bash
-npm install          # Install dependencies
-npm run tauri dev    # Development mode
-npm test             # Run tests
-npm run tauri build  # Production build
-```
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for contribution guidelines.
+Thanks to [@tylergraydev](https://github.com/tylergraydev) for creating and maintaining the upstream project.
 
 ## License
 
