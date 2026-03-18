@@ -100,9 +100,9 @@ Enable the editors you use in Settings, and MCP configurations will sync to all 
 Capture: Open the app → navigate to the Skills page → expand a Skill's edit panel to show Markdown content, allowedTools, and model selection
 Size: 1280px wide, PNG
 Path: imgs/skills.png
-Uncomment when ready:
-![Skills & Commands](./imgs/skills.png)
+Replace below when ready:
 -->
+![Skills & Commands](./imgs/skills.png)
 
 - **Skill** — On-demand capabilities; Claude decides whether to invoke based on conversation context
 - **Command** — Manually triggered via `/command-name`, with argument hints
@@ -116,9 +116,9 @@ Uncomment when ready:
 Capture: Open the app → navigate to the Hooks page → expand a Hook's edit panel showing event type, regex matcher, and script input
 Size: 1280px wide, PNG
 Path: imgs/hooks.png
-Uncomment when ready:
-![Hooks](./imgs/hooks.png)
+Replace below when ready:
 -->
+![Hooks](./imgs/hooks.png)
 
 - **Subagent** — Independent child agents with dedicated model, system instructions, tool set, and permission mode
 - **Hook** — Execute scripts or inject prompts on specific events
@@ -172,8 +172,7 @@ The app runs its own MCP Server on startup, exposing **31 tools** over Streamabl
 Capture: Open the app → navigate to the StatusLine page → drag in several segments (model, cost, git_branch, etc.) → switch to Powerline theme → screenshot the full builder including the preview bar
 Size: 1280px wide, PNG
 Path: imgs/statusline.png
-Uncomment when ready:
-![StatusLine Builder](./imgs/statusline.png)
+Add image below when ready:
 -->
 
 **StatusLine** is the info bar at the bottom of the Claude Code terminal. Drag-and-drop builder with 25+ segment types:
@@ -192,8 +191,7 @@ Uncomment when ready:
 Capture: Open the app → navigate to the Analytics page (requires existing usage history) → screenshot the full page including activity heatmap and model distribution chart
 Size: 1280px wide, PNG
 Path: imgs/analytics.png
-Uncomment when ready:
-![Usage Analytics](./imgs/analytics.png)
+Add image below when ready:
 -->
 
 Parse local Claude Code session data. All analysis runs locally — no cloud required:
