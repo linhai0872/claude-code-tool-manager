@@ -58,7 +58,7 @@ This app brings all those configs into one interface. **See it, manage it.**
 ```bash
 # macOS (Homebrew)
 brew tap linhai0872/tap
-brew install --cask claude-code-tool-manager
+brew install --cask linhai0872/tap/claude-code-tool-manager
 
 # Or download from GitHub Releases
 # https://github.com/linhai0872/claude-code-tool-manager/releases
@@ -214,10 +214,10 @@ Parse local Claude Code session data. All analysis runs locally — no cloud req
 
 ```bash
 brew tap linhai0872/tap
-brew install --cask claude-code-tool-manager
+brew install --cask linhai0872/tap/claude-code-tool-manager
 ```
 
-Update: `brew upgrade --cask claude-code-tool-manager`
+Update: `brew upgrade --cask linhai0872/tap/claude-code-tool-manager`
 
 ### Direct Download
 
