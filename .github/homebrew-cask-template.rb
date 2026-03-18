@@ -3,7 +3,7 @@
 # CI 每次发版时会自动更新版本号和 SHA256。
 
 cask "claude-code-tool-manager" do
-  version "3.4.1"
+  version "1.0.0"
 
   on_arm do
     url "https://github.com/linhai0872/claude-code-tool-manager/releases/download/v#{version}/Claude.Code.Tool.Manager_#{version}_aarch64.dmg"
