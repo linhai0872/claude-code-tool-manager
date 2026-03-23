@@ -33,6 +33,9 @@ npm-debug.log*
 # Claude Code local settings (may contain tokens)
 .claude/
 
+# Internal governance docs (not for public)
+docs/internal/
+
 # Playwright
 /test-results/
 /playwright-report/
