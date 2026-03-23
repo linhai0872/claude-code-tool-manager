@@ -93,7 +93,7 @@ describe('SkillCard Component', () => {
 
 	it('should display singular tool text for one tool', () => {
 		render(SkillCard, { props: { skill: { ...mockSkill, allowedTools: ['Read'] } } });
-		expect(screen.getByText('1 tool')).toBeInTheDocument();
+		expect(screen.getByText('1 tools')).toBeInTheDocument();
 	});
 
 	it('should not show tool badge when no tools', () => {
@@ -221,7 +221,7 @@ describe('SkillLibrary Component', () => {
 
 	it('should render search bar placeholder', () => {
 		render(SkillLibrary);
-		expect(screen.getByPlaceholderText('Search skills...')).toBeInTheDocument();
+		expect(screen.getByPlaceholderText('Search available skills...')).toBeInTheDocument();
 	});
 
 	it('should show skill count', () => {

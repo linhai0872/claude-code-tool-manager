@@ -18,7 +18,7 @@ describe('SandboxConfigEditor Component', () => {
 		render(SandboxConfigEditor, {
 			props: { settings: mockSettings as any, onsave: vi.fn() }
 		});
-		expect(screen.getByText('General')).toBeInTheDocument();
+		expect(screen.getByText('Sandbox')).toBeInTheDocument();
 	});
 
 	it('should render save button', async () => {

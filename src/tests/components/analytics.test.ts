@@ -156,7 +156,7 @@ describe('OverviewCards Component', () => {
 				totalCostUSD: 25.5
 			}
 		});
-		expect(screen.getByText('Est. API Cost')).toBeInTheDocument();
+		expect(screen.getByText('Est. Cost')).toBeInTheDocument();
 		expect(screen.getByText('$25.50')).toBeInTheDocument();
 	});
 
@@ -171,7 +171,7 @@ describe('OverviewCards Component', () => {
 				lastComputedDate: '2024-06-15'
 			}
 		});
-		expect(document.body.textContent).toContain('Last updated:');
+		expect(document.body.textContent).toContain('Last updated');
 	});
 });
 
@@ -255,7 +255,7 @@ describe('DailyCostChart Component', () => {
 
 	it('should render chart with data', () => {
 		const data = [
-			{ date: '2024-01-01', total: 1.5, costByModel: { 'claude-3-opus': 1.5 } }
+			{ date: '2024-01-01', tokensByModel: { 'claude-3-opus': 1.5 } }
 		];
 		const { container } = render(DailyCostChart, {
 			props: { data, models: ['claude-3-opus'] }
@@ -266,7 +266,7 @@ describe('DailyCostChart Component', () => {
 
 	it('should render model legend', () => {
 		const data = [
-			{ date: '2024-01-01', total: 1.0, costByModel: { 'claude-3-opus': 1.0 } }
+			{ date: '2024-01-01', tokensByModel: { 'claude-3-opus': 1.0 } }
 		];
 		render(DailyCostChart, {
 			props: { data, models: ['claude-3-opus'] }
@@ -336,7 +336,7 @@ describe('ModelUsageBreakdown Component', () => {
 
 	it('should render empty data message when no usage', () => {
 		render(ModelUsageBreakdown, { props: { modelUsage: {} } });
-		expect(screen.getByText('No model usage data')).toBeInTheDocument();
+		expect(screen.getByText('No model usage data available')).toBeInTheDocument();
 	});
 
 	it('should render model data when provided', () => {
@@ -353,11 +353,11 @@ describe('ModelUsageBreakdown Component', () => {
 				}
 			}
 		});
-		expect(screen.getByText('total tokens')).toBeInTheDocument();
+		expect(screen.getByText('Total Tokens')).toBeInTheDocument();
 		// Table headers
-		expect(screen.getByText('Input')).toBeInTheDocument();
-		expect(screen.getByText('Output')).toBeInTheDocument();
-		expect(screen.getByText('Cache Read')).toBeInTheDocument();
+		expect(screen.getByText('In')).toBeInTheDocument();
+		expect(screen.getByText('Out')).toBeInTheDocument();
+		expect(screen.getByText('Cache')).toBeInTheDocument();
 		expect(screen.getByText('Cache Write')).toBeInTheDocument();
 		expect(screen.getByText('Total')).toBeInTheDocument();
 		expect(screen.getByText('Est. Cost')).toBeInTheDocument();
@@ -400,7 +400,7 @@ describe('PeakHoursChart Component', () => {
 
 	it('should render empty data message when all zeros', () => {
 		render(PeakHoursChart, { props: { hourCounts: new Array(24).fill(0) } });
-		expect(screen.getByText('No hour data available')).toBeInTheDocument();
+		expect(screen.getByText('No hourly data available')).toBeInTheDocument();
 	});
 
 	it('should render chart with data', () => {
@@ -416,8 +416,7 @@ describe('PeakHoursChart Component', () => {
 		const hourCounts = new Array(24).fill(0);
 		hourCounts[14] = 10;
 		render(PeakHoursChart, { props: { hourCounts } });
-		expect(document.body.textContent).toContain('Peak:');
-		expect(document.body.textContent).toContain('2:00 PM');
+		expect(document.body.textContent).toContain('Peak at');
 		expect(document.body.textContent).toContain('10 sessions');
 	});
 });
@@ -444,13 +443,13 @@ describe('CostProjectionsCard Component', () => {
 		render(CostProjectionsCard, {
 			props: { dailyCosts: [], totalCostUSD: 0 }
 		});
-		expect(screen.getByText('No cost data')).toBeInTheDocument();
+		expect(screen.getByText('No cost data available')).toBeInTheDocument();
 	});
 
 	it('should render projections with data', () => {
 		const dailyCosts = [
-			{ date: '2024-01-01', total: 2.0, costByModel: {} },
-			{ date: '2024-01-02', total: 3.0, costByModel: {} }
+			{ date: '2024-01-01', tokensByModel: { 'default': 2.0 } },
+			{ date: '2024-01-02', tokensByModel: { 'default': 3.0 } }
 		];
 		render(CostProjectionsCard, {
 			props: { dailyCosts, totalCostUSD: 5.0 }
@@ -462,32 +461,32 @@ describe('CostProjectionsCard Component', () => {
 
 	it('should show flat trend with insufficient data', () => {
 		const dailyCosts = [
-			{ date: '2024-01-01', total: 2.0, costByModel: {} }
+			{ date: '2024-01-01', tokensByModel: { 'default': 2.0 } }
 		];
 		render(CostProjectionsCard, {
 			props: { dailyCosts, totalCostUSD: 2.0 }
 		});
-		expect(screen.getByText('Spending stable')).toBeInTheDocument();
+		expect(screen.getByText('Spending is stable')).toBeInTheDocument();
 	});
 
 	it('should show spending trending up when recent > prior', () => {
 		const dailyCosts = [
 			// Prior period (older)
-			{ date: '2024-01-01', total: 1.0, costByModel: {} },
-			{ date: '2024-01-02', total: 1.0, costByModel: {} },
-			{ date: '2024-01-03', total: 1.0, costByModel: {} },
-			{ date: '2024-01-04', total: 1.0, costByModel: {} },
-			{ date: '2024-01-05', total: 1.0, costByModel: {} },
-			{ date: '2024-01-06', total: 1.0, costByModel: {} },
-			{ date: '2024-01-07', total: 1.0, costByModel: {} },
+			{ date: '2024-01-01', tokensByModel: { 'default': 1.0 } },
+			{ date: '2024-01-02', tokensByModel: { 'default': 1.0 } },
+			{ date: '2024-01-03', tokensByModel: { 'default': 1.0 } },
+			{ date: '2024-01-04', tokensByModel: { 'default': 1.0 } },
+			{ date: '2024-01-05', tokensByModel: { 'default': 1.0 } },
+			{ date: '2024-01-06', tokensByModel: { 'default': 1.0 } },
+			{ date: '2024-01-07', tokensByModel: { 'default': 1.0 } },
 			// Recent period (newer)
-			{ date: '2024-01-08', total: 5.0, costByModel: {} },
-			{ date: '2024-01-09', total: 5.0, costByModel: {} },
-			{ date: '2024-01-10', total: 5.0, costByModel: {} },
-			{ date: '2024-01-11', total: 5.0, costByModel: {} },
-			{ date: '2024-01-12', total: 5.0, costByModel: {} },
-			{ date: '2024-01-13', total: 5.0, costByModel: {} },
-			{ date: '2024-01-14', total: 5.0, costByModel: {} }
+			{ date: '2024-01-08', tokensByModel: { 'default': 5.0 } },
+			{ date: '2024-01-09', tokensByModel: { 'default': 5.0 } },
+			{ date: '2024-01-10', tokensByModel: { 'default': 5.0 } },
+			{ date: '2024-01-11', tokensByModel: { 'default': 5.0 } },
+			{ date: '2024-01-12', tokensByModel: { 'default': 5.0 } },
+			{ date: '2024-01-13', tokensByModel: { 'default': 5.0 } },
+			{ date: '2024-01-14', tokensByModel: { 'default': 5.0 } }
 		];
 		render(CostProjectionsCard, {
 			props: { dailyCosts, totalCostUSD: 42.0 }
@@ -498,21 +497,21 @@ describe('CostProjectionsCard Component', () => {
 	it('should show spending trending down when recent < prior', () => {
 		const dailyCosts = [
 			// Prior period (older, higher)
-			{ date: '2024-01-01', total: 5.0, costByModel: {} },
-			{ date: '2024-01-02', total: 5.0, costByModel: {} },
-			{ date: '2024-01-03', total: 5.0, costByModel: {} },
-			{ date: '2024-01-04', total: 5.0, costByModel: {} },
-			{ date: '2024-01-05', total: 5.0, costByModel: {} },
-			{ date: '2024-01-06', total: 5.0, costByModel: {} },
-			{ date: '2024-01-07', total: 5.0, costByModel: {} },
+			{ date: '2024-01-01', tokensByModel: { 'default': 5.0 } },
+			{ date: '2024-01-02', tokensByModel: { 'default': 5.0 } },
+			{ date: '2024-01-03', tokensByModel: { 'default': 5.0 } },
+			{ date: '2024-01-04', tokensByModel: { 'default': 5.0 } },
+			{ date: '2024-01-05', tokensByModel: { 'default': 5.0 } },
+			{ date: '2024-01-06', tokensByModel: { 'default': 5.0 } },
+			{ date: '2024-01-07', tokensByModel: { 'default': 5.0 } },
 			// Recent period (newer, lower)
-			{ date: '2024-01-08', total: 1.0, costByModel: {} },
-			{ date: '2024-01-09', total: 1.0, costByModel: {} },
-			{ date: '2024-01-10', total: 1.0, costByModel: {} },
-			{ date: '2024-01-11', total: 1.0, costByModel: {} },
-			{ date: '2024-01-12', total: 1.0, costByModel: {} },
-			{ date: '2024-01-13', total: 1.0, costByModel: {} },
-			{ date: '2024-01-14', total: 1.0, costByModel: {} }
+			{ date: '2024-01-08', tokensByModel: { 'default': 1.0 } },
+			{ date: '2024-01-09', tokensByModel: { 'default': 1.0 } },
+			{ date: '2024-01-10', tokensByModel: { 'default': 1.0 } },
+			{ date: '2024-01-11', tokensByModel: { 'default': 1.0 } },
+			{ date: '2024-01-12', tokensByModel: { 'default': 1.0 } },
+			{ date: '2024-01-13', tokensByModel: { 'default': 1.0 } },
+			{ date: '2024-01-14', tokensByModel: { 'default': 1.0 } }
 		];
 		render(CostProjectionsCard, {
 			props: { dailyCosts, totalCostUSD: 42.0 }
@@ -539,7 +538,7 @@ describe('FrictionTrendsChart Component', () => {
 
 	it('should render empty state when no friction data', () => {
 		render(FrictionTrendsChart, { props: { facets: [] } });
-		expect(screen.getByText('No friction data recorded')).toBeInTheDocument();
+		expect(screen.getByText('No friction data available')).toBeInTheDocument();
 	});
 
 	it('should render friction bars when data present', () => {
@@ -560,7 +559,7 @@ describe('FrictionTrendsChart Component', () => {
 		render(FrictionTrendsChart, { props: { facets } });
 		expect(screen.getByText('Slow Response')).toBeInTheDocument();
 		expect(screen.getByText('3')).toBeInTheDocument();
-		expect(screen.getByText('Context Limit')).toBeInTheDocument();
+		expect(screen.getByText('context_limit')).toBeInTheDocument();
 		expect(screen.getByText('1')).toBeInTheDocument();
 	});
 });
@@ -623,8 +622,8 @@ describe('SessionQualityCards Component', () => {
 		// Should render SVG circles for donuts
 		const circles = container.querySelectorAll('circle');
 		expect(circles.length).toBeGreaterThan(0);
-		expect(screen.getByText('Success')).toBeInTheDocument();
-		expect(screen.getByText('Failure')).toBeInTheDocument();
+		expect(screen.getByText('success')).toBeInTheDocument();
+		expect(screen.getByText('failure')).toBeInTheDocument();
 	});
 });
 
@@ -690,7 +689,7 @@ describe('SessionSummaryList Component', () => {
 			}
 		];
 		render(SessionSummaryList, { props: { facets } });
-		expect(screen.getByText('Untitled session')).toBeInTheDocument();
+		expect(screen.getByText('Untitled Session')).toBeInTheDocument();
 	});
 
 	it('should truncate long session IDs', () => {

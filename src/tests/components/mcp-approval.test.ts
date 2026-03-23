@@ -15,7 +15,7 @@ describe('McpApprovalEditor Component', () => {
 		render(McpApprovalEditor, {
 			props: { settings: mockSettings as any, onsave: vi.fn() }
 		});
-		expect(screen.getByText('MCP Server Approval')).toBeInTheDocument();
+		expect(screen.getByText('MCP Approval')).toBeInTheDocument();
 	});
 
 	it('should show enabled servers', async () => {

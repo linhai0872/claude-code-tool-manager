@@ -113,7 +113,7 @@ describe('ComparisonProjectSelector Component', () => {
 	it('should show session count and token count', () => {
 		render(ComparisonProjectSelector, { props: { projects: [mockProject] } });
 		expect(screen.getByText('10 sessions')).toBeInTheDocument();
-		expect(screen.getByText('8000 tokens')).toBeInTheDocument();
+		expect(screen.getByText('8000 Tokens')).toBeInTheDocument();
 	});
 });
 
@@ -127,7 +127,7 @@ describe('CostComparisonChart Component', () => {
 
 	it('should render heading', () => {
 		render(CostComparisonChart, { props: { data: [] } });
-		expect(screen.getByText('Cost Comparison')).toBeInTheDocument();
+		expect(screen.getByText('Cost')).toBeInTheDocument();
 	});
 
 	it('should show empty state message with no data', () => {
@@ -151,7 +151,7 @@ describe('TokenComparisonChart Component', () => {
 
 	it('should render heading', () => {
 		render(TokenComparisonChart, { props: { data: [] } });
-		expect(screen.getByText('Token Comparison')).toBeInTheDocument();
+		expect(screen.getByText('Token')).toBeInTheDocument();
 	});
 
 	it('should show empty state with no data', () => {
@@ -161,9 +161,9 @@ describe('TokenComparisonChart Component', () => {
 
 	it('should render legend items', () => {
 		render(TokenComparisonChart, { props: { data: [] } });
-		expect(screen.getByText('Input')).toBeInTheDocument();
-		expect(screen.getByText('Output')).toBeInTheDocument();
-		expect(screen.getByText('Cache Read')).toBeInTheDocument();
+		expect(screen.getByText('In')).toBeInTheDocument();
+		expect(screen.getByText('Out')).toBeInTheDocument();
+		expect(screen.getByText('Cache')).toBeInTheDocument();
 		expect(screen.getByText('Cache Write')).toBeInTheDocument();
 	});
 
@@ -229,7 +229,7 @@ describe('ToolUsageComparisonChart Component', () => {
 
 	it('should show empty state with no tools', () => {
 		render(ToolUsageComparisonChart, { props: { data: [], tools: [] } });
-		expect(screen.getByText('No tool usage data')).toBeInTheDocument();
+		expect(screen.getByText('No tool usage data available')).toBeInTheDocument();
 	});
 
 	it('should render SVG chart with data', () => {

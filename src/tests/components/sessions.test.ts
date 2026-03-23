@@ -220,7 +220,7 @@ describe('ProjectOverviewCards Component', () => {
 		expect(screen.getByText('Total Sessions')).toBeInTheDocument();
 		expect(screen.getByText('Total Tokens')).toBeInTheDocument();
 		expect(screen.getByText('Models Used')).toBeInTheDocument();
-		expect(screen.getByText('Est. API Cost')).toBeInTheDocument();
+		expect(screen.getByText('Est. Cost')).toBeInTheDocument();
 	});
 
 	it('should show project count', () => {
@@ -230,7 +230,7 @@ describe('ProjectOverviewCards Component', () => {
 
 	it('should show cost subtitle', () => {
 		render(ProjectOverviewCards, { props: { projects: [mockProject] } });
-		expect(screen.getByText('if billed at API rates')).toBeInTheDocument();
+		expect(screen.getByText('If billed at API rates')).toBeInTheDocument();
 	});
 });
 
@@ -249,7 +249,7 @@ describe('ToolUsageChart Component', () => {
 
 	it('should show empty state when no usage data', () => {
 		render(ToolUsageChart, { props: { toolUsage: {} } });
-		expect(screen.getByText('No tool usage data')).toBeInTheDocument();
+		expect(screen.getByText('No tool usage data available')).toBeInTheDocument();
 	});
 
 	it('should render SVG chart when data present', () => {
@@ -291,7 +291,7 @@ describe('SessionDetailPanel Component', () => {
 
 	it('should render Session Transcript heading', () => {
 		render(SessionDetailPanel, { props: { detail: mockDetail, onClose: vi.fn() } });
-		expect(screen.getByText('Session Transcript')).toBeInTheDocument();
+		expect(screen.getByText('Transcript')).toBeInTheDocument();
 	});
 
 	it('should show message count', () => {
@@ -311,8 +311,8 @@ describe('SessionDetailPanel Component', () => {
 
 	it('should show role badges', () => {
 		render(SessionDetailPanel, { props: { detail: mockDetail, onClose: vi.fn() } });
-		expect(screen.getByText('User')).toBeInTheDocument();
-		expect(screen.getByText('Assistant')).toBeInTheDocument();
+		expect(screen.getByText('Role User')).toBeInTheDocument();
+		expect(screen.getByText('Role Assistant')).toBeInTheDocument();
 	});
 
 	it('should render tool calls', () => {

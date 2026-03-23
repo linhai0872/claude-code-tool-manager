@@ -35,14 +35,14 @@ describe('PluginListEditor Component', () => {
 		render(PluginListEditor, {
 			props: { settings: mockSettings as any, onsave: vi.fn() }
 		});
-		expect(screen.getByText('Enabled Plugins')).toBeInTheDocument();
+		expect(screen.getByText('Plugins')).toBeInTheDocument();
 	});
 
 	it('should render description', () => {
 		render(PluginListEditor, {
 			props: { settings: mockSettings as any, onsave: vi.fn() }
 		});
-		expect(screen.getByText(/Configure which plugins are enabled/)).toBeInTheDocument();
+		expect(screen.getByText(/Manage enabled plugins and tool restrictions/)).toBeInTheDocument();
 	});
 
 	it('should show existing plugins', () => {
@@ -64,7 +64,7 @@ describe('PluginListEditor Component', () => {
 		render(PluginListEditor, {
 			props: { settings: mockSettings as any, onsave: vi.fn() }
 		});
-		expect(screen.getByPlaceholderText('Plugin name')).toBeInTheDocument();
+		expect(screen.getByPlaceholderText('Plugin Name')).toBeInTheDocument();
 	});
 
 	it('should call onsave on save', async () => {
@@ -80,7 +80,7 @@ describe('PluginListEditor Component', () => {
 		const { container } = render(PluginListEditor, {
 			props: { settings: mockSettings as any, onsave: vi.fn() }
 		});
-		const selects = container.querySelectorAll('select');
+		const selects = container.querySelectorAll('[role="combobox"]');
 		expect(selects.length).toBe(2);
 	});
 
@@ -114,28 +114,28 @@ describe('MarketplaceEditor Component', () => {
 		render(MarketplaceEditor, {
 			props: { settings: mockSettings as any, onsave: vi.fn() }
 		});
-		expect(screen.getByText('Extra Marketplaces')).toBeInTheDocument();
+		expect(screen.getByText('Marketplace Sources')).toBeInTheDocument();
 	});
 
 	it('should show empty state', () => {
 		render(MarketplaceEditor, {
 			props: { settings: mockSettings as any, onsave: vi.fn() }
 		});
-		expect(screen.getByText(/No extra marketplaces/)).toBeInTheDocument();
+		expect(screen.getByText(/No marketplace sources configured/)).toBeInTheDocument();
 	});
 
 	it('should show Add Marketplace button', () => {
 		render(MarketplaceEditor, {
 			props: { settings: mockSettings as any, onsave: vi.fn() }
 		});
-		expect(screen.getByText('Add Marketplace')).toBeInTheDocument();
+		expect(screen.getByText('Add Marketplace Source')).toBeInTheDocument();
 	});
 
 	it('should show Save Marketplaces button', () => {
 		render(MarketplaceEditor, {
 			props: { settings: mockSettings as any, onsave: vi.fn() }
 		});
-		expect(screen.getByText('Save Marketplaces')).toBeInTheDocument();
+		expect(screen.getByText('Save Marketplace Source')).toBeInTheDocument();
 	});
 
 	it('should render existing marketplaces', () => {
@@ -165,7 +165,7 @@ describe('MarketplaceSourceForm Component', () => {
 		render(MarketplaceSourceForm, {
 			props: { onsave: vi.fn(), oncancel: vi.fn() }
 		});
-		expect(screen.getByText('Marketplace Name')).toBeInTheDocument();
+		expect(screen.getByText('Source Name')).toBeInTheDocument();
 		expect(screen.getByText('Source Type')).toBeInTheDocument();
 	});
 
@@ -181,7 +181,7 @@ describe('MarketplaceSourceForm Component', () => {
 			props: { onsave: vi.fn(), oncancel: vi.fn() }
 		});
 		expect(screen.getByText('Cancel')).toBeInTheDocument();
-		expect(screen.getByText('Add Marketplace')).toBeInTheDocument();
+		expect(screen.getByText('Add Marketplace Source')).toBeInTheDocument();
 	});
 
 	it('should show Update text when editing', () => {
@@ -193,7 +193,7 @@ describe('MarketplaceSourceForm Component', () => {
 				oncancel: vi.fn()
 			}
 		});
-		expect(screen.getByText('Update Marketplace')).toBeInTheDocument();
+		expect(screen.getByText('Update Marketplace Source')).toBeInTheDocument();
 	});
 
 	it('should show install location field', () => {

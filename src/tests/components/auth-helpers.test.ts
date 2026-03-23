@@ -16,11 +16,11 @@ describe('AuthHelpersEditor Component', () => {
 		render(AuthHelpersEditor, {
 			props: { settings: mockSettings as any, onsave: vi.fn() }
 		});
-		expect(screen.getByText('Auth & API Key Helpers')).toBeInTheDocument();
+		expect(screen.getByText('Authentication Helpers')).toBeInTheDocument();
 		expect(screen.getByLabelText('API Key Helper')).toBeInTheDocument();
-		expect(screen.getByLabelText('OpenTelemetry Headers Helper')).toBeInTheDocument();
-		expect(screen.getByLabelText('AWS Auth Refresh')).toBeInTheDocument();
-		expect(screen.getByLabelText('AWS Credential Export')).toBeInTheDocument();
+		expect(screen.getByLabelText('OTEL Headers Helper')).toBeInTheDocument();
+		expect(screen.getByLabelText('AWS Auth Refresh Helper')).toBeInTheDocument();
+		expect(screen.getByLabelText('AWS Credential Export Helper')).toBeInTheDocument();
 	});
 
 	it('should populate initial values', async () => {
@@ -38,7 +38,7 @@ describe('AuthHelpersEditor Component', () => {
 		render(AuthHelpersEditor, {
 			props: { settings: mockSettings as any, onsave }
 		});
-		await fireEvent.click(screen.getByText('Save Auth Helper Settings'));
+		await fireEvent.click(screen.getByText('Save Authentication Helpers'));
 		expect(onsave).toHaveBeenCalledOnce();
 	});
 });

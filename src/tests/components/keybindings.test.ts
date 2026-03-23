@@ -78,13 +78,13 @@ describe('KeyCaptureDialog Component', () => {
 				oncancel: vi.fn()
 			}
 		});
-		expect(screen.getByText('Test Action')).toBeInTheDocument();
+		expect(screen.getByText(/Test Action/)).toBeInTheDocument();
 	});
 
 	it('should render context name', () => {
 		render(KeyCaptureDialog, {
 			props: {
-				context: 'global' as any,
+				context: 'Global' as any,
 				action: 'test-action',
 				actionLabel: 'Test Action',
 				currentKeys: [],
@@ -92,7 +92,7 @@ describe('KeyCaptureDialog Component', () => {
 				oncancel: vi.fn()
 			}
 		});
-		expect(screen.getByText('global')).toBeInTheDocument();
+		expect(screen.getByText(/Global/)).toBeInTheDocument();
 	});
 
 	it('should show press key instructions when no key captured', () => {
@@ -187,8 +187,8 @@ describe('KeybindingsEditor Component', () => {
 
 	it('should show Expand All and Collapse All buttons', () => {
 		render(KeybindingsEditor);
-		expect(screen.getByText('Expand All')).toBeInTheDocument();
-		expect(screen.getByText('Collapse All')).toBeInTheDocument();
+		expect(screen.getByText('Expand all')).toBeInTheDocument();
+		expect(screen.getByText('Collapse all')).toBeInTheDocument();
 	});
 
 	it('should show Save Keybindings button', () => {

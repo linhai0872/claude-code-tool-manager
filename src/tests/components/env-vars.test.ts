@@ -30,7 +30,7 @@ describe('EnvVarsEditor Component', () => {
 		render(EnvVarsEditor, {
 			props: { settings: mockSettings as any, onsave: vi.fn() }
 		});
-		expect(screen.getByText('Environment Variables')).toBeInTheDocument();
+		expect(screen.getAllByText('Environment').length).toBeGreaterThanOrEqual(1);
 	});
 
 	it('should show existing env vars', () => {

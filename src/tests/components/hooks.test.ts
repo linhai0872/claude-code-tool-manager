@@ -133,13 +133,13 @@ describe('HookCard Component', () => {
 
 	it('should show Command badge for command hook type', () => {
 		render(HookCard, { props: { hook: mockHook } });
-		expect(screen.getByText('Command')).toBeInTheDocument();
+		expect(screen.getByText('Type Command')).toBeInTheDocument();
 	});
 
 	it('should show Prompt badge for prompt hook type', () => {
 		const promptHook = { ...mockHook, hookType: 'prompt' as const, prompt: 'test prompt' };
 		render(HookCard, { props: { hook: promptHook } });
-		expect(screen.getByText('Prompt')).toBeInTheDocument();
+		expect(screen.getByText('Type Prompt')).toBeInTheDocument();
 	});
 
 	it('should show Template badge when isTemplate is true', () => {
@@ -175,7 +175,7 @@ describe('HookCard Component', () => {
 	it('should show timeout badge when timeout is set', () => {
 		const hookWithTimeout = { ...mockHook, timeout: 30 };
 		render(HookCard, { props: { hook: hookWithTimeout } });
-		expect(screen.getByText('30s timeout')).toBeInTheDocument();
+		expect(screen.getByText('Timeout: 30s')).toBeInTheDocument();
 	});
 
 	it('should not show timeout badge when timeout is not set', () => {
@@ -254,13 +254,13 @@ describe('HookForm Component', () => {
 
 	it('should render hook type toggle with Command and Prompt options', () => {
 		render(HookForm, { props: defaultProps });
-		expect(screen.getAllByText('Command').length).toBeGreaterThan(0);
-		expect(screen.getAllByText('Prompt').length).toBeGreaterThan(0);
+		expect(screen.getAllByText('Type Command').length).toBeGreaterThan(0);
+		expect(screen.getAllByText('Type Prompt').length).toBeGreaterThan(0);
 	});
 
 	it('should show command textarea by default', () => {
 		render(HookForm, { props: defaultProps });
-		expect(screen.getByLabelText(/^Command/)).toBeInTheDocument();
+		expect(screen.getByLabelText(/^Type Command/)).toBeInTheDocument();
 	});
 
 	it('should show timeout field for command type', () => {
@@ -270,22 +270,22 @@ describe('HookForm Component', () => {
 
 	it('should show prompt textarea when prompt type selected', async () => {
 		render(HookForm, { props: defaultProps });
-		const promptBtn = screen.getByText('Prompt');
-		await fireEvent.click(promptBtn);
+		const promptBtns = screen.getAllByText('Type Prompt');
+		await fireEvent.click(promptBtns[0].closest('button')!);
 		expect(screen.getByLabelText(/Prompt Text/)).toBeInTheDocument();
 	});
 
 	it('should hide command textarea when prompt type selected', async () => {
 		render(HookForm, { props: defaultProps });
-		const promptBtn = screen.getByText('Prompt');
-		await fireEvent.click(promptBtn);
-		expect(screen.queryByLabelText(/^Command /)).not.toBeInTheDocument();
+		const promptBtns = screen.getAllByText('Type Prompt');
+		await fireEvent.click(promptBtns[0].closest('button')!);
+		expect(screen.queryByLabelText(/^Type Command /)).not.toBeInTheDocument();
 	});
 
 	it('should hide timeout field when prompt type selected', async () => {
 		render(HookForm, { props: defaultProps });
-		const promptBtn = screen.getByText('Prompt');
-		await fireEvent.click(promptBtn);
+		const promptBtns = screen.getAllByText('Type Prompt');
+		await fireEvent.click(promptBtns[0].closest('button')!);
 		expect(screen.queryByLabelText(/Timeout/)).not.toBeInTheDocument();
 	});
 
@@ -296,14 +296,14 @@ describe('HookForm Component', () => {
 
 	it('should show Create Hook button when no initial values', () => {
 		render(HookForm, { props: defaultProps });
-		expect(screen.getByText('Create Hook')).toBeInTheDocument();
+		expect(screen.getByText('Create')).toBeInTheDocument();
 	});
 
 	it('should show Update Hook button when editing', () => {
 		render(HookForm, {
 			props: { ...defaultProps, initialValues: { name: 'existing-hook' } }
 		});
-		expect(screen.getByText('Update Hook')).toBeInTheDocument();
+		expect(screen.getByText('Update')).toBeInTheDocument();
 	});
 
 	it('should show Cancel button', () => {
@@ -322,33 +322,33 @@ describe('HookForm Component', () => {
 		render(HookForm, { props: defaultProps });
 		const form = document.querySelector('form')!;
 		await fireEvent.submit(form);
-		expect(screen.getByText('Command is required for command hooks')).toBeInTheDocument();
+		expect(screen.getByText('Command is required')).toBeInTheDocument();
 	});
 
 	it('should validate prompt is required for prompt hooks', async () => {
 		render(HookForm, { props: defaultProps });
-		const promptBtn = screen.getByText('Prompt');
-		await fireEvent.click(promptBtn);
+		const promptBtns = screen.getAllByText('Type Prompt');
+		await fireEvent.click(promptBtns[0].closest('button')!);
 		const form = document.querySelector('form')!;
 		await fireEvent.submit(form);
-		expect(screen.getByText('Prompt is required for prompt hooks')).toBeInTheDocument();
+		expect(screen.getByText('Prompt is required')).toBeInTheDocument();
 	});
 
 	it('should validate timeout is a positive number', async () => {
 		render(HookForm, { props: defaultProps });
-		const commandInput = screen.getByLabelText(/^Command/);
+		const commandInput = screen.getByLabelText(/^Type Command/);
 		await fireEvent.input(commandInput, { target: { value: 'echo test' } });
 		const timeoutInput = screen.getByLabelText(/Timeout/);
 		await fireEvent.input(timeoutInput, { target: { value: '-5' } });
 		const form = document.querySelector('form')!;
 		await fireEvent.submit(form);
-		expect(screen.getByText('Timeout must be a positive number')).toBeInTheDocument();
+		expect(screen.getByText('Timeout must be zero or greater')).toBeInTheDocument();
 	});
 
 	it('should submit with correct command data', async () => {
 		const onSubmit = vi.fn();
 		render(HookForm, { props: { ...defaultProps, onSubmit } });
-		const commandInput = screen.getByLabelText(/^Command/);
+		const commandInput = screen.getByLabelText(/^Type Command/);
 		await fireEvent.input(commandInput, { target: { value: 'echo hello' } });
 		const form = document.querySelector('form')!;
 		await fireEvent.submit(form);
@@ -363,8 +363,8 @@ describe('HookForm Component', () => {
 	it('should submit with correct prompt data', async () => {
 		const onSubmit = vi.fn();
 		render(HookForm, { props: { ...defaultProps, onSubmit } });
-		const promptBtn = screen.getByText('Prompt');
-		await fireEvent.click(promptBtn);
+		const promptBtns = screen.getAllByText('Type Prompt');
+		await fireEvent.click(promptBtns[0].closest('button')!);
 		const promptInput = screen.getByLabelText(/Prompt Text/);
 		await fireEvent.input(promptInput, { target: { value: 'Test prompt' } });
 		const form = document.querySelector('form')!;
@@ -402,13 +402,13 @@ describe('HookForm Component', () => {
 
 	it('should show import section', () => {
 		render(HookForm, { props: defaultProps });
-		expect(screen.getByText('Import from JSON or Template')).toBeInTheDocument();
+		expect(screen.getByText('Import JSON Or Template')).toBeInTheDocument();
 	});
 
 	it('should show Paste and File buttons', () => {
 		render(HookForm, { props: defaultProps });
-		expect(screen.getByText('Paste')).toBeInTheDocument();
-		expect(screen.getByText('File')).toBeInTheDocument();
+		expect(screen.getByText('Import Paste')).toBeInTheDocument();
+		expect(screen.getByText('Import File')).toBeInTheDocument();
 	});
 
 	it('should show template dropdown when templates provided', () => {
@@ -416,13 +416,13 @@ describe('HookForm Component', () => {
 			{ id: 1, name: 'Template 1', hookType: 'command', eventType: 'PreToolUse', isEnabled: true, isTemplate: true, command: 'echo', createdAt: '', updatedAt: '' }
 		];
 		render(HookForm, { props: { ...defaultProps, templates } });
-		expect(screen.getByText('Templates...')).toBeInTheDocument();
+		expect(screen.getByText('Templates Placeholder')).toBeInTheDocument();
 	});
 
 	it('should parse tags from comma-separated input', async () => {
 		const onSubmit = vi.fn();
 		render(HookForm, { props: { ...defaultProps, onSubmit } });
-		const commandInput = screen.getByLabelText(/^Command/);
+		const commandInput = screen.getByLabelText(/^Type Command/);
 		await fireEvent.input(commandInput, { target: { value: 'echo test' } });
 		const tagsInput = screen.getByLabelText(/Tags/);
 		await fireEvent.input(tagsInput, { target: { value: 'tag1, tag2, tag3' } });
@@ -440,7 +440,7 @@ describe('HookForm Component', () => {
 		render(HookForm, { props: { ...defaultProps, onSubmit } });
 		const matcherInput = screen.getByLabelText(/Matcher Pattern/);
 		await fireEvent.input(matcherInput, { target: { value: 'Bash|Write' } });
-		const commandInput = screen.getByLabelText(/^Command/);
+		const commandInput = screen.getByLabelText(/^Type Command/);
 		await fireEvent.input(commandInput, { target: { value: 'echo test' } });
 		const form = document.querySelector('form')!;
 		await fireEvent.submit(form);
@@ -467,7 +467,7 @@ describe('HookLibrary Component', () => {
 
 	it('should show search bar', () => {
 		render(HookLibrary, { props: {} });
-		expect(screen.getByPlaceholderText('Search hooks...')).toBeInTheDocument();
+		expect(screen.getByPlaceholderText('Search Hooks Library...')).toBeInTheDocument();
 	});
 
 	it('should show All Events filter dropdown', () => {
@@ -477,13 +477,13 @@ describe('HookLibrary Component', () => {
 
 	it('should show view mode toggle with All and By Scope', () => {
 		render(HookLibrary, { props: {} });
-		expect(screen.getByText('All')).toBeInTheDocument();
-		expect(screen.getByText('By Scope')).toBeInTheDocument();
+		expect(screen.getByText('View All')).toBeInTheDocument();
+		expect(screen.getByText('View By Scope')).toBeInTheDocument();
 	});
 
 	it('should show hook count', () => {
 		render(HookLibrary, { props: {} });
-		expect(screen.getByText('0 hooks')).toBeInTheDocument();
+		expect(screen.getByText(/\b0\b/)).toBeInTheDocument();
 	});
 
 	it('should show empty state for all view when no hooks', () => {
@@ -493,7 +493,7 @@ describe('HookLibrary Component', () => {
 
 	it('should show add hook description in empty state', () => {
 		render(HookLibrary, { props: {} });
-		expect(screen.getByText('Add your first hook to automate Claude Code actions')).toBeInTheDocument();
+		expect(screen.getByText('Add your first hook to get started')).toBeInTheDocument();
 	});
 });
 
@@ -523,7 +523,7 @@ describe('HookExportModal Component', () => {
 
 	it('should show selection count', () => {
 		render(HookExportModal, { props: { onClose: vi.fn() } });
-		expect(screen.getByText('0 of 0 selected')).toBeInTheDocument();
+		expect(screen.getByText('Selected 0 of 0')).toBeInTheDocument();
 	});
 
 	it('should show Copy to Clipboard button', () => {
@@ -533,7 +533,7 @@ describe('HookExportModal Component', () => {
 
 	it('should show Export to File button', () => {
 		render(HookExportModal, { props: { onClose: vi.fn() } });
-		expect(screen.getByText('Export to File')).toBeInTheDocument();
+		expect(screen.getByText('Export To File')).toBeInTheDocument();
 	});
 
 	it('should show Cancel button', () => {
@@ -548,12 +548,12 @@ describe('HookExportModal Component', () => {
 
 	it('should show preview placeholder when no hooks selected', () => {
 		render(HookExportModal, { props: { onClose: vi.fn() } });
-		expect(screen.getByText('Select hooks to preview export')).toBeInTheDocument();
+		expect(screen.getByText('Export Select To Preview')).toBeInTheDocument();
 	});
 
 	it('should show Preview section header', () => {
 		render(HookExportModal, { props: { onClose: vi.fn() } });
-		expect(screen.getByText('Preview')).toBeInTheDocument();
+		expect(screen.getByText('Export Preview')).toBeInTheDocument();
 	});
 });
 

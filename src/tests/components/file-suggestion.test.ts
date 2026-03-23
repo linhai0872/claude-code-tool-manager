@@ -20,14 +20,14 @@ describe('FileSuggestionEditor Component', () => {
 		render(FileSuggestionEditor, {
 			props: { settings: mockSettings as any, onsave: vi.fn() }
 		});
-		expect(screen.getByText('File Suggestion')).toBeInTheDocument();
+		expect(screen.getByText('File Suggestions')).toBeInTheDocument();
 	});
 
 	it('should populate command value', () => {
 		render(FileSuggestionEditor, {
 			props: { settings: mockSettings as any, onsave: vi.fn() }
 		});
-		const input = screen.getByLabelText('Command') as HTMLInputElement;
+		const input = screen.getByLabelText('Suggestion Command') as HTMLInputElement;
 		expect(input.value).toBe('/path/to/suggest.sh');
 	});
 
@@ -36,7 +36,7 @@ describe('FileSuggestionEditor Component', () => {
 		render(FileSuggestionEditor, {
 			props: { settings: mockSettings as any, onsave }
 		});
-		await fireEvent.click(screen.getByText('Save File Suggestion Settings'));
+		await fireEvent.click(screen.getByText('Save File Suggestions'));
 		expect(onsave).toHaveBeenCalledOnce();
 		const saved = onsave.mock.calls[0][0];
 		expect(saved.fileSuggestionCommand).toBe('/path/to/suggest.sh');
@@ -49,7 +49,7 @@ describe('FileSuggestionEditor Component', () => {
 		render(FileSuggestionEditor, {
 			props: { settings: emptySettings as any, onsave }
 		});
-		await fireEvent.click(screen.getByText('Save File Suggestion Settings'));
+		await fireEvent.click(screen.getByText('Save File Suggestions'));
 		const saved = onsave.mock.calls[0][0];
 		expect(saved.fileSuggestionCommand).toBeUndefined();
 		expect(saved.fileSuggestionType).toBeUndefined();

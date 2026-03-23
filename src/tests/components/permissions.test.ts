@@ -69,7 +69,7 @@ describe('PermissionRuleList Component', () => {
 		render(PermissionRuleList, {
 			props: { category: 'deny', rules: [], onremove: vi.fn(), onadd: vi.fn(), onreorder: vi.fn() }
 		});
-		expect(screen.getByText('No deny rules configured')).toBeInTheDocument();
+		expect(screen.getByText('No Deny rules configured')).toBeInTheDocument();
 	});
 
 	it('should show Add button', () => {
@@ -221,10 +221,10 @@ describe('DefaultModeSelector Component', () => {
 	});
 
 	it('should render a select element', () => {
-		const { container } = render(DefaultModeSelector, {
+		render(DefaultModeSelector, {
 			props: { value: undefined, onchange: vi.fn() }
 		});
-		expect(container.querySelector('select')).toBeInTheDocument();
+		expect(screen.getByRole('combobox')).toBeInTheDocument();
 	});
 });
 

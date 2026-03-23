@@ -61,19 +61,19 @@ describe('StatusLineCard Component', () => {
 
 	it('should show type badge Custom', () => {
 		render(StatusLineCard, { props: { statusline: mockStatusLine } });
-		expect(screen.getAllByText('Custom').length).toBeGreaterThan(0);
+		expect(screen.getAllByText('Type Custom').length).toBeGreaterThan(0);
 	});
 
 	it('should show Premade badge for premade type', () => {
 		const premade = { ...mockStatusLine, statuslineType: 'premade' };
 		render(StatusLineCard, { props: { statusline: premade } });
-		expect(screen.getAllByText('Premade').length).toBeGreaterThan(0);
+		expect(screen.getAllByText('Type Premade').length).toBeGreaterThan(0);
 	});
 
 	it('should show Raw badge for raw type', () => {
 		const raw = { ...mockStatusLine, statuslineType: 'raw' };
 		render(StatusLineCard, { props: { statusline: raw } });
-		expect(screen.getAllByText('Raw').length).toBeGreaterThan(0);
+		expect(screen.getAllByText('Type Raw').length).toBeGreaterThan(0);
 	});
 
 	it('should show Active badge when isActive', () => {
@@ -96,7 +96,7 @@ describe('StatusLineCard Component', () => {
 	it('should show author when present', () => {
 		const withAuthor = { ...mockStatusLine, author: 'john' };
 		render(StatusLineCard, { props: { statusline: withAuthor } });
-		expect(screen.getByText('by john')).toBeInTheDocument();
+		expect(screen.getByText('By john')).toBeInTheDocument();
 	});
 
 	it('should show Activate button when inactive', () => {
@@ -138,7 +138,7 @@ describe('StatusLineForm Component', () => {
 
 	it('should render Command label', () => {
 		render(StatusLineForm, { props: { onSubmit: vi.fn(), onCancel: vi.fn() } });
-		expect(screen.getByText('Command')).toBeInTheDocument();
+		expect(screen.getAllByText('Command').length).toBeGreaterThanOrEqual(1);
 	});
 
 	it('should render Padding label', () => {
@@ -178,7 +178,7 @@ describe('StatusLinePreview Component', () => {
 
 	it('should render empty state when no segments', () => {
 		render(StatusLinePreview, { props: { segments: [] } });
-		expect(document.body.textContent).toContain('No segments');
+		expect(document.body.textContent).toContain('Add segments to build your status line');
 	});
 
 	it('should render segments in default theme', () => {
@@ -338,7 +338,7 @@ describe('SegmentConfig Component', () => {
 	it('should render Configure heading', () => {
 		const seg = { id: 'a', type: 'model', enabled: true, color: 'cyan', position: 0 };
 		render(SegmentConfig, { props: { segment: seg, onChange: vi.fn() } });
-		expect(document.body.textContent).toContain('Configure:');
+		expect(document.body.textContent).toContain('Configure Model');
 	});
 
 	it('should render Text Color label', () => {
@@ -350,19 +350,19 @@ describe('SegmentConfig Component', () => {
 	it('should render Background Color for non-separator types', () => {
 		const seg = { id: 'a', type: 'model', enabled: true, color: 'cyan', position: 0 };
 		render(SegmentConfig, { props: { segment: seg, onChange: vi.fn() } });
-		expect(screen.getByText('Background Color')).toBeInTheDocument();
+		expect(screen.getByText('Bg Color')).toBeInTheDocument();
 	});
 
 	it('should not render Background Color for separator type', () => {
 		const seg = { id: 'a', type: 'separator', enabled: true, color: 'gray', separatorChar: '|', position: 0 };
 		render(SegmentConfig, { props: { segment: seg, onChange: vi.fn() } });
-		expect(screen.queryByText('Background Color')).not.toBeInTheDocument();
+		expect(screen.queryByText('Bg Color')).not.toBeInTheDocument();
 	});
 
 	it('should render Label prefix for non-separator non-custom types', () => {
 		const seg = { id: 'a', type: 'model', enabled: true, color: 'cyan', position: 0 };
 		render(SegmentConfig, { props: { segment: seg, onChange: vi.fn() } });
-		expect(screen.getByText('Label prefix')).toBeInTheDocument();
+		expect(screen.getByText('Label Prefix')).toBeInTheDocument();
 	});
 
 	it('should render Character section for separator type', () => {
@@ -431,7 +431,7 @@ describe('StatusLineBuilder Component', () => {
 
 	it('should render Segments heading', () => {
 		render(StatusLineBuilder);
-		expect(screen.getByText('Segments (drag to reorder)')).toBeInTheDocument();
+		expect(screen.getByText('Reorder Segments')).toBeInTheDocument();
 	});
 
 	it('should render Preview heading', () => {
@@ -490,7 +490,7 @@ describe('StatusLineGalleryCard Component', () => {
 
 	it('should render author', () => {
 		render(StatusLineGalleryCard, { props: { entry: mockEntry } });
-		expect(screen.getByText('by dev')).toBeInTheDocument();
+		expect(screen.getByText('By dev')).toBeInTheDocument();
 	});
 
 	it('should render preview text', () => {
@@ -617,7 +617,7 @@ describe('StatusLineLibrary Component', () => {
 	it('should render loading state', () => {
 		statuslineLibrary.isLoading = true;
 		render(StatusLineLibrary);
-		expect(screen.getByText('Loading...')).toBeInTheDocument();
+		expect(screen.getByText('Loading')).toBeInTheDocument();
 	});
 
 	it('should render status line cards', () => {

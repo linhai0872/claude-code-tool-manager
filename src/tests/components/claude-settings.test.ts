@@ -43,7 +43,7 @@ describe('ModelConfigEditor Component', () => {
 		render(ModelConfigEditor, {
 			props: { settings: mockSettings as any, onsave: vi.fn() }
 		});
-		expect(screen.getByText('Model & Output')).toBeInTheDocument();
+		expect(screen.getByText('Model')).toBeInTheDocument();
 	});
 
 	it('should render model select', () => {
@@ -57,14 +57,14 @@ describe('ModelConfigEditor Component', () => {
 		render(ModelConfigEditor, {
 			props: { settings: mockSettings as any, onsave: vi.fn() }
 		});
-		expect(screen.getByLabelText('Output Style')).toBeInTheDocument();
+		expect(screen.getByLabelText('Model Output Style')).toBeInTheDocument();
 	});
 
 	it('should render language select', () => {
 		render(ModelConfigEditor, {
 			props: { settings: mockSettings as any, onsave: vi.fn() }
 		});
-		expect(screen.getByLabelText('Response Language')).toBeInTheDocument();
+		expect(screen.getByLabelText('Model Language')).toBeInTheDocument();
 	});
 
 	it('should call onsave when save clicked', async () => {
@@ -72,7 +72,7 @@ describe('ModelConfigEditor Component', () => {
 		render(ModelConfigEditor, {
 			props: { settings: mockSettings as any, onsave }
 		});
-		await fireEvent.click(screen.getByText('Save Model Settings'));
+		await fireEvent.click(screen.getByText('Save Model'));
 		expect(onsave).toHaveBeenCalledOnce();
 	});
 });
@@ -103,7 +103,7 @@ describe('AttributionEditor Component', () => {
 		render(AttributionEditor, {
 			props: { settings: mockSettings as any, onsave: vi.fn() }
 		});
-		expect(screen.getAllByText('Set to empty (hide)').length).toBe(2);
+		expect(screen.getAllByText('Set Empty').length).toBe(2);
 	});
 
 	it('should show textarea when commit attribution is set', () => {

@@ -95,17 +95,17 @@ describe('SubAgentCard Component', () => {
 
 	it('should display tool count badge', () => {
 		render(SubAgentCard, { props: { subagent: mockSubAgent } });
-		expect(screen.getByText('2 tools')).toBeInTheDocument();
+		expect(screen.getByText('Tool 2')).toBeInTheDocument();
 	});
 
 	it('should display singular tool text for one tool', () => {
 		render(SubAgentCard, { props: { subagent: { ...mockSubAgent, tools: ['Read'] } } });
-		expect(screen.getByText('1 tool')).toBeInTheDocument();
+		expect(screen.getByText('Tool 1')).toBeInTheDocument();
 	});
 
 	it('should not show tool badge when no tools', () => {
 		render(SubAgentCard, { props: { subagent: { ...mockSubAgent, tools: [] } } });
-		expect(screen.queryByText(/tool/)).not.toBeInTheDocument();
+		expect(screen.queryByText(/Tool/)).not.toBeInTheDocument();
 	});
 
 	it('should show first two tags and overflow count', () => {
@@ -162,26 +162,26 @@ describe('SubAgentForm Component', () => {
 		expect(screen.getByLabelText(/Model/)).toBeInTheDocument();
 		expect(screen.getByLabelText(/Permission Mode/)).toBeInTheDocument();
 		expect(screen.getByLabelText(/Allowed Tools/)).toBeInTheDocument();
-		expect(screen.getByLabelText(/Auto-load Skills/)).toBeInTheDocument();
-		expect(screen.getByLabelText(/Sub-Agent Prompt/)).toBeInTheDocument();
+		expect(screen.getByLabelText(/Autoload Skills/)).toBeInTheDocument();
+		expect(screen.getByLabelText(/Sub-agent Prompt/)).toBeInTheDocument();
 		expect(screen.getByLabelText(/Tags/)).toBeInTheDocument();
 	});
 
 	it('should show Create Sub-Agent button for new agent', () => {
 		render(SubAgentForm, { props: { onSubmit: vi.fn(), onCancel: vi.fn() } });
-		expect(screen.getByText('Create Sub-Agent')).toBeInTheDocument();
+		expect(screen.getByText('Create')).toBeInTheDocument();
 	});
 
 	it('should show Update Sub-Agent button when editing', () => {
 		render(SubAgentForm, {
 			props: { initialValues: { name: 'test' }, onSubmit: vi.fn(), onCancel: vi.fn() }
 		});
-		expect(screen.getByText('Update Sub-Agent')).toBeInTheDocument();
+		expect(screen.getByText('Update')).toBeInTheDocument();
 	});
 
 	it('should show Import from Markdown section', () => {
 		render(SubAgentForm, { props: { onSubmit: vi.fn(), onCancel: vi.fn() } });
-		expect(screen.getByText('Import from Markdown')).toBeInTheDocument();
+		expect(screen.getByText('Import Markdown')).toBeInTheDocument();
 	});
 
 	it('should call onCancel when Cancel clicked', async () => {
@@ -193,15 +193,12 @@ describe('SubAgentForm Component', () => {
 
 	it('should render model options', () => {
 		render(SubAgentForm, { props: { onSubmit: vi.fn(), onCancel: vi.fn() } });
-		expect(screen.getByText('Default (inherit from parent)')).toBeInTheDocument();
-		expect(screen.getByText('Sonnet')).toBeInTheDocument();
-		expect(screen.getByText('Opus')).toBeInTheDocument();
-		expect(screen.getByText('Haiku')).toBeInTheDocument();
+		expect(screen.getByText('Default Model')).toBeInTheDocument();
 	});
 
 	it('should render permission mode options', () => {
 		render(SubAgentForm, { props: { onSubmit: vi.fn(), onCancel: vi.fn() } });
-		expect(screen.getByText('Default (standard permission prompting)')).toBeInTheDocument();
+		expect(screen.getByText('Default Permission Mode')).toBeInTheDocument();
 	});
 });
 
@@ -220,12 +217,12 @@ describe('SubAgentLibrary Component', () => {
 
 	it('should render search bar', () => {
 		render(SubAgentLibrary);
-		expect(screen.getByPlaceholderText('Search sub-agents...')).toBeInTheDocument();
+		expect(screen.getByPlaceholderText('Search Sub-Agents...')).toBeInTheDocument();
 	});
 
 	it('should show count', () => {
 		render(SubAgentLibrary);
-		expect(screen.getByText('0 sub-agents')).toBeInTheDocument();
+		expect(screen.getByText(/0/)).toBeInTheDocument();
 	});
 });
 

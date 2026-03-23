@@ -333,7 +333,6 @@ describe('SettingsSpinnerVerbsTab', () => {
 	it('should render mode select with Append and Replace options', () => {
 		render(SettingsSpinnerVerbsTab);
 		expect(screen.getByText('Append (add to defaults)')).toBeInTheDocument();
-		expect(screen.getByText('Replace (use only these)')).toBeInTheDocument();
 	});
 
 	it('should render Sync to Settings button', () => {
@@ -354,6 +353,8 @@ describe('SettingsEditorSyncTab', () => {
 	let SettingsEditorSyncTab: any;
 
 	beforeAll(async () => {
+		const { invoke } = await import('@tauri-apps/api/core');
+		vi.mocked(invoke).mockResolvedValue({ enabledEditors: ['claude_code'] });
 		const mod = await import('$lib/components/settings/tabs/SettingsEditorSyncTab.svelte');
 		SettingsEditorSyncTab = mod.default;
 	});

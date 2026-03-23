@@ -29,32 +29,6 @@ vi.mock('@tauri-apps/api/core', () => ({
 	invoke: vi.fn()
 }));
 
-vi.mock('$lib/i18n', () => ({
-	i18n: {
-		t: (key: string) => {
-			const translations: Record<string, string> = {
-				'mcp.addToFavorites': 'Add to favorites',
-				'mcp.removeFromFavorites': 'Remove from favorites',
-				'common.test': 'Test',
-				'common.edit': 'Edit',
-				'common.duplicate': 'Duplicate',
-				'common.delete': 'Delete',
-				'common.system': 'System',
-				'common.auto': 'Auto',
-				'common.add': 'Add',
-				'common.remove': 'Remove',
-				'mcp.gateway': 'Gateway',
-				'mcp.inGateway': 'In Gateway',
-				'mcp.addToGateway': 'Add to Gateway',
-				'mcp.removeFromGateway': 'Remove from Gateway',
-				'jsonSchema.noParams': 'This tool takes no parameters',
-				'jsonSchema.argsJson': 'Arguments (JSON)',
-				'jsonSchema.select': 'Select...'
-			};
-			return translations[key] ?? key;
-		}
-	}
-}));
 
 describe('McpCard Component', () => {
 	let McpCard: any;
@@ -108,19 +82,19 @@ describe('McpCard Component', () => {
 	it('should show System badge for system MCP', () => {
 		const systemMcp = { ...mockMcp, source: 'system' as const };
 		render(McpCard, { props: { mcp: systemMcp } });
-		expect(screen.getByText('System')).toBeInTheDocument();
+		expect(screen.getByText('Badge System')).toBeInTheDocument();
 	});
 
 	it('should show Auto badge for auto-detected MCP', () => {
 		const autoMcp = { ...mockMcp, source: 'auto-detected' as const };
 		render(McpCard, { props: { mcp: autoMcp } });
-		expect(screen.getByText('Auto')).toBeInTheDocument();
+		expect(screen.getByText('Badge Auto')).toBeInTheDocument();
 	});
 
 	it('should not show System or Auto badge for user MCP', () => {
 		render(McpCard, { props: { mcp: mockMcp } });
-		expect(screen.queryByText('System')).not.toBeInTheDocument();
-		expect(screen.queryByText('Auto')).not.toBeInTheDocument();
+		expect(screen.queryByText('Badge System')).not.toBeInTheDocument();
+		expect(screen.queryByText('Badge Auto')).not.toBeInTheDocument();
 	});
 
 	it('should show command for stdio type', () => {
@@ -148,12 +122,12 @@ describe('McpCard Component', () => {
 
 	it('should show FavoriteButton when onFavoriteToggle provided', () => {
 		render(McpCard, { props: { mcp: mockMcp, onFavoriteToggle: vi.fn() } });
-		expect(screen.getByTitle('Add to favorites')).toBeInTheDocument();
+		expect(screen.getByTitle('Add To Favorites')).toBeInTheDocument();
 	});
 
 	it('should not show FavoriteButton when onFavoriteToggle not provided', () => {
 		render(McpCard, { props: { mcp: mockMcp } });
-		expect(screen.queryByTitle('Add to favorites')).not.toBeInTheDocument();
+		expect(screen.queryByTitle('Add To Favorites')).not.toBeInTheDocument();
 	});
 
 	it('should show Gateway badge when showGatewayToggle and isInGateway', () => {
@@ -206,16 +180,16 @@ describe('McpTypeSelector Component', () => {
 
 	it('should render all three types', () => {
 		render(McpTypeSelector, { props: { value: 'stdio' } });
-		expect(screen.getByText('Standard I/O')).toBeInTheDocument();
-		expect(screen.getByText('Server-Sent Events')).toBeInTheDocument();
-		expect(screen.getByText('HTTP/REST')).toBeInTheDocument();
+		expect(screen.getByText('stdio')).toBeInTheDocument();
+		expect(screen.getByText('SSE')).toBeInTheDocument();
+		expect(screen.getByText('HTTP')).toBeInTheDocument();
 	});
 
 	it('should show descriptions for each type', () => {
 		render(McpTypeSelector, { props: { value: 'stdio' } });
-		expect(screen.getByText('Local command-line tool (npx, python, etc.)')).toBeInTheDocument();
-		expect(screen.getByText('Cloud service with SSE endpoint')).toBeInTheDocument();
-		expect(screen.getByText('REST API with token authentication')).toBeInTheDocument();
+		expect(screen.getByText('Type stdio')).toBeInTheDocument();
+		expect(screen.getByText('Type Sse')).toBeInTheDocument();
+		expect(screen.getByText('Type HTTP')).toBeInTheDocument();
 	});
 
 	it('should show Connection Type label', () => {
@@ -239,12 +213,12 @@ describe('McpLibrary Component', () => {
 
 	it('should show search bar', () => {
 		render(McpLibrary, { props: {} });
-		expect(screen.getByPlaceholderText('Search MCPs...')).toBeInTheDocument();
+		expect(screen.getByPlaceholderText('Search available MCPs...')).toBeInTheDocument();
 	});
 
 	it('should show type filter buttons', () => {
 		render(McpLibrary, { props: {} });
-		expect(screen.getByText('All')).toBeInTheDocument();
+		expect(screen.getByText('Filter All')).toBeInTheDocument();
 		// "stdio" appears as both a label and a count area
 		expect(screen.getAllByText('stdio').length).toBeGreaterThan(0);
 		expect(screen.getByText('SSE')).toBeInTheDocument();
@@ -253,12 +227,12 @@ describe('McpLibrary Component', () => {
 
 	it('should show empty state when no MCPs', () => {
 		render(McpLibrary, { props: {} });
-		expect(screen.getByText('No MCPs in library')).toBeInTheDocument();
+		expect(screen.getByText('Library is empty')).toBeInTheDocument();
 	});
 
 	it('should show empty state description', () => {
 		render(McpLibrary, { props: {} });
-		expect(screen.getByText('Add your first MCP to get started')).toBeInTheDocument();
+		expect(screen.getByText('Add an MCP server to get started')).toBeInTheDocument();
 	});
 });
 
@@ -285,7 +259,7 @@ describe('McpTestModal Component', () => {
 
 	it('should render modal with MCP name', () => {
 		render(McpTestModal, { props: { mcp: mockMcp, onClose: vi.fn() } });
-		expect(screen.getByText('Test MCP: Test Server')).toBeInTheDocument();
+		expect(screen.getByText('Test Test Server')).toBeInTheDocument();
 	});
 
 	it('should show command for stdio MCP', () => {
@@ -301,13 +275,13 @@ describe('McpTestModal Component', () => {
 
 	it('should show loading state initially', () => {
 		render(McpTestModal, { props: { mcp: mockMcp, onClose: vi.fn() } });
-		expect(screen.getByText('Testing connection...')).toBeInTheDocument();
-		expect(screen.getByText('This may take a few seconds')).toBeInTheDocument();
+		expect(screen.getByText('Testing Connection')).toBeInTheDocument();
+		expect(screen.getByText('May Take Seconds')).toBeInTheDocument();
 	});
 
 	it('should show Re-run Test button (disabled during loading)', () => {
 		render(McpTestModal, { props: { mcp: mockMcp, onClose: vi.fn() } });
-		expect(screen.getByText('Testing...')).toBeInTheDocument();
+		expect(screen.getByText('Testing')).toBeInTheDocument();
 	});
 
 	it('should show Close button', () => {
@@ -339,18 +313,18 @@ describe('McpExecutionModal Component', () => {
 
 	it('should render modal with MCP name', () => {
 		render(McpExecutionModal, { props: { mcp: mockMcp, onClose: vi.fn() } });
-		expect(screen.getByText('Execute: Exec Server')).toBeInTheDocument();
+		expect(screen.getByText('Execute Exec Server')).toBeInTheDocument();
 	});
 
 	it('should show connecting state initially', () => {
 		render(McpExecutionModal, { props: { mcp: mockMcp, onClose: vi.fn() } });
-		expect(screen.getByText('Starting session...')).toBeInTheDocument();
-		expect(screen.getByText('This may take a few seconds')).toBeInTheDocument();
+		expect(screen.getByText('Starting Session')).toBeInTheDocument();
+		expect(screen.getByText('May Take Seconds')).toBeInTheDocument();
 	});
 
 	it('should show Connecting... status', () => {
 		render(McpExecutionModal, { props: { mcp: mockMcp, onClose: vi.fn() } });
-		expect(screen.getByText('Connecting...')).toBeInTheDocument();
+		expect(screen.getByText('Status Connecting')).toBeInTheDocument();
 	});
 
 	it('should show Close button', () => {
@@ -371,14 +345,14 @@ describe('JsonSchemaForm Component', () => {
 		render(JsonSchemaForm, {
 			props: { schema: null, value: {}, onChange: vi.fn() }
 		});
-		expect(screen.getByText('This tool takes no parameters')).toBeInTheDocument();
+		expect(screen.getByText('No Parameters')).toBeInTheDocument();
 	});
 
 	it('should show no parameters message for empty schema', () => {
 		render(JsonSchemaForm, {
 			props: { schema: {}, value: {}, onChange: vi.fn() }
 		});
-		expect(screen.getByText('This tool takes no parameters')).toBeInTheDocument();
+		expect(screen.getByText('No Parameters')).toBeInTheDocument();
 	});
 
 	it('should render string fields from schema properties', () => {
@@ -435,7 +409,7 @@ describe('JsonSchemaForm Component', () => {
 			props: { schema, value: {}, onChange: vi.fn() }
 		});
 		expect(screen.getByText('color')).toBeInTheDocument();
-		expect(screen.getByText('Select...')).toBeInTheDocument();
+		expect(screen.getByText('Select')).toBeInTheDocument();
 	});
 
 	it('should render array fields with Add button', () => {
@@ -525,7 +499,7 @@ describe('JsonSchemaForm Component', () => {
 		render(JsonSchemaForm, {
 			props: { schema, value: {}, onChange: vi.fn() }
 		});
-		expect(screen.getByText('Arguments (JSON)')).toBeInTheDocument();
+		expect(screen.getByText('Arguments JSON')).toBeInTheDocument();
 	});
 
 	it('should disable fields when disabled prop is true', () => {

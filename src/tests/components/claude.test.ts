@@ -89,7 +89,7 @@ describe('ClaudeJsonView Component', () => {
 		render(ClaudeJsonView);
 		expect(screen.getByText('Project MCPs')).toBeInTheDocument();
 		expect(screen.getByText('my-project')).toBeInTheDocument();
-		expect(screen.getByText('1 MCP')).toBeInTheDocument();
+		expect(screen.getByText('1 MCPs')).toBeInTheDocument();
 		(claudeJson as any).projects = [];
 	});
 

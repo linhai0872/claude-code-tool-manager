@@ -33,7 +33,7 @@ describe('SessionCleanupEditor Component', () => {
 		render(SessionCleanupEditor, {
 			props: { settings: mockSettings as any, onsave: vi.fn() }
 		});
-		expect(screen.getByText('Session & Cleanup')).toBeInTheDocument();
+		expect(screen.getByText('Session')).toBeInTheDocument();
 	});
 
 	it('should populate cleanup days', async () => {
@@ -41,7 +41,7 @@ describe('SessionCleanupEditor Component', () => {
 		render(SessionCleanupEditor, {
 			props: { settings: mockSettings as any, onsave: vi.fn() }
 		});
-		const input = screen.getByLabelText('Cleanup Period (days)') as HTMLInputElement;
+		const input = screen.getByLabelText('Session Cleanup') as HTMLInputElement;
 		expect(input.value).toBe('30');
 	});
 
@@ -51,7 +51,7 @@ describe('SessionCleanupEditor Component', () => {
 		render(SessionCleanupEditor, {
 			props: { settings: mockSettings as any, onsave }
 		});
-		await fireEvent.click(screen.getByText('Save Session & Cleanup Settings'));
+		await fireEvent.click(screen.getByText('Save Session'));
 		expect(onsave).toHaveBeenCalledOnce();
 	});
 });
