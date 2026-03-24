@@ -22,7 +22,7 @@
 			isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 		}
 		document.documentElement.classList.toggle('dark', isDark);
-		document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
+		document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
 	});
 
 	async function handleRefresh() {
@@ -36,7 +36,7 @@
 	function toggleTheme() {
 		isDark = !isDark;
 		document.documentElement.classList.toggle('dark', isDark);
-		document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
+		document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
 		localStorage.setItem('theme', isDark ? 'dark' : 'light');
 	}
 </script>
