@@ -37,6 +37,11 @@ npm-debug.log*
 docs/internal/
 docs/superpowers/
 
+# Design exploration artifacts (internal, not for public)
+design-*.png
+final-*.png
+static/design-demo*.html
+
 # Playwright
 /test-results/
 /playwright-report/
