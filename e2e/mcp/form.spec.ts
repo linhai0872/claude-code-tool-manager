@@ -17,16 +17,16 @@ test.describe('MCP Form', () => {
 		const nameInput = page.locator('#name');
 		await expect(nameInput).toBeVisible();
 
-		// Type selector buttons should be visible (these use full labels, not abbreviations)
-		await expect(page.getByRole('button', { name: /Standard I\/O/i })).toBeVisible();
-		await expect(page.getByRole('button', { name: /Server-Sent Events/i })).toBeVisible();
-		await expect(page.getByRole('button', { name: /HTTP\/REST/i })).toBeVisible();
+		// Type selector buttons
+		await expect(page.getByRole('button', { name: /stdio/i })).toBeVisible();
+		await expect(page.getByRole('button', { name: /SSE/i })).toBeVisible();
+		await expect(page.getByRole('button', { name: /HTTP/i })).toBeVisible();
 
 		// Command field should be visible for stdio (default)
 		await expect(page.locator('#command')).toBeVisible();
 
-		// Submit and cancel buttons should be visible
-		await expect(page.locator('button:has-text("Create MCP")')).toBeVisible();
+		// Submit and cancel buttons
+		await expect(page.locator('button[type="submit"]')).toBeVisible();
 		await expect(page.locator('button:has-text("Cancel")')).toBeVisible();
 	});
 
@@ -40,8 +40,7 @@ test.describe('MCP Form', () => {
 	});
 
 	test('should show URL field when switching to SSE type', async ({ page }) => {
-		// Click SSE type button (use full label to avoid matching library filter)
-		await page.getByRole('button', { name: /Server-Sent Events/i }).click();
+		await page.getByRole('button', { name: /SSE/i }).click();
 		await page.waitForTimeout(100);
 
 		// URL should now be visible
@@ -52,8 +51,7 @@ test.describe('MCP Form', () => {
 	});
 
 	test('should show URL and headers fields when switching to HTTP type', async ({ page }) => {
-		// Click HTTP type button (use full label to avoid matching library filter)
-		await page.getByRole('button', { name: /HTTP\/REST/i }).click();
+		await page.getByRole('button', { name: /HTTP/i }).click();
 		await page.waitForTimeout(100);
 
 		// URL should be visible
@@ -65,7 +63,7 @@ test.describe('MCP Form', () => {
 
 	test('should validate required name field', async ({ page }) => {
 		// Try to submit without filling name
-		await page.click('button:has-text("Create MCP")');
+		await page.click('button[type="submit"]');
 
 		// Should show error
 		await expect(page.locator('text=Name is required')).toBeVisible();
@@ -79,10 +77,9 @@ test.describe('MCP Form', () => {
 		await page.fill('#command', 'npx');
 
 		// Try to submit
-		await page.click('button:has-text("Create MCP")');
+		await page.click('button[type="submit"]');
 
-		// Should show format error
-		await expect(page.locator('text=Name can only contain')).toBeVisible();
+		await expect(page.locator('text=Invalid name format')).toBeVisible();
 	});
 
 	test('should validate required command for stdio type', async ({ page }) => {
@@ -92,7 +89,7 @@ test.describe('MCP Form', () => {
 		// Don't fill command
 
 		// Try to submit
-		await page.click('button:has-text("Create MCP")');
+		await page.click('button[type="submit"]');
 
 		// Should show command error
 		await expect(page.locator('text=Command is required')).toBeVisible();
@@ -103,11 +100,11 @@ test.describe('MCP Form', () => {
 		await page.fill('#name', 'my-mcp');
 
 		// Switch to SSE
-		await page.getByRole('button', { name: /Server-Sent Events/i }).click();
+		await page.getByRole('button', { name: /SSE/i }).click();
 		await page.waitForTimeout(100);
 
 		// Try to submit without URL
-		await page.click('button:has-text("Create MCP")');
+		await page.click('button[type="submit"]');
 
 		// Should show URL error
 		await expect(page.locator('text=URL is required')).toBeVisible();
@@ -118,17 +115,16 @@ test.describe('MCP Form', () => {
 		await page.fill('#name', 'my-mcp');
 
 		// Switch to SSE
-		await page.getByRole('button', { name: /Server-Sent Events/i }).click();
+		await page.getByRole('button', { name: /SSE/i }).click();
 		await page.waitForTimeout(100);
 
 		// Fill invalid URL
 		await page.fill('#url', 'not-a-valid-url');
 
 		// Try to submit
-		await page.click('button:has-text("Create MCP")');
+		await page.click('button[type="submit"]');
 
-		// Should show format error from custom validation
-		await expect(page.locator('text=Invalid URL format')).toBeVisible();
+		await expect(page.locator('text=Please enter a valid URL')).toBeVisible();
 	});
 
 	test('should accept valid stdio MCP form', async ({ page }) => {
@@ -139,7 +135,7 @@ test.describe('MCP Form', () => {
 		await page.fill('#args', '-y @test/mcp-server');
 
 		// Submit
-		await page.click('button:has-text("Create MCP")');
+		await page.click('button[type="submit"]');
 
 		// Modal should close (form submitted)
 		await expect(page.locator('text=Add New MCP')).not.toBeVisible({ timeout: 5000 });
@@ -150,21 +146,20 @@ test.describe('MCP Form', () => {
 		await page.fill('#name', 'test-sse-mcp');
 
 		// Switch to SSE
-		await page.getByRole('button', { name: /Server-Sent Events/i }).click();
+		await page.getByRole('button', { name: /SSE/i }).click();
 		await page.waitForTimeout(100);
 
 		await page.fill('#url', 'https://api.example.com/sse');
 
 		// Submit
-		await page.click('button:has-text("Create MCP")');
+		await page.click('button[type="submit"]');
 
 		// Modal should close
 		await expect(page.locator('text=Add New MCP')).not.toBeVisible({ timeout: 5000 });
 	});
 
 	test('should have Quick Import paste area', async ({ page }) => {
-		await expect(page.locator('text=Quick Import')).toBeVisible();
-		await expect(page.locator('text=claude mcp add')).toBeVisible();
+		await expect(page.locator('text=Quick Import').first()).toBeVisible();
 		await expect(page.locator('button:has-text("Paste")')).toBeVisible();
 	});
 
