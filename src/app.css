@@ -61,11 +61,6 @@
 		--radius: 8px;
 	}
 
-	.dark {
-		--background: 17 24 39;
-		--foreground: 249 250 251;
-	}
-
 	[data-theme="light"] {
 		--background: oklch(0.985 0.002 260);
 		--foreground: oklch(0.14 0.01 260);
