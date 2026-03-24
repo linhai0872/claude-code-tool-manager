@@ -35,6 +35,7 @@ npm-debug.log*
 
 # Internal governance docs (not for public)
 docs/internal/
+docs/superpowers/
 
 # Playwright
 /test-results/
