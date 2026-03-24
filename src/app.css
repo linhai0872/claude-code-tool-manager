@@ -15,17 +15,93 @@
 	--color-primary-800: #1e40af;
 	--color-primary-900: #1e3a8a;
 	--color-primary-950: #172554;
+	/* Semantic token utilities */
+	--color-bg: var(--background);
+	--color-fg: var(--foreground);
+	--color-card: var(--card);
+	--color-card-fg: var(--card-foreground);
+	--color-muted: var(--muted);
+	--color-muted-fg: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-fg: var(--accent-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--color-sidebar: var(--sidebar);
+	--color-sidebar-fg: var(--sidebar-foreground);
+	--color-sidebar-active: var(--sidebar-active);
+	--color-sidebar-active-bg: var(--sidebar-active-bg);
+	--color-primary: var(--primary);
+	--color-primary-fg: var(--primary-foreground);
+	--color-success: var(--success);
+	--color-success-fg: var(--success-foreground);
+	--color-warning: var(--warning);
+	--color-warning-fg: var(--warning-foreground);
+	--color-destructive: var(--destructive);
+	--color-destructive-fg: var(--destructive-foreground);
+	--color-info: var(--info);
+	--color-info-fg: var(--info-foreground);
+	--radius-base: var(--radius);
 }
 
 @layer base {
 	:root {
 		--background: 249 250 251;
 		--foreground: 17 24 39;
+		/* === Shared tokens (theme-independent) === */
+		--primary: oklch(0.64 0.14 40);
+		--primary-foreground: oklch(0.98 0.005 40);
+		--primary-hover: oklch(0.57 0.15 40);
+		--success: oklch(0.60 0.14 155);
+		--success-foreground: oklch(0.98 0 0);
+		--warning: oklch(0.76 0.13 80);
+		--warning-foreground: oklch(0.14 0.01 80);
+		--destructive: oklch(0.52 0.18 25);
+		--destructive-foreground: oklch(0.98 0 0);
+		--info: oklch(0.60 0.10 240);
+		--info-foreground: oklch(0.98 0 0);
+		--radius: 8px;
 	}
 
 	.dark {
 		--background: 17 24 39;
 		--foreground: 249 250 251;
+	}
+
+	[data-theme="light"] {
+		--background: oklch(0.985 0.002 260);
+		--foreground: oklch(0.14 0.01 260);
+		--card: oklch(1.0 0 0);
+		--card-foreground: oklch(0.14 0.01 260);
+		--muted: oklch(0.96 0.006 80);
+		--muted-foreground: oklch(0.46 0.015 260);
+		--accent: oklch(0.95 0.012 40);
+		--accent-foreground: oklch(0.30 0.04 40);
+		--border: oklch(0.91 0.004 260);
+		--input: oklch(0.89 0.004 260);
+		--ring: var(--primary);
+		--sidebar: oklch(0.98 0.004 80);
+		--sidebar-foreground: oklch(0.38 0.012 260);
+		--sidebar-active: var(--primary);
+		--sidebar-active-bg: oklch(0.95 0.02 40);
+	}
+
+	[data-theme="dark"] {
+		--background: oklch(0.14 0.006 60);
+		--foreground: oklch(0.93 0.005 260);
+		--card: oklch(0.18 0.006 60);
+		--card-foreground: oklch(0.93 0.005 260);
+		--muted: oklch(0.22 0.006 60);
+		--muted-foreground: oklch(0.58 0.01 260);
+		--accent: oklch(0.24 0.014 40);
+		--accent-foreground: oklch(0.84 0.04 40);
+		--border: oklch(0.26 0.006 60);
+		--input: oklch(0.26 0.006 60);
+		--ring: var(--primary);
+		--sidebar: oklch(0.12 0.006 60);
+		--sidebar-foreground: oklch(0.58 0.01 260);
+		--sidebar-active: oklch(0.74 0.12 40);
+		--sidebar-active-bg: oklch(0.19 0.02 40);
 	}
 
 	body {
